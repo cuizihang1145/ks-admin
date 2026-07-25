@@ -1445,16 +1445,9 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // ================================================================
-        // 配置
-        // ================================================================
-        const PASSWORD = 'QwQ20141031.';
         const STORAGE_KEY = 'admin_logged_in';
         const KEEP_LOGIN_KEY = 'admin_keep_login';
 
-        // ================================================================
-        // 主题
-        // ================================================================
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = document.getElementById('themeIcon');
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -1471,9 +1464,6 @@
             setTheme(currentTheme === 'dark' ? 'light' : 'dark');
         });
 
-        // ================================================================
-        // Toast
-        // ================================================================
         const toastEl = document.getElementById('toast');
         let toastTimer = null;
 
@@ -1489,9 +1479,6 @@
             }, 3000);
         }
 
-        // ================================================================
-        // 弹窗
-        // ================================================================
         const modalOverlay = document.getElementById('modalOverlay');
         const modalIcon = document.getElementById('modalIcon');
         const modalTitle = document.getElementById('modalTitle');
@@ -1526,9 +1513,6 @@
             if (e.target === this) closeModal(false);
         });
 
-        // ================================================================
-        // 登录
-        // ================================================================
         const loginScreen = document.getElementById('loginScreen');
         const mainApp = document.getElementById('mainApp');
         const passwordInput = document.getElementById('passwordInput');
@@ -1575,8 +1559,8 @@
                 if (data.success) {
                     const keepLogin = keepLoginCheck.checked;
                     localStorage.setItem(KEEP_LOGIN_KEY, String(keepLogin));
-                    sessionStorage.setItem(STORAGE_KEY, 'true');
                     sessionStorage.setItem('admin_password', pwd);
+                    sessionStorage.setItem(STORAGE_KEY, 'true');
                     loginScreen.classList.add('hidden');
                     mainApp.classList.add('active');
                     loadAll();
@@ -1606,9 +1590,6 @@
             loginError.textContent = '';
         });
 
-        // ================================================================
-        // Tab 切换
-        // ================================================================
         const tabs = document.querySelectorAll('.tab');
         const tabContents = {
             write: document.getElementById('tabWrite'),
@@ -1635,9 +1616,6 @@
             });
         });
 
-        // ================================================================
-        // 字数统计
-        // ================================================================
         function countWords(text) {
             if (!text) return 0;
             var clean = text
@@ -1664,9 +1642,6 @@
             document.getElementById('wordCount').textContent = count;
         }
 
-        // ================================================================
-        // 日期默认今天
-        // ================================================================
         var editDateInput = document.getElementById('editDate');
 
         function setDefaultDate() {
@@ -1677,9 +1652,6 @@
         }
         setDefaultDate();
 
-        // ================================================================
-        // Markdown 编辑器
-        // ================================================================
         var mdEditor = document.getElementById('mdEditor');
         var previewArea = document.getElementById('previewArea');
         var publishBtn = document.getElementById('publishBtn');
@@ -1863,9 +1835,6 @@
             updateWordCount();
         });
 
-        // ================================================================
-        // Markdown 渲染器（纯手写，不卡死，不依赖外部DOM）
-        // ================================================================
         function renderMarkdown(md) {
             if (!md) return '<span style="color:#8a8ab5;font-size:0.85rem;">预览会显示在这里</span>';
 
@@ -1878,25 +1847,19 @@
 
             var html = md;
 
-            // 1. 代码块
             html = html.replace(/```(\w*)\n([\s\S]*?)```/g, function(match, lang, code) {
                 var langLabel = lang ? '<span class="code-lang">' + lang + '</span>' : '';
                 return '<pre>' + langLabel + '<code>' + escapeHtml(code) + '</code></pre>';
             });
 
-            // 2. 行内代码
             html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
 
-            // 3. 粗体
             html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
-            // 4. 斜体
             html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
 
-            // 5. 删除线
             html = html.replace(/~~(.*?)~~/g, '<del>$1</del>');
 
-            // 6. 标题
             html = html.replace(/^###### (.+)$/gm, '<h6>$1</h6>');
             html = html.replace(/^##### (.+)$/gm, '<h5>$1</h5>');
             html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
@@ -1904,19 +1867,16 @@
             html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
             html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
 
-            // 7. 引用
             html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
 
-            // 8. 链接
             html = html.replace(/\[([^\]]*)\]\(([^)]*)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
 
-            // 9. 图片
-            html = html.replace(/!\[([^\]]*)\]\(([^)]*)\)/g, '<img src="$2" alt="$1" />');
+            html = html.replace(/!\[([^\]]*)\]\(([^)]*)\)/g, function(match, alt, src) {
+                return '<img src="' + src + '" alt="' + alt + '" style="max-width:100%;border-radius:6px;margin:0.4rem 0;display:block;height:auto;" />';
+            });
 
-            // 10. 分割线
             html = html.replace(/^---$/gm, '<hr />');
 
-            // 11. 表格
             html = html.replace(/\|(.+)\|\n\|([\-:| ]+)\|\n((?:\|.+\|\n?)+)/g, function(match, header, align, rows) {
                 var headers = header.split('|').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
                 var aligns = align.split('|').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
@@ -1940,7 +1900,6 @@
                 return tableHtml;
             });
 
-            // 12. 列表（用逐行解析，防止死循环）
             var lines = html.split('\n');
             var result = [];
             var i = 0;
@@ -1949,14 +1908,12 @@
                 var line = lines[i];
                 var trimmed = line.trim();
 
-                // 空行直接跳过
                 if (trimmed === '') {
                     result.push(line);
                     i++;
                     continue;
                 }
 
-                // 检查是否是无序列表项
                 var ulMatch = line.match(/^(\s*)[-*]\s+(.*)/);
                 if (ulMatch) {
                     var ulItems = [];
@@ -1975,7 +1932,6 @@
                     continue;
                 }
 
-                // 检查是否是有序列表项
                 var olMatch = line.match(/^(\s*)(\d+)\.\s+(.*)/);
                 if (olMatch) {
                     var olItems = [];
@@ -1996,24 +1952,19 @@
                     continue;
                 }
 
-                // 普通行直接保留
                 result.push(line);
                 i++;
             }
 
             html = result.join('\n');
 
-            // 13. 换行
             html = html.replace(/\n/g, '<br />');
 
             return html;
         }
 
-        // ================================================================
-        // API
-        // ================================================================
         function getPassword() {
-            return sessionStorage.getItem('admin_password') || PASSWORD;
+            return sessionStorage.getItem('admin_password') || '';
         }
 
         async function apiCall(endpoint, options) {
@@ -2039,9 +1990,6 @@
             return res;
         }
 
-        // ================================================================
-        // 数据
-        // ================================================================
         var allArticles = [];
         var currentFilter = 'all';
         var currentSort = 'desc';
@@ -2100,9 +2048,6 @@
             return div.innerHTML;
         }
 
-        // ================================================================
-        // 文章列表渲染
-        // ================================================================
         function renderArticleList() {
             var list = document.getElementById('articleList');
             var search = document.getElementById('listSearch').value.trim().toLowerCase();
@@ -2190,9 +2135,6 @@
             });
         }
 
-        // ================================================================
-        // 文章操作
-        // ================================================================
         function editArticle(idx) {
             var article = allArticles[idx];
             if (!article) return;
@@ -2295,9 +2237,6 @@
             }
         }
 
-        // ================================================================
-        // 硬删除
-        // ================================================================
         var hardDeleteTarget = -1;
 
         function showHardDeleteModal(idx, title) {
@@ -2347,9 +2286,6 @@
             }
         }
 
-        // ================================================================
-        // 草稿箱
-        // ================================================================
         function renderDraftList() {
             var list = document.getElementById('draftList');
             if (allDrafts.length === 0) {
@@ -2461,9 +2397,6 @@
             }
         }
 
-        // ================================================================
-        // 发布 / 更新
-        // ================================================================
         document.getElementById('publishBtn').addEventListener('click', async function() {
             var title = document.getElementById('editTitle').value.trim();
             var content = mdEditor.value.trim();
@@ -2586,9 +2519,6 @@
             }
         });
 
-        // ================================================================
-        // 保存草稿
-        // ================================================================
         document.getElementById('saveDraftBtn').addEventListener('click', async function() {
             var title = document.getElementById('editTitle').value.trim() || '无标题';
             var content = mdEditor.value;
@@ -2620,9 +2550,6 @@
             this.disabled = false;
         });
 
-        // ================================================================
-        // 筛选 / 搜索 / 排序
-        // ================================================================
         document.querySelectorAll('#tabList .filter-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('#tabList .filter-btn').forEach(function(b) { b.classList.remove(
@@ -2649,17 +2576,11 @@
             renderArticleList();
         });
 
-        // ================================================================
-        // Badge 更新
-        // ================================================================
         function updateBadges() {
             document.getElementById('listBadge').textContent = allArticles.length;
             document.getElementById('draftBadge').textContent = allDrafts.length;
         }
 
-        // ================================================================
-        // 启动
-        // ================================================================
         if (!checkLogin()) {
             loginScreen.classList.remove('hidden');
             mainApp.classList.remove('active');
