@@ -2,21 +2,43 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>管理后台 · ks</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
+        /* ===== 禁用所有蓝色点击高亮 ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent !important;
+            -webkit-touch-callout: none !important;
+            outline: none !important;
         }
+        *:focus,
+        *:active,
+        *:visited {
+            outline: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+        }
+        a:focus,
+        a:active,
+        button:focus,
+        button:active,
+        input:focus,
+        input:active,
+        textarea:focus,
+        textarea:active {
+            outline: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+        }
+
         body {
             font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
             background: #f5f3ff;
             color: #1a1a2e;
             min-height: 100vh;
-            transition: background 0.3s;
+            transition: background 0.4s ease, color 0.3s ease;
         }
         body.dark {
             background: #12101e;
@@ -27,6 +49,8 @@
             margin: 0 auto;
             padding: 2rem 1.5rem;
         }
+
+        /* ===== 登录界面 ===== */
         #loginScreen {
             display: flex;
             align-items: center;
@@ -39,12 +63,14 @@
         .login-card {
             background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-radius: 2rem;
             padding: 2.8rem 2.5rem;
             border: 1px solid rgba(255, 255, 255, 0.4);
             width: 100%;
             max-width: 380px;
             text-align: center;
+            transition: background 0.4s ease, border-color 0.3s ease;
         }
         body.dark .login-card {
             background: rgba(30, 28, 50, 0.6);
@@ -56,6 +82,7 @@
             background: linear-gradient(135deg, #201D3A, #5B4DAF);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            transition: background 0.3s ease;
         }
         body.dark .login-card h1 {
             background: linear-gradient(135deg, #c8c0f0, #8f7be0);
@@ -66,26 +93,78 @@
             color: #8a8ab5;
             font-size: 0.85rem;
             margin-bottom: 1.5rem;
+            transition: color 0.3s ease;
         }
-        .login-card input {
+        body.dark .login-card .sub {
+            color: #9a96b8;
+        }
+        .login-card input[type="password"] {
             width: 100%;
             padding: 0.9rem 1.2rem;
             border-radius: 60px;
             border: 1px solid rgba(0, 0, 0, 0.08);
             background: rgba(255, 255, 255, 0.5);
             font-size: 1rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0.8rem;
             color: #1a1a2e;
+            transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
         }
-        body.dark .login-card input {
+        body.dark .login-card input[type="password"] {
             background: rgba(255, 255, 255, 0.06);
             border-color: rgba(255, 255, 255, 0.08);
             color: #e8e6f0;
         }
-        .login-card input:focus {
-            outline: none;
+        .login-card input[type="password"]:focus {
             border-color: #6b5acf;
             box-shadow: 0 0 0 3px rgba(107, 90, 207, 0.15);
+        }
+        .login-card .login-options {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            color: #8a8ab5;
+        }
+        body.dark .login-card .login-options {
+            color: #7a7aa0;
+        }
+        .login-card .login-options label {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        .login-card .login-options input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #6b5acf;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+            border: 2px solid #8a8ab5;
+            border-radius: 4px;
+            background: transparent;
+            transition: 0.2s ease;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .login-card .login-options input[type="checkbox"]:checked {
+            background: #6b5acf;
+            border-color: #6b5acf;
+        }
+        .login-card .login-options input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
         }
         .login-card .btn-login {
             width: 100%;
@@ -97,7 +176,11 @@
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.25s;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            box-shadow: 0 8px 24px rgba(90, 70, 170, 0.25);
+        }
+        body.dark .login-card .btn-login {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
         }
         .login-card .btn-login:hover {
             transform: translateY(-2px);
@@ -105,6 +188,7 @@
         .login-card .btn-login:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none !important;
         }
         .login-card .error-msg {
             color: #e57373;
@@ -112,12 +196,25 @@
             margin-top: 0.5rem;
             min-height: 1.5rem;
         }
+
+        /* ===== 主界面 ===== */
         #mainApp {
             display: none;
+            animation: fadeIn 0.4s ease;
         }
         #mainApp.active {
             display: block;
         }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(12px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideDown {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
         .admin-header {
             display: flex;
             align-items: center;
@@ -132,11 +229,46 @@
             background: linear-gradient(135deg, #201D3A, #5B4DAF);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            transition: background 0.3s ease;
         }
         body.dark .admin-header .title {
             background: linear-gradient(135deg, #c8c0f0, #8f7be0);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+        .admin-header .right-group {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .admin-header .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 60px;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: #6a6a92;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        body.dark .admin-header .theme-toggle {
+            background: rgba(40, 38, 65, 0.4);
+            color: #9a96b8;
+            border-color: rgba(255, 255, 255, 0.06);
+        }
+        .admin-header .theme-toggle:hover {
+            transform: scale(1.05) rotate(8deg);
+            background: rgba(255, 255, 255, 0.7);
+        }
+        body.dark .admin-header .theme-toggle:hover {
+            background: rgba(60, 55, 100, 0.6);
         }
         .admin-header .btn-logout {
             padding: 0.4rem 1.2rem;
@@ -147,7 +279,7 @@
             font-size: 0.85rem;
             font-weight: 500;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.2s ease;
         }
         body.dark .admin-header .btn-logout {
             background: rgba(255, 255, 255, 0.08);
@@ -159,11 +291,14 @@
         body.dark .admin-header .btn-logout:hover {
             background: rgba(255, 255, 255, 0.15);
         }
+
+        /* ===== Tabs ===== */
         .tabs {
             display: flex;
             gap: 0.3rem;
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border-radius: 60px;
             padding: 4px;
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -183,7 +318,7 @@
             font-weight: 500;
             color: #6a6a92;
             cursor: pointer;
-            transition: 0.25s;
+            transition: 0.25s ease;
             white-space: nowrap;
         }
         body.dark .tabs .tab {
@@ -198,11 +333,14 @@
         .tabs .tab.active {
             background: rgba(255, 255, 255, 0.65);
             backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             color: #3d2d8a;
+            box-shadow: 0 4px 16px rgba(80, 60, 160, 0.08);
         }
         body.dark .tabs .tab.active {
             background: rgba(60, 55, 100, 0.55);
             color: #c8c0f0;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
         }
         .tabs .tab .badge {
             display: inline-block;
@@ -220,21 +358,13 @@
         }
         .tab-content {
             display: none;
-            animation: fadeIn 0.3s ease;
+            animation: slideDown 0.3s ease;
         }
         .tab-content.active {
             display: block;
         }
-        @keyframes fadeIn {
-            0% {
-                opacity: 0;
-                transform: translateY(8px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+
+        /* ===== 编辑器 ===== */
         .editor-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -248,9 +378,11 @@
         .editor-panel {
             background: rgba(255, 255, 255, 0.4);
             backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border-radius: 1.5rem;
             padding: 1.5rem;
             border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: background 0.4s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         }
         body.dark .editor-panel {
             background: rgba(40, 38, 65, 0.3);
@@ -263,6 +395,10 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 0.6rem;
+            transition: color 0.3s ease;
+        }
+        body.dark .editor-panel .panel-label {
+            color: #7a7aa0;
         }
         .editor-panel input {
             width: 100%;
@@ -273,6 +409,9 @@
             font-size: 0.95rem;
             color: #1a1a2e;
             margin-bottom: 0.8rem;
+            transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
         }
         body.dark .editor-panel input {
             background: rgba(255, 255, 255, 0.06);
@@ -280,8 +419,8 @@
             color: #e8e6f0;
         }
         .editor-panel input:focus {
-            outline: none;
             border-color: #6b5acf;
+            box-shadow: 0 0 0 3px rgba(107, 90, 207, 0.1);
         }
         .editor-row {
             display: flex;
@@ -292,6 +431,8 @@
             flex: 1;
             margin-bottom: 0;
         }
+
+        /* ===== 工具栏 ===== */
         .md-toolbar {
             display: flex;
             flex-wrap: wrap;
@@ -300,6 +441,7 @@
             background: rgba(0, 0, 0, 0.03);
             border-radius: 8px;
             margin-bottom: 0.4rem;
+            transition: background 0.3s ease;
         }
         body.dark .md-toolbar {
             background: rgba(255, 255, 255, 0.04);
@@ -313,12 +455,13 @@
             color: #6a6a92;
             font-size: 0.8rem;
             cursor: pointer;
-            transition: 0.15s;
+            transition: 0.15s ease;
             font-family: inherit;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             padding: 0 6px;
+            -webkit-tap-highlight-color: transparent !important;
         }
         body.dark .md-toolbar button {
             color: #9a96b8;
@@ -339,6 +482,7 @@
         body.dark .md-toolbar .sep {
             background: rgba(255, 255, 255, 0.08);
         }
+
         .md-editor {
             width: 100%;
             min-height: 400px;
@@ -351,6 +495,9 @@
             color: #1a1a2e;
             resize: vertical;
             line-height: 1.7;
+            transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
         }
         body.dark .md-editor {
             background: rgba(255, 255, 255, 0.06);
@@ -358,9 +505,10 @@
             color: #e8e6f0;
         }
         .md-editor:focus {
-            outline: none;
             border-color: #6b5acf;
+            box-shadow: 0 0 0 3px rgba(107, 90, 207, 0.1);
         }
+
         .preview-area {
             min-height: 400px;
             max-height: 550px;
@@ -374,6 +522,7 @@
             color: #2d2d4a;
             white-space: pre-wrap;
             word-wrap: break-word;
+            transition: background 0.4s ease, border-color 0.3s ease, color 0.3s ease;
         }
         body.dark .preview-area {
             background: rgba(255, 255, 255, 0.03);
@@ -389,6 +538,7 @@
             margin: 0.6rem 0 0.3rem 0;
             font-weight: 700;
             color: #1a1a2e;
+            transition: color 0.3s ease;
         }
         body.dark .preview-area h1,
         body.dark .preview-area h2,
@@ -493,6 +643,7 @@
         body.dark .preview-area hr {
             border-top-color: rgba(255, 255, 255, 0.08);
         }
+
         .editor-actions {
             display: flex;
             gap: 0.8rem;
@@ -506,11 +657,15 @@
             font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.25s;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.3s ease, color 0.3s ease;
         }
         .editor-actions .btn-publish {
             background: linear-gradient(145deg, #7a6bcf, #624ed0);
             color: #fff;
+            box-shadow: 0 8px 24px rgba(90, 70, 170, 0.25);
+        }
+        body.dark .editor-actions .btn-publish {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
         }
         .editor-actions .btn-publish:hover {
             transform: translateY(-2px);
@@ -518,6 +673,7 @@
         .editor-actions .btn-publish:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none !important;
         }
         .editor-actions .btn-save-draft {
             background: rgba(0, 0, 0, 0.06);
@@ -543,6 +699,8 @@
         body.dark .editor-actions .btn-cancel:hover {
             color: #d0caf0;
         }
+
+        /* ===== 文章列表 ===== */
         .list-controls {
             display: flex;
             gap: 0.8rem;
@@ -559,7 +717,7 @@
             cursor: pointer;
             background: rgba(255, 255, 255, 0.3);
             color: #6a6a92;
-            transition: 0.2s;
+            transition: 0.2s ease;
         }
         body.dark .list-controls .filter-btn {
             background: rgba(40, 38, 65, 0.3);
@@ -584,7 +742,7 @@
             cursor: pointer;
             background: rgba(255, 255, 255, 0.3);
             color: #6a6a92;
-            transition: 0.2s;
+            transition: 0.2s ease;
         }
         body.dark .list-controls .sort-btn {
             background: rgba(40, 38, 65, 0.3);
@@ -609,6 +767,9 @@
             color: #1a1a2e;
             flex: 1;
             min-width: 150px;
+            transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
         }
         body.dark .list-controls .search-input {
             background: rgba(255, 255, 255, 0.06);
@@ -616,7 +777,6 @@
             color: #e8e6f0;
         }
         .list-controls .search-input:focus {
-            outline: none;
             border-color: #6b5acf;
         }
         .list-controls .count-badge {
@@ -627,6 +787,7 @@
         body.dark .list-controls .count-badge {
             color: #7a7aa0;
         }
+
         .article-list {
             display: flex;
             flex-direction: column;
@@ -638,16 +799,18 @@
             color: #8a8ab5;
             font-size: 0.9rem;
         }
+
         .article-item-admin {
             background: rgba(255, 255, 255, 0.4);
             backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border-radius: 1rem;
             padding: 1rem 1.2rem;
             border: 1px solid rgba(255, 255, 255, 0.3);
             display: flex;
             align-items: center;
             gap: 1rem;
-            transition: 0.2s;
+            transition: transform 0.2s ease, background 0.3s ease, border-color 0.3s ease, opacity 0.3s ease;
         }
         body.dark .article-item-admin {
             background: rgba(40, 38, 65, 0.3);
@@ -674,6 +837,7 @@
             font-weight: 600;
             font-size: 0.95rem;
             color: #2d2d4a;
+            transition: color 0.3s ease;
         }
         body.dark .article-item-admin .item-title {
             color: #d0caf0;
@@ -685,6 +849,7 @@
             gap: 0.8rem;
             flex-wrap: wrap;
             margin-top: 0.1rem;
+            transition: color 0.3s ease;
         }
         body.dark .article-item-admin .item-meta {
             color: #7a7aa0;
@@ -720,7 +885,7 @@
             font-size: 0.7rem;
             font-weight: 500;
             cursor: pointer;
-            transition: 0.15s;
+            transition: 0.15s ease;
         }
         .article-item-admin .item-actions .btn-edit {
             background: rgba(107, 90, 207, 0.12);
@@ -755,16 +920,26 @@
         .article-item-admin .item-actions .btn-restore:hover {
             background: rgba(76, 175, 80, 0.22);
         }
+        .article-item-admin .item-actions .btn-undo {
+            background: rgba(255, 152, 0, 0.12);
+            color: #f57c00;
+        }
+        .article-item-admin .item-actions .btn-undo:hover {
+            background: rgba(255, 152, 0, 0.22);
+        }
+
+        /* ===== 草稿箱 ===== */
         .draft-item {
             background: rgba(255, 255, 255, 0.35);
             backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border-radius: 1rem;
             padding: 1rem 1.2rem;
             border: 1px solid rgba(255, 255, 255, 0.2);
             display: flex;
             align-items: center;
             gap: 1rem;
-            transition: 0.2s;
+            transition: transform 0.2s ease, background 0.3s ease, border-color 0.3s ease;
             border-left: 3px solid #ffc107;
         }
         body.dark .draft-item {
@@ -787,6 +962,7 @@
             font-weight: 600;
             font-size: 0.95rem;
             color: #2d2d4a;
+            transition: color 0.3s ease;
         }
         body.dark .draft-item .draft-title {
             color: #d0caf0;
@@ -794,9 +970,29 @@
         .draft-item .draft-meta {
             font-size: 0.7rem;
             color: #8a8ab5;
+            transition: color 0.3s ease;
         }
         body.dark .draft-item .draft-meta {
             color: #7a7aa0;
+        }
+        .draft-item .draft-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.2rem 0.4rem;
+            margin-top: 0.2rem;
+        }
+        .draft-item .draft-tags .tag {
+            display: inline-block;
+            font-size: 0.6rem;
+            font-weight: 500;
+            color: #6b5acf;
+            background: rgba(107, 90, 207, 0.1);
+            padding: 0.02rem 0.5rem;
+            border-radius: 40px;
+        }
+        body.dark .draft-item .draft-tags .tag {
+            color: #88ccff;
+            background: rgba(136, 204, 255, 0.1);
         }
         .draft-item .draft-preview {
             font-size: 0.8rem;
@@ -805,6 +1001,7 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             max-width: 200px;
+            transition: color 0.3s ease;
         }
         body.dark .draft-item .draft-preview {
             color: #a8a4c8;
@@ -822,7 +1019,7 @@
             font-size: 0.7rem;
             font-weight: 500;
             cursor: pointer;
-            transition: 0.15s;
+            transition: 0.15s ease;
         }
         .draft-item .draft-actions .btn-continue {
             background: rgba(107, 90, 207, 0.12);
@@ -849,95 +1046,86 @@
         .draft-item .draft-actions .btn-delete-draft:hover {
             background: rgba(229, 115, 115, 0.22);
         }
-        .hard-delete-overlay {
+
+        /* ===== 弹窗 ===== */
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             z-index: 999;
             display: none;
             align-items: center;
             justify-content: center;
             padding: 1.5rem;
+            animation: overlayFade 0.25s ease;
         }
-        .hard-delete-overlay.active {
+        .modal-overlay.active {
             display: flex;
         }
-        .hard-delete-box {
+        @keyframes overlayFade {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .modal-box {
             max-width: 460px;
             width: 100%;
-            background: rgba(255, 255, 255, 0.92);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
             border-radius: 2rem;
-            padding: 2.2rem 2rem;
-            border: 2px solid #e53935;
+            padding: 2rem 1.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.15);
             text-align: center;
-            animation: modalFade 0.3s ease;
+            animation: modalSlide 0.3s ease;
         }
-        body.dark .hard-delete-box {
+        body.dark .modal-box {
             background: rgba(30, 28, 50, 0.95);
-            border-color: #e53935;
+            border-color: rgba(255, 255, 255, 0.06);
         }
-        @keyframes modalFade {
-            0% {
-                opacity: 0;
-                transform: scale(0.92) translateY(20px);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
+        @keyframes modalSlide {
+            0% { opacity: 0; transform: scale(0.92) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
         }
-        .hard-delete-box .icon {
-            font-size: 3.5rem;
-            color: #e53935;
+        .modal-box .modal-icon {
+            font-size: 3rem;
             margin-bottom: 0.2rem;
+            display: block;
         }
-        .hard-delete-box .title {
-            font-size: 1.5rem;
+        .modal-box .modal-title {
+            font-size: 1.3rem;
             font-weight: 700;
             color: #1a1a2e;
             margin-bottom: 0.5rem;
         }
-        body.dark .hard-delete-box .title {
+        body.dark .modal-box .modal-title {
             color: #e8e6f0;
         }
-        .hard-delete-box .warning {
-            font-size: 0.95rem;
-            color: #e53935;
-            font-weight: 600;
-            margin-bottom: 0.8rem;
-        }
-        .hard-delete-box .desc {
-            font-size: 0.85rem;
+        .modal-box .modal-desc {
+            font-size: 0.9rem;
             color: #6a6a92;
-            line-height: 1.8;
-            margin-bottom: 0.8rem;
-        }
-        body.dark .hard-delete-box .desc {
-            color: #a8a4c8;
-        }
-        .hard-delete-box .article-title {
-            font-weight: 600;
-            color: #1a1a2e;
-            background: rgba(0, 0, 0, 0.04);
-            padding: 0.3rem 1rem;
-            border-radius: 8px;
-            display: inline-block;
+            line-height: 1.7;
             margin-bottom: 1rem;
         }
-        body.dark .hard-delete-box .article-title {
-            color: #e8e6f0;
-            background: rgba(255, 255, 255, 0.04);
+        body.dark .modal-box .modal-desc {
+            color: #a8a4c8;
         }
-        .hard-delete-box .actions {
+        .modal-box .modal-desc strong {
+            color: #1a1a2e;
+        }
+        body.dark .modal-box .modal-desc strong {
+            color: #e8e6f0;
+        }
+        .modal-box .modal-actions {
             display: flex;
             gap: 0.8rem;
         }
-        .hard-delete-box .actions button {
+        .modal-box .modal-actions button {
             flex: 1;
             padding: 0.7rem 1.2rem;
             border: none;
@@ -945,29 +1133,45 @@
             font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.2s ease;
         }
-        .hard-delete-box .actions .btn-cancel {
+        .modal-box .modal-actions .btn-cancel {
             background: rgba(0, 0, 0, 0.06);
             color: #6a6a92;
         }
-        body.dark .hard-delete-box .actions .btn-cancel {
+        body.dark .modal-box .modal-actions .btn-cancel {
             background: rgba(255, 255, 255, 0.08);
             color: #9a96b8;
         }
-        .hard-delete-box .actions .btn-cancel:hover {
+        .modal-box .modal-actions .btn-cancel:hover {
             background: rgba(0, 0, 0, 0.1);
         }
-        body.dark .hard-delete-box .actions .btn-cancel:hover {
+        body.dark .modal-box .modal-actions .btn-cancel:hover {
             background: rgba(255, 255, 255, 0.15);
         }
-        .hard-delete-box .actions .btn-confirm-hard {
+        .modal-box .modal-actions .btn-confirm {
             background: #e53935;
             color: #fff;
         }
-        .hard-delete-box .actions .btn-confirm-hard:hover {
+        .modal-box .modal-actions .btn-confirm:hover {
             transform: scale(1.02);
         }
+        .modal-box .modal-actions .btn-confirm-primary {
+            background: linear-gradient(145deg, #7a6bcf, #624ed0);
+            color: #fff;
+        }
+        .modal-box .modal-actions .btn-confirm-primary:hover {
+            transform: scale(1.02);
+        }
+        .modal-box .modal-actions .btn-confirm-warning {
+            background: #f57c00;
+            color: #fff;
+        }
+        .modal-box .modal-actions .btn-confirm-warning:hover {
+            transform: scale(1.02);
+        }
+
+        /* ===== Toast ===== */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -975,12 +1179,14 @@
             transform: translateX(-50%) translateY(100px);
             background: rgba(28, 26, 44, 0.92);
             backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             padding: 0.8rem 2.5rem;
             border-radius: 60px;
             color: #efeaff;
             font-size: 0.9rem;
             font-weight: 500;
             border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
             opacity: 0;
             transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             z-index: 1000;
@@ -1001,6 +1207,8 @@
         body.dark .toast.error {
             background: rgba(180, 40, 40, 0.95);
         }
+
+        /* ===== 响应式 ===== */
         @media (max-width: 600px) {
             .container {
                 padding: 1.2rem 0.8rem;
@@ -1051,36 +1259,59 @@
                 padding: 0.6rem 1.2rem;
                 font-size: 0.8rem;
             }
-            .hard-delete-box {
+            .modal-box {
                 padding: 1.6rem 1.2rem;
             }
-            .hard-delete-box .actions {
+            .modal-box .modal-actions {
                 flex-direction: column;
             }
             .editor-row {
                 flex-direction: column;
+            }
+            .admin-header .right-group {
+                gap: 0.4rem;
+            }
+            .admin-header .theme-toggle {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+            .admin-header .btn-logout {
+                font-size: 0.75rem;
+                padding: 0.3rem 0.8rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 登录界面 -->
+        <!-- ===== 登录界面 ===== -->
         <div id="loginScreen">
             <div class="login-card">
                 <h1>管理后台</h1>
                 <p class="sub">ks · 内容管理</p>
                 <input type="password" id="passwordInput" placeholder="请输入密码" autocomplete="current-password" />
+                <div class="login-options">
+                    <label>
+                        <input type="checkbox" id="keepLogin" checked />
+                        保持登录
+                    </label>
+                </div>
                 <button class="btn-login" id="loginBtn">登录</button>
                 <div class="error-msg" id="loginError"></div>
             </div>
         </div>
 
-        <!-- 主应用 -->
+        <!-- ===== 主应用 ===== -->
         <div id="mainApp">
             <div class="admin-header">
                 <span class="title">管理后台</span>
-                <button class="btn-logout" id="logoutBtn">退出</button>
+                <div class="right-group">
+                    <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
+                    <button class="btn-logout" id="logoutBtn">退出</button>
+                </div>
             </div>
 
             <div class="tabs" id="tabs">
@@ -1089,7 +1320,7 @@
                 <button class="tab" data-tab="drafts">草稿箱 <span class="badge" id="draftBadge">0</span></button>
             </div>
 
-            <!-- 写文章 -->
+            <!-- ===== Tab: 写文章 ===== -->
             <div class="tab-content active" id="tabWrite">
                 <div class="editor-section">
                     <div class="editor-panel">
@@ -1140,7 +1371,7 @@
                 </div>
             </div>
 
-            <!-- 文章列表 -->
+            <!-- ===== Tab: 文章列表 ===== -->
             <div class="tab-content" id="tabList">
                 <div class="list-controls">
                     <button class="filter-btn active" data-filter="all">全部</button>
@@ -1153,26 +1384,22 @@
                 <div class="article-list" id="articleList"></div>
             </div>
 
-            <!-- 草稿箱 -->
+            <!-- ===== Tab: 草稿箱 ===== -->
             <div class="tab-content" id="tabDrafts">
                 <div class="article-list" id="draftList"></div>
             </div>
         </div>
     </div>
 
-    <!-- 硬删除确认弹窗 -->
-    <div class="hard-delete-overlay" id="hardDeleteOverlay">
-        <div class="hard-delete-box">
-            <div class="icon"><i class="fas fa-exclamation-triangle"></i></div>
-            <div class="title">危险操作</div>
-            <div class="warning">此操作不可恢复！</div>
-            <div class="desc">你正在执行<strong>硬删除</strong>操作，该文章将从 <code>wenzhang.json</code> 中<strong>彻底移除</strong>，无法通过任何方式恢复。</div>
-            <div class="article-title" id="hardDeleteTitle">文章标题</div>
-            <div class="desc" style="font-size:0.8rem;color:#E53935;font-weight:500;">输入 <strong style="color:#E53935;">删除</strong> 确认</div>
-            <input type="text" id="hardDeleteConfirm" placeholder="输入「删除」" style="width:100%;padding:0.6rem 1rem;border-radius:60px;border:2px solid #E53935;font-size:0.9rem;font-family:inherit;background:rgba(255,255,255,0.5);color:#1a1a2e;margin-bottom:1rem;text-align:center;" />
-            <div class="actions">
-                <button class="btn-cancel" id="hardDeleteCancel">取消</button>
-                <button class="btn-confirm-hard" id="hardDeleteConfirmBtn" disabled>确认硬删除</button>
+    <!-- ===== 通用弹窗 ===== -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <span class="modal-icon" id="modalIcon">⚠️</span>
+            <div class="modal-title" id="modalTitle">确认操作</div>
+            <div class="modal-desc" id="modalDesc">确定要执行此操作吗？</div>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="modalCancel">取消</button>
+                <button class="btn-confirm" id="modalConfirm">确认</button>
             </div>
         </div>
     </div>
@@ -1180,21 +1407,35 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // ===== 配置 =====
+        // ================================================================
+        // 配置
+        // ================================================================
         const PASSWORD = 'QwQ20141031.';
+        const STORAGE_KEY = 'admin_logged_in';
+        const KEEP_LOGIN_KEY = 'admin_keep_login';
 
-        // ===== 主题 =====
+        // ================================================================
+        // 主题
+        // ================================================================
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         let currentTheme = localStorage.getItem('ks-theme') || (prefersDark ? 'dark' : 'light');
 
         function setTheme(theme) {
             document.body.classList.toggle('dark', theme === 'dark');
+            themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
             localStorage.setItem('ks-theme', theme);
             currentTheme = theme;
         }
         setTheme(currentTheme);
+        themeToggle.addEventListener('click', function() {
+            setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        });
 
-        // ===== Toast =====
+        // ================================================================
+        // Toast
+        // ================================================================
         const toastEl = document.getElementById('toast');
         let toastTimer = null;
 
@@ -1210,19 +1451,72 @@
             }, 3000);
         }
 
-        // ===== 登录 =====
+        // ================================================================
+        // 弹窗系统
+        // ================================================================
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalIcon = document.getElementById('modalIcon');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDesc = document.getElementById('modalDesc');
+        const modalConfirm = document.getElementById('modalConfirm');
+        const modalCancel = document.getElementById('modalCancel');
+        let modalResolve = null;
+
+        function showModal(icon, title, desc, confirmText, confirmClass) {
+            return new Promise((resolve) => {
+                modalIcon.textContent = icon || '⚠️';
+                modalTitle.textContent = title || '确认操作';
+                modalDesc.innerHTML = desc || '确定要执行此操作吗？';
+                modalConfirm.textContent = confirmText || '确认';
+                modalConfirm.className = confirmClass || 'btn-confirm';
+                modalResolve = resolve;
+                modalOverlay.classList.add('active');
+            });
+        }
+
+        function closeModal(result) {
+            modalOverlay.classList.remove('active');
+            if (modalResolve) {
+                modalResolve(result);
+                modalResolve = null;
+            }
+        }
+
+        modalCancel.addEventListener('click', function() { closeModal(false); });
+        modalConfirm.addEventListener('click', function() { closeModal(true); });
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === this) closeModal(false);
+        });
+
+        // ================================================================
+        // 登录
+        // ================================================================
         const loginScreen = document.getElementById('loginScreen');
         const mainApp = document.getElementById('mainApp');
         const passwordInput = document.getElementById('passwordInput');
         const loginBtn = document.getElementById('loginBtn');
         const loginError = document.getElementById('loginError');
+        const keepLoginCheck = document.getElementById('keepLogin');
+
+        // 加载保存的"保持登录"状态
+        if (localStorage.getItem(KEEP_LOGIN_KEY) === 'false') {
+            keepLoginCheck.checked = false;
+        } else {
+            keepLoginCheck.checked = true;
+        }
 
         function checkLogin() {
-            if (sessionStorage.getItem('admin_logged_in') === 'true') {
+            const loggedIn = sessionStorage.getItem(STORAGE_KEY);
+            const keepLogin = localStorage.getItem(KEEP_LOGIN_KEY) !== 'false';
+            if (loggedIn === 'true' && keepLogin) {
                 loginScreen.classList.add('hidden');
                 mainApp.classList.add('active');
                 loadAll();
                 return true;
+            }
+            // 如果 keepLogin 为 false，清除 session
+            if (!keepLogin) {
+                sessionStorage.removeItem(STORAGE_KEY);
             }
             return false;
         }
@@ -1243,7 +1537,13 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    sessionStorage.setItem('admin_logged_in', 'true');
+                    const keepLogin = keepLoginCheck.checked;
+                    localStorage.setItem(KEEP_LOGIN_KEY, String(keepLogin));
+                    if (keepLogin) {
+                        sessionStorage.setItem(STORAGE_KEY, 'true');
+                    } else {
+                        sessionStorage.setItem(STORAGE_KEY, 'true');
+                    }
                     sessionStorage.setItem('admin_password', pwd);
                     loginScreen.classList.add('hidden');
                     mainApp.classList.add('active');
@@ -1256,27 +1556,38 @@
             }
             loginBtn.disabled = false;
         }
+
         loginBtn.addEventListener('click', doLogin);
         passwordInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') doLogin();
         });
 
+        // ================================================================
+        // 退出
+        // ================================================================
         document.getElementById('logoutBtn').addEventListener('click', function() {
-            sessionStorage.removeItem('admin_logged_in');
+            sessionStorage.removeItem(STORAGE_KEY);
             sessionStorage.removeItem('admin_password');
+            // 如果"保持登录"未勾选，清除 session
+            if (localStorage.getItem(KEEP_LOGIN_KEY) === 'false') {
+                sessionStorage.removeItem(STORAGE_KEY);
+            }
             loginScreen.classList.remove('hidden');
             mainApp.classList.remove('active');
             passwordInput.value = '';
             loginError.textContent = '';
         });
 
-        // ===== Tab 切换 =====
+        // ================================================================
+        // Tab 切换
+        // ================================================================
         const tabs = document.querySelectorAll('.tab');
         const tabContents = {
             write: document.getElementById('tabWrite'),
             list: document.getElementById('tabList'),
             drafts: document.getElementById('tabDrafts')
         };
+
         tabs.forEach(function(tab) {
             tab.addEventListener('click', function() {
                 tabs.forEach(function(t) { t.classList.remove('active'); });
@@ -1290,9 +1601,12 @@
             });
         });
 
-        // ===== Markdown 编辑器 =====
+        // ================================================================
+        // Markdown 编辑器
+        // ================================================================
         const mdEditor = document.getElementById('mdEditor');
         const previewArea = document.getElementById('previewArea');
+        const publishBtn = document.getElementById('publishBtn');
 
         function insertText(text) {
             const start = mdEditor.selectionStart;
@@ -1465,32 +1779,24 @@
         }
         mdEditor.addEventListener('input', updatePreview);
 
-        // ===== 完整的 Markdown 渲染器 =====
+        // ================================================================
+        // Markdown 渲染器
+        // ================================================================
         function renderMarkdown(md) {
             if (!md) return '<span style="color:#8a8ab5;font-size:0.85rem;">预览会显示在这里</span>';
 
-            // 先转义 HTML
             let html = md.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-            // 1. 代码块（必须最先处理，防止内部被解析）
             html = html.replace(/```(\w*)\n([\s\S]*?)```/g, function(match, lang, code) {
                 const langLabel = lang ? '<span class="code-lang">' + lang + '</span>' : '';
                 return '<pre>' + langLabel + '<code>' + code + '</code></pre>';
             });
 
-            // 2. 行内代码
             html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-            // 3. 粗体
             html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-            // 4. 斜体
             html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-
-            // 5. 删除线
             html = html.replace(/~~(.*?)~~/g, '<del>$1</del>');
 
-            // 6. 标题
             html = html.replace(/^###### (.+)$/gm, '<h6>$1</h6>');
             html = html.replace(/^##### (.+)$/gm, '<h5>$1</h5>');
             html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
@@ -1498,19 +1804,12 @@
             html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
             html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
 
-            // 7. 引用
             html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
-
-            // 8. 链接
             html = html.replace(/\[([^\]]*)\]\(([^)]*)\)/g, '<a href="$2" target="_blank">$1</a>');
-
-            // 9. 图片
             html = html.replace(/!\[([^\]]*)\]\(([^)]*)\)/g, '<img src="$2" alt="$1" />');
-
-            // 10. 分割线
             html = html.replace(/^---$/gm, '<hr />');
 
-            // 11. 表格（复杂但完整）
+            // 表格
             html = html.replace(/\|(.+)\|\n\|([\-:| ]+)\|\n((?:\|.+\|\n?)+)/g, function(match, header, align, rows) {
                 const headers = header.split('|').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
                 const aligns = align.split('|').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
@@ -1536,27 +1835,25 @@
                 return tableHtml;
             });
 
-            // 12. 无序列表
+            // 列表
             html = html.replace(/^[-*] (.+)$/gm, '<li>$1</li>');
             html = html.replace(/((?:<li>.*<\/li>\s*)+)/g, function(match) {
                 if (match.indexOf('<ul>') !== -1 || match.indexOf('<ol>') !== -1) return match;
                 return '<ul>' + match.trim() + '</ul>';
             });
-
-            // 13. 有序列表
             html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
             html = html.replace(/((?:<li>.*<\/li>\s*)+)/g, function(match) {
                 if (match.indexOf('<ul>') !== -1 || match.indexOf('<ol>') !== -1) return match;
                 return '<ol>' + match.trim() + '</ol>';
             });
 
-            // 14. 换行
             html = html.replace(/\n/g, '<br />');
-
             return html;
         }
 
-        // ===== API =====
+        // ================================================================
+        // API
+        // ================================================================
         function getPassword() {
             return sessionStorage.getItem('admin_password') || PASSWORD;
         }
@@ -1576,7 +1873,7 @@
             const res = await fetch('/api/' + endpoint, merged);
             if (res.status === 401) {
                 showToast('登录已过期，请重新登录', true);
-                sessionStorage.removeItem('admin_logged_in');
+                sessionStorage.removeItem(STORAGE_KEY);
                 loginScreen.classList.remove('hidden');
                 mainApp.classList.remove('active');
                 throw new Error('Unauthorized');
@@ -1584,12 +1881,15 @@
             return res;
         }
 
-        // ===== 文章数据 =====
+        // ================================================================
+        // 数据
+        // ================================================================
         let allArticles = [];
         let currentFilter = 'all';
         let currentSort = 'desc';
         let allDrafts = [];
         let editingIdx = -1;
+        let previousVersion = null;
 
         async function loadAll() {
             await loadArticles();
@@ -1635,6 +1935,16 @@
             return result;
         }
 
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ================================================================
+        // 文章列表渲染
+        // ================================================================
         function renderArticleList() {
             const list = document.getElementById('articleList');
             const search = document.getElementById('listSearch').value.trim().toLowerCase();
@@ -1660,6 +1970,12 @@
                 }).join(' ');
                 const deletedClass = article.delete ? 'deleted' : '';
                 const statusHtml = article.delete ? '<span class="status-deleted">已删除</span>' : '';
+
+                // 撤销按钮：如果有上一个版本且当前文章被修改过
+                const undoBtn = (previousVersion && previousVersion.idx === idx) ?
+                    '<button class="btn-undo" data-idx="' + idx + '">撤销</button>' :
+                    '';
+
                 html += `
                     <div class="article-item-admin ${deletedClass}">
                         <div class="item-info">
@@ -1677,11 +1993,13 @@
                                 '<button class="btn-soft-delete" data-idx="' + idx + '">软删除</button>'
                             }
                             <button class="btn-hard-delete" data-idx="${idx}" data-title="${escapeHtml(article.title || '无标题')}">硬删除</button>
+                            ${undoBtn}
                         </div>
                     </div>
                 `;
             });
             list.innerHTML = html;
+
             list.querySelectorAll('.btn-edit').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     const idx = parseInt(this.dataset.idx);
@@ -1707,15 +2025,17 @@
                     showHardDeleteModal(idx, title);
                 });
             });
+            list.querySelectorAll('.btn-undo').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const idx = parseInt(this.dataset.idx);
+                    undoArticle(idx);
+                });
+            });
         }
 
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
+        // ================================================================
+        // 文章操作
+        // ================================================================
         function editArticle(idx) {
             const article = allArticles[idx];
             if (!article) return;
@@ -1725,12 +2045,14 @@
             document.getElementById('editTags').value = (article.tags || []).join('，');
             mdEditor.value = article.content || '';
             updatePreview();
+            publishBtn.textContent = '更新文章';
             document.querySelector('.tab[data-tab="write"]').click();
-            showToast('已加载文章，修改后点发布更新');
+            showToast('已加载文章，修改后点更新');
         }
 
         async function softDeleteArticle(idx) {
-            if (!confirm('确定要软删除这篇文章吗？')) return;
+            const result = await showModal('📌', '软删除', '确定要软删除这篇文章吗？<br />软删除后文章仍可恢复。', '确认软删除', 'btn-confirm-warning');
+            if (!result) return;
             try {
                 const res = await apiCall('posts', {
                     method: 'DELETE',
@@ -1770,69 +2092,77 @@
             }
         }
 
-        // ===== 硬删除（真正从数组中移除） =====
+        async function undoArticle(idx) {
+            if (!previousVersion || previousVersion.idx !== idx) {
+                showToast('没有可撤销的版本', true);
+                return;
+            }
+            const result = await showModal('↩️', '撤销修改', '确定要撤销对 <strong>' + escapeHtml(previousVersion.title) +
+                '</strong> 的修改吗？<br />将恢复到修改前的版本。', '确认撤销', 'btn-confirm-warning');
+            if (!result) return;
+            try {
+                const res = await apiCall('posts', {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        id: idx,
+                        title: previousVersion.title,
+                        content: previousVersion.content,
+                        tags: previousVersion.tags,
+                        date: previousVersion.date
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('已撤销');
+                    previousVersion = null;
+                    await loadArticles();
+                    renderArticleList();
+                    updateBadges();
+                } else {
+                    showToast(data.error || '撤销失败', true);
+                }
+            } catch (e) {
+                showToast('撤销失败', true);
+            }
+        }
+
+        // ================================================================
+        // 硬删除
+        // ================================================================
         let hardDeleteTarget = -1;
-        const hardDeleteOverlay = document.getElementById('hardDeleteOverlay');
-        const hardDeleteTitle = document.getElementById('hardDeleteTitle');
-        const hardDeleteConfirm = document.getElementById('hardDeleteConfirm');
-        const hardDeleteConfirmBtn = document.getElementById('hardDeleteConfirmBtn');
-        const hardDeleteCancel = document.getElementById('hardDeleteCancel');
 
         function showHardDeleteModal(idx, title) {
             hardDeleteTarget = idx;
-            hardDeleteTitle.textContent = title;
-            hardDeleteConfirm.value = '';
-            hardDeleteConfirmBtn.disabled = true;
-            hardDeleteOverlay.classList.add('active');
-            hardDeleteConfirm.focus();
-        }
-
-        hardDeleteConfirm.addEventListener('input', function() {
-            hardDeleteConfirmBtn.disabled = this.value !== '删除';
-        });
-        hardDeleteConfirm.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !hardDeleteConfirmBtn.disabled) confirmHardDelete();
-            if (e.key === 'Escape') closeHardDeleteModal();
-        });
-        hardDeleteCancel.addEventListener('click', closeHardDeleteModal);
-        hardDeleteConfirmBtn.addEventListener('click', confirmHardDelete);
-        hardDeleteOverlay.addEventListener('click', function(e) {
-            if (e.target === this) closeHardDeleteModal();
-        });
-
-        function closeHardDeleteModal() {
-            hardDeleteOverlay.classList.remove('active');
-            hardDeleteTarget = -1;
-            hardDeleteConfirm.value = '';
-            hardDeleteConfirmBtn.disabled = true;
+            showModal('⚠️', '危险操作', '你正在执行<strong>硬删除</strong>操作，该文章将从数据中<strong>彻底移除</strong>，无法恢复。<br /><br />确定要硬删除 <strong>' +
+                escapeHtml(title) + '</strong> 吗？', '确认硬删除', 'btn-confirm'
+            ).then(async function(confirmed) {
+                if (confirmed) {
+                    await confirmHardDelete();
+                }
+                hardDeleteTarget = -1;
+            });
         }
 
         async function confirmHardDelete() {
             if (hardDeleteTarget === -1) return;
             try {
-                // 直接从数组中移除
                 const idx = hardDeleteTarget;
-                const title = allArticles[idx]?.title || '文章';
                 allArticles.splice(idx, 1);
-                // 更新 JSON
                 const res = await apiCall('posts', {
                     method: 'PUT',
                     body: JSON.stringify({
                         hardDelete: true,
-                        index: idx,
                         articles: allArticles
                     })
                 });
                 const data = await res.json();
                 if (data.success) {
                     showToast('已硬删除');
-                    closeHardDeleteModal();
                     await loadArticles();
                     renderArticleList();
                     updateBadges();
                 } else {
-                    showToast(data.error || '硬删除失败，请重试', true);
-                    // 回滚本地状态
+                    showToast(data.error || '硬删除失败', true);
                     await loadArticles();
                     renderArticleList();
                 }
@@ -1843,7 +2173,9 @@
             }
         }
 
-        // ===== 草稿 =====
+        // ================================================================
+        // 草稿箱
+        // ================================================================
         function renderDraftList() {
             const list = document.getElementById('draftList');
             if (allDrafts.length === 0) {
@@ -1854,11 +2186,15 @@
             allDrafts.forEach(function(draft) {
                 const preview = (draft.content || '').replace(/\n/g, ' ').slice(0, 80) + (draft.content && draft.content
                     .length > 80 ? '...' : '');
+                const tagsHtml = (draft.tags || []).map(function(t) {
+                    return '<span class="tag">' + escapeHtml(t) + '</span>';
+                }).join(' ');
                 html += `
                     <div class="draft-item">
                         <div class="draft-info">
                             <div class="draft-title">${escapeHtml(draft.title || '无标题')}</div>
                             <div class="draft-meta">创建于 ${draft.created || ''} ${draft.updated && draft.updated !== draft.created ? ' · 更新于 ' + draft.updated : ''}</div>
+                            ${tagsHtml ? '<div class="draft-tags">' + tagsHtml + '</div>' : ''}
                             <div class="draft-preview">${escapeHtml(preview)}</div>
                         </div>
                         <div class="draft-actions">
@@ -1870,6 +2206,7 @@
                 `;
             });
             list.innerHTML = html;
+
             list.querySelectorAll('.btn-continue').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     const id = this.dataset.id;
@@ -1881,6 +2218,7 @@
                         mdEditor.value = draft.content || '';
                         updatePreview();
                         editingIdx = -1;
+                        publishBtn.textContent = '发布文章';
                         document.querySelector('.tab[data-tab="write"]').click();
                         showToast('已加载草稿');
                     }
@@ -1897,6 +2235,7 @@
                         mdEditor.value = draft.content || '';
                         updatePreview();
                         editingIdx = -1;
+                        publishBtn.textContent = '发布文章';
                         deleteDraft(id);
                         document.querySelector('.tab[data-tab="write"]').click();
                         document.getElementById('publishBtn').click();
@@ -1906,9 +2245,10 @@
             list.querySelectorAll('.btn-delete-draft').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     const id = this.dataset.id;
-                    if (confirm('确定要删除这个草稿吗？')) {
-                        deleteDraft(id);
-                    }
+                    showModal('🗑️', '删除草稿', '确定要删除这个草稿吗？', '确认删除', 'btn-confirm'
+                    ).then(function(confirmed) {
+                        if (confirmed) deleteDraft(id);
+                    });
                 });
             });
         }
@@ -1933,13 +2273,16 @@
             }
         }
 
-        // ===== 发布/更新 =====
+        // ================================================================
+        // 发布/更新
+        // ================================================================
         document.getElementById('publishBtn').addEventListener('click', async function() {
             const title = document.getElementById('editTitle').value.trim();
             const content = mdEditor.value.trim();
             const tagsRaw = document.getElementById('editTags').value.trim();
             const date = document.getElementById('editDate').value;
             const tags = tagsRaw ? tagsRaw.split(/[，,、\s]+/).filter(Boolean) : [];
+
             if (!title) {
                 showToast('请输入标题', true);
                 return;
@@ -1948,6 +2291,30 @@
                 showToast('请输入内容', true);
                 return;
             }
+
+            // 如果是编辑模式且标题与已有文章重叠（但不是自己）
+            if (editingIdx >= 0) {
+                const existing = allArticles.findIndex(function(a, i) {
+                    return i !== editingIdx && a.title === title;
+                });
+                if (existing !== -1) {
+                    const confirmed = await showModal('⚠️', '标题重复',
+                        '已存在标题为 <strong>' + escapeHtml(title) + '</strong> 的文章。<br />确定要覆盖它吗？',
+                        '确认覆盖', 'btn-confirm-warning'
+                    );
+                    if (!confirmed) return;
+                    // 保存当前版本用于撤销
+                    const current = allArticles[editingIdx];
+                    previousVersion = {
+                        idx: editingIdx,
+                        title: current.title,
+                        content: current.content,
+                        tags: current.tags,
+                        date: current.date
+                    };
+                }
+            }
+
             this.disabled = true;
             try {
                 let res, data;
@@ -1966,6 +2333,7 @@
                     if (data.success) {
                         showToast('文章已更新');
                         editingIdx = -1;
+                        publishBtn.textContent = '发布文章';
                         clearEditor();
                         await loadArticles();
                         renderArticleList();
@@ -2007,15 +2375,24 @@
             mdEditor.value = '';
             updatePreview();
             editingIdx = -1;
+            publishBtn.textContent = '发布文章';
         }
 
         document.getElementById('cancelEditBtn').addEventListener('click', function() {
             if (editingIdx >= 0 || mdEditor.value || document.getElementById('editTitle').value) {
-                if (!confirm('确定要清空当前内容吗？')) return;
+                showModal('🗑️', '清空内容', '确定要清空当前编辑的内容吗？<br />未保存的修改将丢失。', '确认清空', 'btn-confirm-warning'
+                ).then(function(confirmed) {
+                    if (confirmed) {
+                        clearEditor();
+                        showToast('已清空');
+                    }
+                });
             }
-            clearEditor();
         });
 
+        // ================================================================
+        // 保存草稿
+        // ================================================================
         document.getElementById('saveDraftBtn').addEventListener('click', async function() {
             const title = document.getElementById('editTitle').value.trim() || '无标题';
             const content = mdEditor.value;
@@ -2046,7 +2423,9 @@
             this.disabled = false;
         });
 
-        // ===== 筛选 & 搜索 & 排序 =====
+        // ================================================================
+        // 筛选/搜索/排序
+        // ================================================================
         document.querySelectorAll('#tabList .filter-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('#tabList .filter-btn').forEach(function(b) { b.classList.remove(
@@ -2073,16 +2452,28 @@
             renderArticleList();
         });
 
+        // ================================================================
+        // Badge 更新
+        // ================================================================
         function updateBadges() {
             document.getElementById('listBadge').textContent = allArticles.length;
             document.getElementById('draftBadge').textContent = allDrafts.length;
         }
 
-        // ===== 启动 =====
+        // ================================================================
+        // 启动
+        // ================================================================
         if (!checkLogin()) {
             loginScreen.classList.remove('hidden');
             mainApp.classList.remove('active');
         }
+
+        // 监听页面关闭：如果"保持登录"未勾选，清除 session
+        window.addEventListener('beforeunload', function() {
+            if (localStorage.getItem(KEEP_LOGIN_KEY) === 'false') {
+                sessionStorage.removeItem(STORAGE_KEY);
+            }
+        });
     </script>
 </body>
 </html>
