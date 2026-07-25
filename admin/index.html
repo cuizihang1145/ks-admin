@@ -1621,4 +1621,322 @@
             showToast('已加载文章，修改后点击发布即可更新');
         }
 
-        async function delete
+        async function deleteArticle(idx) {
+            if (!confirm('确定要删除这篇文章吗？')) return;
+            try {
+                const res = await apiCall('posts', {
+                    method: 'DELETE',
+                    body: JSON.stringify({ id: idx })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('已删除');
+                    await loadArticles();
+                    renderArticleList();
+                    updateBadges();
+                } else {
+                    showToast(data.error || '删除失败', true);
+                }
+            } catch (e) {
+                showToast('删除失败', true);
+            }
+        }
+
+        async function restoreArticle(idx) {
+            try {
+                const res = await apiCall('posts', {
+                    method: 'DELETE',
+                    body: JSON.stringify({ id: idx, restore: true })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('已恢复');
+                    await loadArticles();
+                    renderArticleList();
+                    updateBadges();
+                } else {
+                    showToast(data.error || '恢复失败', true);
+                }
+            } catch (e) {
+                showToast('恢复失败', true);
+            }
+        }
+
+        // ============================================================
+        // 发布/更新文章
+        // ============================================================
+        document.getElementById('publishBtn').addEventListener('click', async function() {
+            const title = document.getElementById('editTitle').value.trim();
+            const content = mdEditor.value.trim();
+            const tagsRaw = document.getElementById('editTags').value.trim();
+            const tags = tagsRaw ? tagsRaw.split(/[，,、\s]+/).filter(Boolean) : [];
+
+            if (!title) {
+                showToast('请输入标题', true);
+                return;
+            }
+            if (!content) {
+                showToast('请输入内容', true);
+                return;
+            }
+
+            this.disabled = true;
+
+            try {
+                let res, data;
+                if (editingIdx >= 0) {
+                    // 更新已有文章
+                    res = await apiCall('posts', {
+                        method: 'PUT',
+                        body: JSON.stringify({
+                            id: editingIdx,
+                            title: title,
+                            content: content,
+                            tags: tags
+                        })
+                    });
+                    data = await res.json();
+                    if (data.success) {
+                        showToast('文章已更新');
+                        editingIdx = -1;
+                        clearEditor();
+                        await loadArticles();
+                        renderArticleList();
+                        updateBadges();
+                    } else {
+                        showToast(data.error || '更新失败', true);
+                    }
+                } else {
+                    // 发布新文章
+                    res = await apiCall('posts', {
+                        method: 'POST',
+                        body: JSON.stringify({ title, content, tags })
+                    });
+                    data = await res.json();
+                    if (data.success) {
+                        showToast('发布成功！');
+                        clearEditor();
+                        await loadArticles();
+                        renderArticleList();
+                        updateBadges();
+                    } else {
+                        showToast(data.error || '发布失败', true);
+                    }
+                }
+            } catch (e) {
+                showToast('请求失败', true);
+            }
+            this.disabled = false;
+        });
+
+        function clearEditor() {
+            document.getElementById('editTitle').value = '';
+            document.getElementById('editTags').value = '';
+            mdEditor.value = '';
+            updatePreview();
+            editingIdx = -1;
+        }
+
+        document.getElementById('cancelEditBtn').addEventListener('click', function() {
+            if (editingIdx >= 0 || mdEditor.value || document.getElementById('editTitle').value) {
+                if (!confirm('确定要清空当前内容吗？')) return;
+            }
+            clearEditor();
+        });
+
+        // ============================================================
+        // 草稿
+        // ============================================================
+        let allDrafts = [];
+
+        async function loadDrafts() {
+            try {
+                const res = await apiCall('drafts', { method: 'GET' });
+                const data = await res.json();
+                allDrafts = data.drafts || [];
+            } catch (e) {
+                allDrafts = [];
+            }
+        }
+
+        function renderDraftList() {
+            const list = document.getElementById('draftList');
+            if (allDrafts.length === 0) {
+                list.innerHTML = '<div class="empty">没有草稿</div>';
+                return;
+            }
+            let html = '';
+            allDrafts.forEach(function(draft) {
+                const preview = (draft.content || '').replace(/\n/g, ' ').slice(0, 80) + (draft.content && draft.content
+                    .length > 80 ? '...' : '');
+                html += `
+                    <div class="draft-item">
+                        <div class="draft-info">
+                            <div class="draft-title">${escapeHtml(draft.title || '无标题')}</div>
+                            <div class="draft-meta">
+                                创建于 ${draft.created || ''}
+                                ${draft.updated && draft.updated !== draft.created ? ' · 更新于 ' + draft.updated : ''}
+                            </div>
+                            <div class="draft-preview">${escapeHtml(preview)}</div>
+                        </div>
+                        <div class="draft-actions">
+                            <button class="btn-continue" data-id="${draft.id}">继续编辑</button>
+                            <button class="btn-publish-draft" data-id="${draft.id}">发布</button>
+                            <button class="btn-delete-draft" data-id="${draft.id}">删除</button>
+                        </div>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+
+            list.querySelectorAll('.btn-continue').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const draft = allDrafts.find(function(d) { return d.id === id; });
+                    if (draft) {
+                        document.getElementById('editTitle').value = draft.title || '';
+                        document.getElementById('editTags').value = (draft.tags || []).join('，');
+                        mdEditor.value = draft.content || '';
+                        updatePreview();
+                        editingIdx = -1;
+                        document.querySelector('.tab[data-tab="write"]').click();
+                        showToast('已加载草稿');
+                    }
+                });
+            });
+
+            list.querySelectorAll('.btn-publish-draft').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const draft = allDrafts.find(function(d) { return d.id === id; });
+                    if (draft) {
+                        document.getElementById('editTitle').value = draft.title || '';
+                        document.getElementById('editTags').value = (draft.tags || []).join('，');
+                        mdEditor.value = draft.content || '';
+                        updatePreview();
+                        editingIdx = -1;
+                        // 删除草稿
+                        deleteDraft(id);
+                        document.querySelector('.tab[data-tab="write"]').click();
+                        // 自动点击发布
+                        document.getElementById('publishBtn').click();
+                    }
+                });
+            });
+
+            list.querySelectorAll('.btn-delete-draft').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    if (confirm('确定要删除这个草稿吗？')) {
+                        deleteDraft(id);
+                    }
+                });
+            });
+        }
+
+        async function deleteDraft(id) {
+            try {
+                const res = await apiCall('drafts', {
+                    method: 'DELETE',
+                    body: JSON.stringify({ id: id })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('草稿已删除');
+                    await loadDrafts();
+                    renderDraftList();
+                    updateBadges();
+                } else {
+                    showToast(data.error || '删除失败', true);
+                }
+            } catch (e) {
+                showToast('删除失败', true);
+            }
+        }
+
+        // ============================================================
+        // 保存草稿
+        // ============================================================
+        document.getElementById('saveDraftBtn').addEventListener('click', async function() {
+            const title = document.getElementById('editTitle').value.trim() || '无标题';
+            const content = mdEditor.value;
+            const tagsRaw = document.getElementById('editTags').value.trim();
+            const tags = tagsRaw ? tagsRaw.split(/[，,、\s]+/).filter(Boolean) : [];
+
+            if (!content) {
+                showToast('内容为空，无需保存', true);
+                return;
+            }
+
+            this.disabled = true;
+            try {
+                const res = await apiCall('drafts', {
+                    method: 'POST',
+                    body: JSON.stringify({ title, content, tags })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('草稿已保存');
+                    await loadDrafts();
+                    renderDraftList();
+                    updateBadges();
+                } else {
+                    showToast(data.error || '保存失败', true);
+                }
+            } catch (e) {
+                showToast('保存失败', true);
+            }
+            this.disabled = false;
+        });
+
+        // ============================================================
+        // 列表筛选和搜索
+        // ============================================================
+        document.querySelectorAll('#tabList .filter-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('#tabList .filter-btn').forEach(function(b) {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                renderArticleList();
+            });
+        });
+
+        document.getElementById('listSearch').addEventListener('input', function() {
+            renderArticleList();
+        });
+
+        // ============================================================
+        // Badge 更新
+        // ============================================================
+        function updateBadges() {
+            const published = allArticles.filter(function(a) { return !a.delete; }).length;
+            const deleted = allArticles.filter(function(a) { return a.delete; }).length;
+            document.getElementById('listBadge').textContent = allArticles.length;
+
+            const draftCount = allDrafts.length;
+            document.getElementById('draftBadge').textContent = draftCount;
+        }
+
+        // ============================================================
+        // 初始化
+        // ============================================================
+        if (checkLogin()) {
+            // 已经通过 checkLogin 加载了
+        } else {
+            // 显示登录界面
+            loginScreen.classList.remove('hidden');
+            mainApp.classList.remove('active');
+        }
+
+        // 修复：如果登录成功后 loadAll 已在 checkLogin 里调用
+        // 但 checkLogin 里调用了 loadAll，loadAll 又调用了 loadArticles 和 loadDrafts
+        // 没问题
+
+        console.log('管理后台已加载');
+        console.log('密码: QwQ20141031.');
+        console.log('API 地址: /api/posts, /api/drafts, /api/auth');
+    </script>
+</body>
+</html>
