@@ -1871,9 +1871,13 @@
 
             html = html.replace(/\[([^\]]*)\]\(([^)]*)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
 
-            html = html.replace(/!\[([^\]]*)\]\(([^)]*)\)/g, function(match, alt, src) {
-                return '<img src="' + src + '" alt="' + alt + '" style="max-width:100%;border-radius:6px;margin:0.4rem 0;display:block;height:auto;" />';
-            });
+            html = html.replace(/!\[([^\]]*)\]\(([^)]*?)(?:\s+=\s*(\d*)(?:x(\d+))?)?\)/g, function(match, alt, src, w, h) {
+    var style = '';
+    if (w && h) style = ' style="width:' + w + 'px; height:' + h + 'px;"';
+    else if (w) style = ' style="width:' + w + 'px; height:auto;"';
+    else if (h) style = ' style="height:' + h + 'px; width:auto;"';
+    return '<img src="' + src + '" alt="' + alt + '" loading="lazy"' + style + ' />';
+});
 
             html = html.replace(/^---$/gm, '<hr />');
 
