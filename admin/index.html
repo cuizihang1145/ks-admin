@@ -31,7 +31,6 @@
             outline: none !important;
             -webkit-tap-highlight-color: transparent !important;
         }
-
         body {
             font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
             background: #f5f3ff;
@@ -49,6 +48,7 @@
             padding: 2rem 1.5rem;
         }
 
+        /* ===== 登录 ===== */
         #loginScreen {
             display: flex;
             align-items: center;
@@ -80,7 +80,6 @@
             background: linear-gradient(135deg, #201D3A, #5B4DAF);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            transition: background 0.3s ease;
         }
         body.dark .login-card h1 {
             background: linear-gradient(135deg, #c8c0f0, #8f7be0);
@@ -91,7 +90,6 @@
             color: #8a8ab5;
             font-size: 0.85rem;
             margin-bottom: 1.5rem;
-            transition: color 0.3s ease;
         }
         body.dark .login-card .sub {
             color: #9a96b8;
@@ -195,6 +193,7 @@
             min-height: 1.5rem;
         }
 
+        /* ===== 主界面 ===== */
         #mainApp {
             display: none;
             animation: fadeIn 0.4s ease;
@@ -202,7 +201,6 @@
         #mainApp.active {
             display: block;
         }
-
         @keyframes fadeIn {
             0% { opacity: 0; transform: translateY(12px); }
             100% { opacity: 1; transform: translateY(0); }
@@ -226,7 +224,6 @@
             background: linear-gradient(135deg, #201D3A, #5B4DAF);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            transition: background 0.3s ease;
         }
         body.dark .admin-header .title {
             background: linear-gradient(135deg, #c8c0f0, #8f7be0);
@@ -289,6 +286,7 @@
             background: rgba(255, 255, 255, 0.15);
         }
 
+        /* ===== Tabs ===== */
         .tabs {
             display: flex;
             gap: 0.3rem;
@@ -360,6 +358,7 @@
             display: block;
         }
 
+        /* ===== 编辑器 ===== */
         .editor-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -390,7 +389,6 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 0.6rem;
-            transition: color 0.3s ease;
         }
         body.dark .editor-panel .panel-label {
             color: #7a7aa0;
@@ -427,6 +425,7 @@
             margin-bottom: 0;
         }
 
+        /* ===== 工具栏 ===== */
         .md-toolbar {
             display: flex;
             flex-wrap: wrap;
@@ -532,7 +531,6 @@
             margin: 0.6rem 0 0.3rem 0;
             font-weight: 700;
             color: #1a1a2e;
-            transition: color 0.3s ease;
         }
         body.dark .preview-area h1,
         body.dark .preview-area h2,
@@ -704,6 +702,7 @@
             color: #d0caf0;
         }
 
+        /* ===== 文章列表 ===== */
         .list-controls {
             display: flex;
             gap: 0.8rem;
@@ -931,6 +930,7 @@
             background: rgba(255, 152, 0, 0.22);
         }
 
+        /* ===== 草稿箱 ===== */
         .draft-item {
             background: rgba(255, 255, 255, 0.35);
             backdrop-filter: blur(8px);
@@ -1049,6 +1049,7 @@
             background: rgba(229, 115, 115, 0.22);
         }
 
+        /* ===== 弹窗 ===== */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -1094,9 +1095,13 @@
             100% { opacity: 1; transform: scale(1) translateY(0); }
         }
         .modal-box .modal-icon {
-            font-size: 3rem;
+            font-size: 2.5rem;
             margin-bottom: 0.2rem;
             display: block;
+            color: #6b5acf;
+        }
+        body.dark .modal-box .modal-icon {
+            color: #88ccff;
         }
         .modal-box .modal-title {
             font-size: 1.3rem;
@@ -1172,6 +1177,7 @@
             transform: scale(1.02);
         }
 
+        /* ===== Toast ===== */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -1284,6 +1290,7 @@
 </head>
 <body>
     <div class="container">
+        <!-- ===== 登录 ===== -->
         <div id="loginScreen">
             <div class="login-card">
                 <h1>管理后台</h1>
@@ -1300,6 +1307,7 @@
             </div>
         </div>
 
+        <!-- ===== 主应用 ===== -->
         <div id="mainApp">
             <div class="admin-header">
                 <span class="title">管理后台</span>
@@ -1317,6 +1325,7 @@
                 <button class="tab" data-tab="drafts">草稿箱 <span class="badge" id="draftBadge">0</span></button>
             </div>
 
+            <!-- ===== 写文章 ===== -->
             <div class="tab-content active" id="tabWrite">
                 <div class="editor-section">
                     <div class="editor-panel">
@@ -1367,6 +1376,7 @@
                 </div>
             </div>
 
+            <!-- ===== 文章列表 ===== -->
             <div class="tab-content" id="tabList">
                 <div class="list-controls">
                     <button class="filter-btn active" data-filter="all">全部</button>
@@ -1379,12 +1389,14 @@
                 <div class="article-list" id="articleList"></div>
             </div>
 
+            <!-- ===== 草稿箱 ===== -->
             <div class="tab-content" id="tabDrafts">
                 <div class="article-list" id="draftList"></div>
             </div>
         </div>
     </div>
 
+    <!-- ===== 弹窗 ===== -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-box">
             <span class="modal-icon" id="modalIcon"><i class="fas fa-exclamation-triangle"></i></span>
@@ -1445,7 +1457,7 @@
         }
 
         // ================================================================
-        // 弹窗系统
+        // 弹窗
         // ================================================================
         const modalOverlay = document.getElementById('modalOverlay');
         const modalIcon = document.getElementById('modalIcon');
@@ -1455,9 +1467,9 @@
         const modalCancel = document.getElementById('modalCancel');
         let modalResolve = null;
 
-        function showModal(icon, title, desc, confirmText, confirmClass) {
+        function showModal(iconHtml, title, desc, confirmText, confirmClass) {
             return new Promise((resolve) => {
-                modalIcon.innerHTML = icon || '<i class="fas fa-exclamation-triangle"></i>';
+                modalIcon.innerHTML = iconHtml || '<i class="fas fa-exclamation-triangle"></i>';
                 modalTitle.textContent = title || '确认操作';
                 modalDesc.innerHTML = desc || '确定要执行此操作吗？';
                 modalConfirm.textContent = confirmText || '确认';
@@ -1571,7 +1583,6 @@
             drafts: document.getElementById('tabDrafts')
         };
 
-        // 删除草稿锁
         let isDeletingDraft = false;
 
         tabs.forEach(function(tab) {
@@ -1592,14 +1603,10 @@
         });
 
         // ================================================================
-        // Markdown 编辑器
+        // 日期默认今天
         // ================================================================
-        const mdEditor = document.getElementById('mdEditor');
-        const previewArea = document.getElementById('previewArea');
-        const publishBtn = document.getElementById('publishBtn');
         const editDateInput = document.getElementById('editDate');
 
-        // 日期默认今天
         function setDefaultDate() {
             if (!editDateInput.value) {
                 const today = new Date().toISOString().slice(0, 10);
@@ -1607,6 +1614,13 @@
             }
         }
         setDefaultDate();
+
+        // ================================================================
+        // Markdown 编辑器
+        // ================================================================
+        const mdEditor = document.getElementById('mdEditor');
+        const previewArea = document.getElementById('previewArea');
+        const publishBtn = document.getElementById('publishBtn');
 
         function insertText(text) {
             const start = mdEditor.selectionStart;
@@ -1780,29 +1794,35 @@
         mdEditor.addEventListener('input', updatePreview);
 
         // ================================================================
-        // Markdown 渲染器（完整修复版）
+        // Markdown 渲染器（全部修好）
         // ================================================================
         function renderMarkdown(md) {
             if (!md) return '<span style="color:#8a8ab5;font-size:0.85rem;">预览会显示在这里</span>';
 
-            let html = md.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            let html = md;
 
-            // 代码块
+            // 转义 HTML
+            html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+            // 1. 代码块
             html = html.replace(/```(\w*)\n([\s\S]*?)```/g, function(match, lang, code) {
                 const langLabel = lang ? '<span class="code-lang">' + lang + '</span>' : '';
                 return '<pre>' + langLabel + '<code>' + code + '</code></pre>';
             });
 
-            // 行内代码
+            // 2. 行内代码
             html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-            // 粗体
+
+            // 3. 粗体
             html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            // 斜体
+
+            // 4. 斜体
             html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-            // 删除线
+
+            // 5. 删除线
             html = html.replace(/~~(.*?)~~/g, '<del>$1</del>');
 
-            // 标题
+            // 6. 标题
             html = html.replace(/^###### (.+)$/gm, '<h6>$1</h6>');
             html = html.replace(/^##### (.+)$/gm, '<h5>$1</h5>');
             html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
@@ -1810,27 +1830,21 @@
             html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
             html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
 
-            // 引用 - 用占位符保护
+            // 7. 引用（用占位符保护，防止被列表干扰）
             html = html.replace(/^> (.+)$/gm, '___BLOCKQUOTE___$1___BLOCKQUOTE_END___');
 
-            // 链接（完整 URL 支持）
+            // 8. 链接（直接输出 href，不拼接任何前缀）
             html = html.replace(/\[([^\]]*)\]\(([^)]*)\)/g, function(match, text, url) {
-                if (url.startsWith('http://') || url.startsWith('https://')) {
-                    return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + text + '</a>';
-                } else if (url.startsWith('/')) {
-                    return '<a href="' + url + '" target="_blank">' + text + '</a>';
-                } else {
-                    return '<a href="' + url + '" target="_blank">' + text + '</a>';
-                }
+                return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + text + '</a>';
             });
 
-            // 图片
+            // 9. 图片
             html = html.replace(/!\[([^\]]*)\]\(([^)]*)\)/g, '<img src="$2" alt="$1" />');
 
-            // 分割线
+            // 10. 分割线
             html = html.replace(/^---$/gm, '<hr />');
 
-            // 表格
+            // 11. 表格
             html = html.replace(/\|(.+)\|\n\|([\-:| ]+)\|\n((?:\|.+\|\n?)+)/g, function(match, header, align, rows) {
                 const headers = header.split('|').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
                 const aligns = align.split('|').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
@@ -1854,24 +1868,26 @@
                 return tableHtml;
             });
 
-            // 无序列表（先处理，防止与有序冲突）
+            // 12. 无序列表
             html = html.replace(/^[-*] (.+)$/gm, '<li>$1</li>');
             html = html.replace(/((?:<li>.*<\/li>\s*)+)/g, function(match) {
                 if (match.indexOf('<ul>') !== -1 || match.indexOf('<ol>') !== -1) return match;
                 return '<ul>' + match.trim() + '</ul>';
             });
 
-            // 有序列表
+            // 13. 有序列表
             html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
             html = html.replace(/((?:<li>.*<\/li>\s*)+)/g, function(match) {
                 if (match.indexOf('<ul>') !== -1 || match.indexOf('<ol>') !== -1) return match;
                 return '<ol>' + match.trim() + '</ol>';
             });
 
-            // 恢复引用
+            // 14. 恢复引用
             html = html.replace(/___BLOCKQUOTE___(.+?)___BLOCKQUOTE_END___/g, '<blockquote>$1</blockquote>');
 
+            // 15. 换行
             html = html.replace(/\n/g, '<br />');
+
             return html;
         }
 
@@ -2223,7 +2239,8 @@
             }
             let html = '';
             allDrafts.forEach(function(draft) {
-                const preview = (draft.content || '').replace(/\n/g, ' ').slice(0, 80) + (draft.content && draft.content.length > 80 ? '...' : '');
+                const preview = (draft.content || '').replace(/\n/g, ' ').slice(0, 80) + (draft.content && draft.content
+                    .length > 80 ? '...' : '');
                 const tagsHtml = (draft.tags || []).map(function(t) {
                     return '<span class="tag">' + escapeHtml(t) + '</span>';
                 }).join(' ');
@@ -2262,13 +2279,14 @@
                     }
                 });
             });
+
             list.querySelectorAll('.btn-publish-draft').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     const id = this.dataset.id;
                     const draft = allDrafts.find(function(d) { return d.id === id; });
                     if (draft) {
                         document.getElementById('editTitle').value = draft.title || '';
-                        document.getElementById('editDate').value = '';
+                        document.getElementById('editDate').value = draft.date || '';
                         document.getElementById('editTags').value = (draft.tags || []).join('，');
                         mdEditor.value = draft.content || '';
                         updatePreview();
@@ -2280,6 +2298,7 @@
                     }
                 });
             });
+
             list.querySelectorAll('.btn-delete-draft').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     const id = this.dataset.id;
@@ -2322,7 +2341,7 @@
         }
 
         // ================================================================
-        // 发布/更新
+        // 发布 / 更新
         // ================================================================
         document.getElementById('publishBtn').addEventListener('click', async function() {
             const title = document.getElementById('editTitle').value.trim();
@@ -2453,7 +2472,7 @@
             const content = mdEditor.value;
             const tagsRaw = document.getElementById('editTags').value.trim();
             const tags = tagsRaw ? tagsRaw.split(/[，,、\s]+/).filter(Boolean) : [];
-            const date = document.getElementById('editDate').value;
+            const date = document.getElementById('editDate').value || '';
             if (!content) {
                 showToast('内容为空，无需保存', true);
                 return;
@@ -2480,11 +2499,12 @@
         });
 
         // ================================================================
-        // 筛选/搜索/排序
+        // 筛选 / 搜索 / 排序
         // ================================================================
         document.querySelectorAll('#tabList .filter-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
-                document.querySelectorAll('#tabList .filter-btn').forEach(function(b) { b.classList.remove('active'); });
+                document.querySelectorAll('#tabList .filter-btn').forEach(function(b) { b.classList.remove(
+                        'active'); });
                 this.classList.add('active');
                 currentFilter = this.dataset.filter;
                 renderArticleList();
