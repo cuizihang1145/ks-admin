@@ -1,9 +1,8 @@
 const TOKEN = process.env.TOKEN;
-const REPO = 'cuizihang1145/cuizihang1145.github.io';
 const BRANCH = 'main';
 
-export async function readFile(path) {
-  const url = `https://api.github.com/repos/${REPO}/contents/${path}`;
+export async function readFile(repo, path) {
+  const url = `https://api.github.com/repos/${repo}/contents/${path}`;
   const res = await fetch(url, {
     headers: { 
       Authorization: `token ${TOKEN}`, 
@@ -19,9 +18,9 @@ export async function readFile(path) {
   return { data: JSON.parse(content), sha: data.sha };
 }
 
-export async function writeFile(path, jsonData, sha, commitMsg = '更新文件') {
+export async function writeFile(repo, path, jsonData, sha, commitMsg = '更新文件') {
   const content = Buffer.from(JSON.stringify(jsonData, null, 2)).toString('base64');
-  const url = `https://api.github.com/repos/${REPO}/contents/${path}`;
+  const url = `https://api.github.com/repos/${repo}/contents/${path}`;
   const res = await fetch(url, {
     method: 'PUT',
     headers: {
