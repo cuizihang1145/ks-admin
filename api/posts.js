@@ -4,11 +4,24 @@ const MAIN_REPO = 'cuizihang1145/cuizihang1145.github.io';
 
 export default async function handler(req, res) {
   try {
+    // ===== CSRF 防护：校验 Referer =====
+    const referer = req.headers.referer || '';
+    const allowedDomains = ['admin.cuizi.top', 'cuizi.top', 'localhost'];
+    let isAllowed = false;
+    for (const domain of allowedDomains) {
+      if (referer.includes(domain)) {
+        isAllowed = true;
+        break;
+      }
+    }
+    if (!isAllowed) {
+      return res.status(403).json({ error: '请求来源不合法' });
+    }
+
     if (!checkAuth(req)) {
       return res.status(401).json({ error: '密码错误' });
     }
 
-    // 注意：readFile 现在需要传两个参数：仓库名，文件路径
     const result = await readFile(MAIN_REPO, 'wenzhang.json');
     const posts = result.data;
     const sha = result.sha;
@@ -37,13 +50,11 @@ export default async function handler(req, res) {
     if (req.method === 'PUT') {
       const { id, title, content, tags, date, hardDelete, articles } = req.body;
       
-      // 硬删除：直接用前端传过来的新数组覆盖
       if (hardDelete && articles) {
         await writeFile(MAIN_REPO, 'wenzhang.json', { announcements: articles }, sha, '硬删除文章');
         return res.status(200).json({ success: true, message: '已硬删除' });
       }
       
-      // 普通编辑
       const idx = parseInt(id);
       if (isNaN(idx) || idx < 0 || idx >= posts.announcements.length) {
         return res.status(400).json({ error: '文章不存在' });
