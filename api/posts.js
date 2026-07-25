@@ -8,6 +8,7 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: '密码错误' });
     }
 
+    // 注意：readFile 现在需要传两个参数：仓库名，文件路径
     const result = await readFile(MAIN_REPO, 'wenzhang.json');
     const posts = result.data;
     const sha = result.sha;
@@ -73,4 +74,4 @@ export default async function handler(req, res) {
     console.error('Error:', error.message);
     return res.status(500).json({ error: error.message });
   }
-}
+    }
