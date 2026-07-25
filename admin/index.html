@@ -6,32 +6,78 @@
     <title>管理后台 · ks</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.js">
     </script>
     <style>
-        /* ===== Reset ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
         }
-
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            font-family: 'Inter', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
             background: #FAFAFE;
             color: #1A1A2E;
             min-height: 100vh;
             transition: background 0.4s ease, color 0.3s ease;
         }
-
         body.dark {
             background: #14131F;
             color: #E8E6F0;
         }
-
-        /* ===== 背景光效 ===== */
+        body.dark .EasyMDEContainer .CodeMirror {
+            background: rgba(255, 255, 255, 0.05);
+            color: #E8E6F0;
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+        body.dark .EasyMDEContainer .CodeMirror-cursor {
+            border-color: #E8E6F0;
+        }
+        body.dark .editor-toolbar {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+        body.dark .editor-toolbar button {
+            color: #9A96B8;
+        }
+        body.dark .editor-toolbar button:hover {
+            background: rgba(136, 204, 255, 0.12);
+            color: #88ccff;
+        }
+        body.dark .editor-toolbar i.separator {
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+        body.dark .CodeMirror-selected {
+            background: rgba(136, 204, 255, 0.15);
+        }
+        body.dark .editor-preview {
+            background: rgba(255, 255, 255, 0.03);
+            color: #D0CAF0;
+        }
+        body.dark .editor-preview h1,
+        body.dark .editor-preview h2,
+        body.dark .editor-preview h3,
+        body.dark .editor-preview h4,
+        body.dark .editor-preview h5,
+        body.dark .editor-preview h6 {
+            color: #E8E6F0;
+        }
+        body.dark .editor-preview blockquote {
+            border-left-color: #88ccff;
+            color: #A8A4C8;
+        }
+        body.dark .editor-preview code {
+            background: rgba(255, 255, 255, 0.06);
+        }
+        body.dark .editor-preview table th,
+        body.dark .editor-preview table td {
+            border-color: rgba(255, 255, 255, 0.06);
+        }
+        body.dark .editor-preview table th {
+            background: rgba(255, 255, 255, 0.04);
+        }
         .bg-glow {
             position: fixed;
             top: 0;
@@ -45,7 +91,6 @@
         body.dark .bg-glow {
             background: radial-gradient(circle at 30% 30%, #28253D, #0E0D18);
         }
-
         .glow-soft {
             position: fixed;
             width: 70vw;
@@ -62,7 +107,6 @@
         body.dark .glow-soft {
             background: radial-gradient(circle, rgba(120, 100, 200, 0.20), rgba(60, 40, 120, 0) 70%);
         }
-
         .glow-soft-2 {
             position: fixed;
             width: 50vw;
@@ -79,17 +123,18 @@
         body.dark .glow-soft-2 {
             background: radial-gradient(circle, rgba(90, 70, 160, 0.15), rgba(30, 20, 60, 0) 70%);
         }
-
         @keyframes floatGlow {
-            0% { transform: translate(0, 0) scale(1); opacity: 0.3; }
-            100% { transform: translate(5%, 8%) scale(1.2); opacity: 0.7; }
+            0% { transform: translate(0, 0) scale(1);
+                opacity: 0.3; }
+            100% { transform: translate(5%, 8%) scale(1.2);
+                opacity: 0.7; }
         }
         @keyframes floatGlow2 {
-            0% { transform: translate(0, 0) scale(1); opacity: 0.2; }
-            100% { transform: translate(-6%, -5%) scale(1.3); opacity: 0.6; }
+            0% { transform: translate(0, 0) scale(1);
+                opacity: 0.2; }
+            100% { transform: translate(-6%, -5%) scale(1.3);
+                opacity: 0.6; }
         }
-
-        /* ===== 主题切换按钮 ===== */
         .theme-toggle {
             position: fixed;
             top: 20px;
@@ -125,17 +170,13 @@
         body.dark .theme-toggle:hover {
             background: rgba(50, 45, 80, 0.8);
         }
-
-        /* ===== 容器 ===== */
         .container {
-            max-width: 900px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 2rem 1.5rem 2rem;
             min-height: 100vh;
             position: relative;
         }
-
-        /* ===== 登录界面 ===== */
         #loginScreen {
             display: flex;
             align-items: center;
@@ -145,11 +186,9 @@
         #loginScreen.hidden {
             display: none;
         }
-
         .login-card {
             background: rgba(255, 255, 255, 0.55);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border-radius: 2rem;
             padding: 2.8rem 2.5rem;
             border: 1px solid rgba(255, 255, 255, 0.5);
@@ -157,14 +196,12 @@
             width: 100%;
             max-width: 380px;
             text-align: center;
-            transition: background 0.4s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            transition: background 0.4s ease, border-color 0.3s ease;
         }
         body.dark .login-card {
             background: rgba(30, 28, 50, 0.50);
             border-color: rgba(255, 255, 255, 0.06);
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.30);
         }
-
         .login-card h1 {
             font-size: 1.8rem;
             font-weight: 700;
@@ -180,7 +217,6 @@
             background-clip: text;
             color: transparent;
         }
-
         .login-card .sub {
             color: #8A8AB5;
             font-size: 0.85rem;
@@ -189,7 +225,6 @@
         body.dark .login-card .sub {
             color: #9A96B8;
         }
-
         .login-card input {
             width: 100%;
             padding: 0.9rem 1.2rem;
@@ -212,7 +247,6 @@
             border-color: #6B5ACF;
             box-shadow: 0 0 0 3px rgba(107, 90, 207, 0.15);
         }
-
         .login-card .btn-login {
             width: 100%;
             padding: 0.9rem;
@@ -239,23 +273,18 @@
             cursor: not-allowed;
             transform: none !important;
         }
-
         .login-card .error-msg {
             color: #E57373;
             font-size: 0.85rem;
             margin-top: 0.5rem;
             min-height: 1.5rem;
         }
-
-        /* ===== 主界面 ===== */
         #mainApp {
             display: none;
         }
         #mainApp.active {
             display: block;
         }
-
-        /* ===== 顶部栏 ===== */
         .admin-header {
             display: flex;
             align-items: center;
@@ -264,7 +293,6 @@
             flex-wrap: wrap;
             gap: 0.8rem;
         }
-
         .admin-header .title {
             font-size: 1.6rem;
             font-weight: 700;
@@ -279,13 +307,6 @@
             background-clip: text;
             color: transparent;
         }
-
-        .admin-header .right {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-
         .admin-header .btn-logout {
             padding: 0.4rem 1.2rem;
             border: none;
@@ -308,8 +329,6 @@
         body.dark .admin-header .btn-logout:hover {
             background: rgba(255, 255, 255, 0.15);
         }
-
-        /* ===== Tabs ===== */
         .tabs {
             display: flex;
             gap: 0.3rem;
@@ -325,7 +344,6 @@
             background: rgba(40, 38, 65, 0.30);
             border-color: rgba(255, 255, 255, 0.06);
         }
-
         .tabs .tab {
             padding: 0.6rem 1.4rem;
             border: none;
@@ -373,7 +391,6 @@
             background: rgba(136, 204, 255, 0.12);
             color: #88ccff;
         }
-
         .tab-content {
             display: none;
             animation: fadeIn 0.3s ease;
@@ -381,13 +398,12 @@
         .tab-content.active {
             display: block;
         }
-
         @keyframes fadeIn {
-            0% { opacity: 0; transform: translateY(8px); }
-            100% { opacity: 1; transform: translateY(0); }
+            0% { opacity: 0;
+                transform: translateY(8px); }
+            100% { opacity: 1;
+                transform: translateY(0); }
         }
-
-        /* ===== 写文章 ===== */
         .editor-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -398,7 +414,6 @@
                 grid-template-columns: 1fr;
             }
         }
-
         .editor-panel {
             background: rgba(255, 255, 255, 0.40);
             backdrop-filter: blur(8px);
@@ -411,7 +426,6 @@
             background: rgba(40, 38, 65, 0.30);
             border-color: rgba(255, 255, 255, 0.05);
         }
-
         .editor-panel .panel-label {
             font-size: 0.75rem;
             font-weight: 600;
@@ -423,7 +437,6 @@
         body.dark .editor-panel .panel-label {
             color: #7A7AA0;
         }
-
         .editor-panel input,
         .editor-panel .tag-input-wrap {
             width: 100%;
@@ -448,186 +461,171 @@
             border-color: #6B5ACF;
             box-shadow: 0 0 0 3px rgba(107, 90, 207, 0.10);
         }
-
-        /* ===== Markdown 编辑器 ===== */
-        .md-toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.2rem;
-            margin-bottom: 0.4rem;
-            padding: 0.2rem;
-            background: rgba(0, 0, 0, 0.03);
-            border-radius: 8px;
-        }
-        body.dark .md-toolbar {
-            background: rgba(255, 255, 255, 0.04);
-        }
-        .md-toolbar button {
-            width: 32px;
-            height: 32px;
-            border: none;
-            border-radius: 6px;
-            background: transparent;
-            color: #6A6A92;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: 0.15s ease;
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        body.dark .md-toolbar button {
-            color: #9A96B8;
-        }
-        .md-toolbar button:hover {
-            background: rgba(107, 90, 207, 0.10);
-            color: #6B5ACF;
-        }
-        body.dark .md-toolbar button:hover {
-            background: rgba(136, 204, 255, 0.10);
-            color: #88ccff;
-        }
-        .md-toolbar .sep {
-            width: 1px;
-            background: rgba(0, 0, 0, 0.08);
-            margin: 0 0.2rem;
-        }
-        body.dark .md-toolbar .sep {
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .md-editor {
-            width: 100%;
-            min-height: 320px;
-            padding: 0.8rem 1rem;
+        .EasyMDEContainer {
             border-radius: 12px;
+            overflow: hidden;
+        }
+        .EasyMDEContainer .CodeMirror {
+            min-height: 400px;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            border-radius: 0 0 12px 12px;
             border: 1px solid rgba(0, 0, 0, 0.06);
             background: rgba(255, 255, 255, 0.5);
-            font-size: 0.9rem;
-            font-family: 'JetBrains Mono', 'Courier New', monospace;
             color: #1A1A2E;
-            resize: vertical;
-            transition: 0.3s ease;
-            line-height: 1.7;
         }
-        body.dark .md-editor {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 255, 255, 0.08);
+        body.dark .EasyMDEContainer .CodeMirror {
+            background: rgba(255, 255, 255, 0.05);
             color: #E8E6F0;
+            border-color: rgba(255, 255, 255, 0.08);
         }
-        .md-editor:focus {
-            outline: none;
+        .EasyMDEContainer .CodeMirror-focused {
             border-color: #6B5ACF;
             box-shadow: 0 0 0 3px rgba(107, 90, 207, 0.10);
         }
-
-        .preview-area {
-            min-height: 320px;
+        .EasyMDEContainer .editor-toolbar {
+            border-radius: 12px 12px 0 0;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-bottom: none;
+            background: rgba(255, 255, 255, 0.3);
+        }
+        body.dark .EasyMDEContainer .editor-toolbar {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+        .EasyMDEContainer .editor-toolbar button {
+            color: #6A6A92;
+        }
+        body.dark .EasyMDEContainer .editor-toolbar button {
+            color: #9A96B8;
+        }
+        .EasyMDEContainer .editor-toolbar button:hover {
+            background: rgba(107, 90, 207, 0.10);
+            color: #6B5ACF;
+        }
+        body.dark .EasyMDEContainer .editor-toolbar button:hover {
+            background: rgba(136, 204, 255, 0.12);
+            color: #88ccff;
+        }
+        .EasyMDEContainer .editor-toolbar i.separator {
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+        body.dark .EasyMDEContainer .editor-toolbar i.separator {
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+        .EasyMDEContainer .editor-preview {
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 0 0 12px 12px;
+            min-height: 400px;
             max-height: 500px;
             overflow-y: auto;
-            padding: 0.8rem 1rem;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 0, 0, 0.04);
+            padding: 1rem;
             background: rgba(255, 255, 255, 0.2);
+            color: #2D2D4A;
             font-size: 0.9rem;
             line-height: 1.8;
-            color: #2D2D4A;
-            transition: background 0.4s ease, border-color 0.3s ease, color 0.3s ease;
         }
-        body.dark .preview-area {
+        body.dark .EasyMDEContainer .editor-preview {
             background: rgba(255, 255, 255, 0.03);
             border-color: rgba(255, 255, 255, 0.05);
             color: #D0CAF0;
         }
-        .preview-area h1,
-        .preview-area h2,
-        .preview-area h3,
-        .preview-area h4,
-        .preview-area h5,
-        .preview-area h6 {
+        .EasyMDEContainer .editor-preview h1,
+        .EasyMDEContainer .editor-preview h2,
+        .EasyMDEContainer .editor-preview h3,
+        .EasyMDEContainer .editor-preview h4,
+        .EasyMDEContainer .editor-preview h5,
+        .EasyMDEContainer .editor-preview h6 {
             margin: 0.6rem 0 0.3rem 0;
             font-weight: 700;
             color: #1A1A2E;
         }
-        body.dark .preview-area h1,
-        body.dark .preview-area h2,
-        body.dark .preview-area h3,
-        body.dark .preview-area h4,
-        body.dark .preview-area h5,
-        body.dark .preview-area h6 {
+        body.dark .EasyMDEContainer .editor-preview h1,
+        body.dark .EasyMDEContainer .editor-preview h2,
+        body.dark .EasyMDEContainer .editor-preview h3,
+        body.dark .EasyMDEContainer .editor-preview h4,
+        body.dark .EasyMDEContainer .editor-preview h5,
+        body.dark .EasyMDEContainer .editor-preview h6 {
             color: #E8E6F0;
         }
-        .preview-area p {
+        .EasyMDEContainer .editor-preview p {
             margin-bottom: 0.5rem;
         }
-        .preview-area code {
-            font-family: 'JetBrains Mono', monospace;
+        .EasyMDEContainer .editor-preview code {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
             font-size: 0.85em;
             background: rgba(0, 0, 0, 0.06);
             padding: 0.1rem 0.4rem;
             border-radius: 4px;
         }
-        body.dark .preview-area code {
+        body.dark .EasyMDEContainer .editor-preview code {
             background: rgba(255, 255, 255, 0.06);
         }
-        .preview-area pre {
+        .EasyMDEContainer .editor-preview pre {
             background: #0D1117;
             padding: 0.8rem 1rem;
             border-radius: 8px;
             overflow: auto;
             margin: 0.5rem 0;
         }
-        .preview-area pre code {
+        .EasyMDEContainer .editor-preview pre code {
             background: transparent;
             padding: 0;
             color: #E6EDF3;
         }
-        .preview-area blockquote {
+        .EasyMDEContainer .editor-preview blockquote {
             border-left: 3px solid #6B5ACF;
             padding-left: 1rem;
             margin: 0.5rem 0;
             color: #6A6A92;
             font-style: italic;
         }
-        body.dark .preview-area blockquote {
+        body.dark .EasyMDEContainer .editor-preview blockquote {
             border-left-color: #88ccff;
             color: #A8A4C8;
         }
-        .preview-area img {
+        .EasyMDEContainer .editor-preview img {
             max-width: 100%;
             border-radius: 8px;
             margin: 0.5rem 0;
         }
-        .preview-area ul,
-        .preview-area ol {
+        .EasyMDEContainer .editor-preview ul,
+        .EasyMDEContainer .editor-preview ol {
             padding-left: 1.5rem;
             margin: 0.4rem 0;
         }
-        .preview-area table {
+        .EasyMDEContainer .editor-preview table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.85rem;
             margin: 0.5rem 0;
         }
-        .preview-area th,
-        .preview-area td {
+        .EasyMDEContainer .editor-preview th,
+        .EasyMDEContainer .editor-preview td {
             border: 1px solid rgba(0, 0, 0, 0.08);
             padding: 0.3rem 0.6rem;
             text-align: left;
         }
-        body.dark .preview-area th,
-        body.dark .preview-area td {
+        body.dark .EasyMDEContainer .editor-preview th,
+        body.dark .EasyMDEContainer .editor-preview td {
             border-color: rgba(255, 255, 255, 0.06);
         }
-        .preview-area th {
+        .EasyMDEContainer .editor-preview th {
             background: rgba(0, 0, 0, 0.04);
             font-weight: 600;
         }
-        body.dark .preview-area th {
+        body.dark .EasyMDEContainer .editor-preview th {
             background: rgba(255, 255, 255, 0.04);
         }
-
+        .EasyMDEContainer .editor-preview hr {
+            border: none;
+            border-top: 2px solid rgba(0, 0, 0, 0.08);
+            margin: 1rem 0;
+        }
+        body.dark .EasyMDEContainer .editor-preview hr {
+            border-top-color: rgba(255, 255, 255, 0.08);
+        }
         .editor-actions {
             display: flex;
             gap: 0.8rem;
@@ -661,7 +659,6 @@
             cursor: not-allowed;
             transform: none !important;
         }
-
         .editor-actions .btn-save-draft {
             background: rgba(0, 0, 0, 0.06);
             color: #6A6A92;
@@ -676,7 +673,6 @@
         body.dark .editor-actions .btn-save-draft:hover {
             background: rgba(255, 255, 255, 0.15);
         }
-
         .editor-actions .btn-cancel {
             background: transparent;
             color: #8A8AB5;
@@ -687,8 +683,6 @@
         body.dark .editor-actions .btn-cancel:hover {
             color: #D0CAF0;
         }
-
-        /* ===== 文章列表 ===== */
         .list-controls {
             display: flex;
             gap: 0.8rem;
@@ -722,7 +716,32 @@
         .list-controls .filter-btn:hover:not(.active) {
             background: rgba(107, 90, 207, 0.15);
         }
-
+        .list-controls .sort-btn {
+            padding: 0.3rem 1rem;
+            border: none;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.3);
+            color: #6A6A92;
+            transition: 0.2s ease;
+        }
+        body.dark .list-controls .sort-btn {
+            background: rgba(40, 38, 65, 0.3);
+            color: #9A96B8;
+        }
+        .list-controls .sort-btn.active {
+            background: #6B5ACF;
+            color: #fff;
+        }
+        body.dark .list-controls .sort-btn.active {
+            background: #7A6BCF;
+        }
+        .list-controls .sort-btn:hover:not(.active) {
+            background: rgba(107, 90, 207, 0.15);
+        }
         .list-controls .search-input {
             padding: 0.3rem 1rem;
             border-radius: 40px;
@@ -744,7 +763,6 @@
             outline: none;
             border-color: #6B5ACF;
         }
-
         .list-controls .count-badge {
             font-size: 0.75rem;
             color: #8A8AB5;
@@ -753,20 +771,17 @@
         body.dark .list-controls .count-badge {
             color: #7A7AA0;
         }
-
         .article-list {
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
         }
-
         .article-list .empty {
             text-align: center;
             padding: 3rem 1rem;
             color: #8A8AB5;
             font-size: 0.9rem;
         }
-
         .article-item-admin {
             background: rgba(255, 255, 255, 0.40);
             backdrop-filter: blur(8px);
@@ -789,14 +804,12 @@
         body.dark .article-item-admin:hover {
             background: rgba(50, 45, 80, 0.40);
         }
-
         .article-item-admin.deleted {
             opacity: 0.5;
         }
         .article-item-admin.deleted .item-title {
             text-decoration: line-through;
         }
-
         .article-item-admin .item-info {
             flex: 1;
             min-width: 0;
@@ -838,11 +851,11 @@
             font-weight: 500;
             font-size: 0.65rem;
         }
-
         .article-item-admin .item-actions {
             display: flex;
             gap: 0.3rem;
             flex-shrink: 0;
+            flex-wrap: wrap;
         }
         .article-item-admin .item-actions button {
             padding: 0.2rem 0.7rem;
@@ -865,12 +878,20 @@
         .article-item-admin .item-actions .btn-edit:hover {
             background: rgba(107, 90, 207, 0.22);
         }
-        .article-item-admin .item-actions .btn-delete {
-            background: rgba(229, 115, 115, 0.12);
-            color: #E57373;
+        .article-item-admin .item-actions .btn-soft-delete {
+            background: rgba(255, 193, 7, 0.12);
+            color: #F9A825;
         }
-        .article-item-admin .item-actions .btn-delete:hover {
-            background: rgba(229, 115, 115, 0.22);
+        .article-item-admin .item-actions .btn-soft-delete:hover {
+            background: rgba(255, 193, 7, 0.22);
+        }
+        .article-item-admin .item-actions .btn-hard-delete {
+            background: rgba(229, 115, 115, 0.15);
+            color: #E53935;
+            font-weight: 600;
+        }
+        .article-item-admin .item-actions .btn-hard-delete:hover {
+            background: rgba(229, 115, 115, 0.30);
         }
         .article-item-admin .item-actions .btn-restore {
             background: rgba(76, 175, 80, 0.12);
@@ -879,8 +900,6 @@
         .article-item-admin .item-actions .btn-restore:hover {
             background: rgba(76, 175, 80, 0.22);
         }
-
-        /* ===== 草稿箱 ===== */
         .draft-item {
             background: rgba(255, 255, 255, 0.35);
             backdrop-filter: blur(8px);
@@ -905,7 +924,6 @@
         body.dark .draft-item:hover {
             background: rgba(50, 45, 80, 0.35);
         }
-
         .draft-item .draft-info {
             flex: 1;
             min-width: 0;
@@ -936,11 +954,11 @@
         body.dark .draft-item .draft-preview {
             color: #A8A4C8;
         }
-
         .draft-item .draft-actions {
             display: flex;
             gap: 0.3rem;
             flex-shrink: 0;
+            flex-wrap: wrap;
         }
         .draft-item .draft-actions button {
             padding: 0.2rem 0.7rem;
@@ -977,8 +995,128 @@
         .draft-item .draft-actions .btn-delete-draft:hover {
             background: rgba(229, 115, 115, 0.22);
         }
-
-        /* ===== Toast ===== */
+        .hard-delete-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+        .hard-delete-overlay.active {
+            display: flex;
+        }
+        .hard-delete-box {
+            max-width: 460px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(24px);
+            border-radius: 2rem;
+            padding: 2.2rem 2rem;
+            border: 2px solid #E53935;
+            box-shadow: 0 24px 60px rgba(229, 57, 53, 0.2);
+            text-align: center;
+            animation: modalFade 0.3s ease;
+        }
+        body.dark .hard-delete-box {
+            background: rgba(30, 28, 50, 0.95);
+            border-color: #E53935;
+        }
+        @keyframes modalFade {
+            0% { opacity: 0;
+                transform: scale(0.92) translateY(20px); }
+            100% { opacity: 1;
+                transform: scale(1) translateY(0); }
+        }
+        .hard-delete-box .icon {
+            font-size: 3.5rem;
+            color: #E53935;
+            margin-bottom: 0.2rem;
+        }
+        .hard-delete-box .title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1A1A2E;
+            margin-bottom: 0.5rem;
+        }
+        body.dark .hard-delete-box .title {
+            color: #E8E6F0;
+        }
+        .hard-delete-box .warning {
+            font-size: 0.95rem;
+            color: #E53935;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
+        .hard-delete-box .desc {
+            font-size: 0.85rem;
+            color: #6A6A92;
+            line-height: 1.8;
+            margin-bottom: 0.8rem;
+        }
+        body.dark .hard-delete-box .desc {
+            color: #A8A4C8;
+        }
+        .hard-delete-box .article-title {
+            font-weight: 600;
+            color: #1A1A2E;
+            background: rgba(0, 0, 0, 0.04);
+            padding: 0.3rem 1rem;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        body.dark .hard-delete-box .article-title {
+            color: #E8E6F0;
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .hard-delete-box .actions {
+            display: flex;
+            gap: 0.8rem;
+        }
+        .hard-delete-box .actions button {
+            flex: 1;
+            padding: 0.7rem 1.2rem;
+            border: none;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+        .hard-delete-box .actions .btn-cancel {
+            background: rgba(0, 0, 0, 0.06);
+            color: #6A6A92;
+        }
+        body.dark .hard-delete-box .actions .btn-cancel {
+            background: rgba(255, 255, 255, 0.08);
+            color: #9A96B8;
+        }
+        .hard-delete-box .actions .btn-cancel:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        body.dark .hard-delete-box .actions .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .hard-delete-box .actions .btn-confirm-hard {
+            background: #E53935;
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(229, 57, 53, 0.3);
+        }
+        .hard-delete-box .actions .btn-confirm-hard:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 32px rgba(229, 57, 53, 0.4);
+        }
+        body.dark .hard-delete-box .actions .btn-confirm-hard {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
         .toast {
             position: fixed;
             bottom: 30px;
@@ -1014,7 +1152,6 @@
         body.dark .toast.error {
             background: rgba(180, 40, 40, 0.95);
         }
-
         @media (max-width: 600px) {
             .container {
                 padding: 1.2rem 0.8rem;
@@ -1028,12 +1165,12 @@
             .editor-panel {
                 padding: 1rem;
             }
-            .md-editor {
-                min-height: 200px;
+            .EasyMDEContainer .CodeMirror {
+                min-height: 250px;
             }
-            .preview-area {
-                min-height: 200px;
-                max-height: 300px;
+            .EasyMDEContainer .editor-preview {
+                min-height: 250px;
+                max-height: 350px;
             }
             .article-item-admin {
                 flex-wrap: wrap;
@@ -1072,22 +1209,23 @@
                 padding: 0.6rem 1.2rem;
                 font-size: 0.8rem;
             }
+            .hard-delete-box {
+                padding: 1.6rem 1.2rem;
+            }
+            .hard-delete-box .actions {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
-
     <div class="bg-glow"></div>
     <div class="glow-soft"></div>
     <div class="glow-soft-2"></div>
-
     <div class="theme-toggle" id="themeToggle" role="button" aria-label="切换深色/亮色模式">
         <i class="fas fa-moon"></i>
     </div>
-
     <div class="container">
-
-        <!-- ===== 登录界面 ===== -->
         <div id="loginScreen">
             <div class="login-card">
                 <h1>管理后台</h1>
@@ -1097,23 +1235,16 @@
                 <div class="error-msg" id="loginError"></div>
             </div>
         </div>
-
-        <!-- ===== 主应用 ===== -->
         <div id="mainApp">
             <div class="admin-header">
                 <span class="title">管理后台</span>
-                <div class="right">
-                    <button class="btn-logout" id="logoutBtn">退出</button>
-                </div>
+                <button class="btn-logout" id="logoutBtn">退出</button>
             </div>
-
             <div class="tabs" id="tabs">
                 <button class="tab active" data-tab="write">写文章</button>
                 <button class="tab" data-tab="list">文章列表 <span class="badge" id="listBadge">0</span></button>
                 <button class="tab" data-tab="drafts">草稿箱 <span class="badge" id="draftBadge">0</span></button>
             </div>
-
-            <!-- Tab: 写文章 -->
             <div class="tab-content active" id="tabWrite">
                 <div class="editor-section">
                     <div class="editor-panel">
@@ -1122,26 +1253,7 @@
                         <div class="tag-input-wrap">
                             <input type="text" id="editTags" placeholder="标签，用逗号分隔" style="border:none;background:transparent;padding:0;width:100%;font-family:inherit;font-size:0.95rem;color:inherit;outline:none;" />
                         </div>
-                        <div class="md-toolbar" id="mdToolbar">
-                            <button data-cmd="bold" title="粗体"><b>B</b></button>
-                            <button data-cmd="italic" title="斜体"><i>I</i></button>
-                            <button data-cmd="strike" title="删除线"><s>S</s></button>
-                            <span class="sep"></span>
-                            <button data-cmd="h1" title="一级标题">H1</button>
-                            <button data-cmd="h2" title="二级标题">H2</button>
-                            <button data-cmd="h3" title="三级标题">H3</button>
-                            <span class="sep"></span>
-                            <button data-cmd="link" title="链接"><i class="fas fa-link"></i></button>
-                            <button data-cmd="image" title="图片"><i class="fas fa-image"></i></button>
-                            <span class="sep"></span>
-                            <button data-cmd="code" title="行内代码">&lt;/&gt;</button>
-                            <button data-cmd="codeblock" title="代码块"><i class="fas fa-code"></i></button>
-                            <span class="sep"></span>
-                            <button data-cmd="quote" title="引用"><i class="fas fa-quote-left"></i></button>
-                            <button data-cmd="ul" title="无序列表"><i class="fas fa-list-ul"></i></button>
-                            <button data-cmd="ol" title="有序列表"><i class="fas fa-list-ol"></i></button>
-                        </div>
-                        <textarea class="md-editor" id="mdEditor" placeholder="用 Markdown 写文章..."></textarea>
+                        <textarea id="mdEditor" placeholder="用 Markdown 写文章..."></textarea>
                         <div class="editor-actions">
                             <button class="btn-publish" id="publishBtn">发布文章</button>
                             <button class="btn-save-draft" id="saveDraftBtn">存草稿</button>
@@ -1150,45 +1262,44 @@
                     </div>
                     <div class="editor-panel">
                         <div class="panel-label">预览</div>
-                        <div class="preview-area" id="previewArea">
-                            <span style="color:#8A8AB5;font-size:0.85rem;">预览会显示在这里</span>
-                        </div>
+                        <div class="editor-preview" id="previewArea"></div>
                     </div>
                 </div>
             </div>
-
-            <!-- Tab: 文章列表 -->
             <div class="tab-content" id="tabList">
                 <div class="list-controls">
                     <button class="filter-btn active" data-filter="all">全部</button>
                     <button class="filter-btn" data-filter="published">已发布</button>
                     <button class="filter-btn" data-filter="deleted">已删除</button>
+                    <button class="sort-btn active" data-sort="desc" id="sortBtn"><i class="fas fa-sort-amount-down"></i> 倒序</button>
                     <input class="search-input" id="listSearch" placeholder="搜索文章..." />
                     <span class="count-badge" id="listCount">0 篇</span>
                 </div>
                 <div class="article-list" id="articleList"></div>
             </div>
-
-            <!-- Tab: 草稿箱 -->
             <div class="tab-content" id="tabDrafts">
                 <div class="article-list" id="draftList"></div>
             </div>
         </div>
-
     </div>
-
+    <div class="hard-delete-overlay" id="hardDeleteOverlay">
+        <div class="hard-delete-box">
+            <div class="icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="title">危险操作</div>
+            <div class="warning">此操作不可恢复！</div>
+            <div class="desc">你正在执行<strong>硬删除</strong>操作，该文章将从 <code>wenzhang.json</code> 中<strong>彻底移除</strong>，无法通过任何方式恢复。</div>
+            <div class="article-title" id="hardDeleteTitle">文章标题</div>
+            <div class="desc" style="font-size:0.8rem;color:#E53935;font-weight:500;">输入 <strong style="color:#E53935;">删除</strong> 确认</div>
+            <input type="text" id="hardDeleteConfirm" placeholder="输入「删除」" style="width:100%;padding:0.6rem 1rem;border-radius:60px;border:2px solid #E53935;font-size:0.9rem;font-family:'Inter',sans-serif;background:rgba(255,255,255,0.5);color:#1A1A2E;margin-bottom:1rem;text-align:center;" />
+            <div class="actions">
+                <button class="btn-cancel" id="hardDeleteCancel">取消</button>
+                <button class="btn-confirm-hard" id="hardDeleteConfirmBtn" disabled>确认硬删除</button>
+            </div>
+        </div>
+    </div>
     <div class="toast" id="toast"></div>
-
     <script>
-        // ============================================================
-        // 配置
-        // ============================================================
-        const API_BASE = ''; // 空字符串表示同域，Vercel 会自动路由
         const PASSWORD = 'QwQ20141031.';
-
-        // ============================================================
-        // 主题切换
-        // ============================================================
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = themeToggle.querySelector('i');
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -1205,9 +1316,6 @@
             setTheme(currentTheme === 'dark' ? 'light' : 'dark');
         });
 
-        // ============================================================
-        // Toast
-        // ============================================================
         const toastEl = document.getElementById('toast');
         let toastTimer = null;
 
@@ -1216,7 +1324,6 @@
             toastEl.className = 'toast';
             if (isError) toastEl.classList.add('error');
             clearTimeout(toastTimer);
-            // 触发重排以重启动画
             void toastEl.offsetWidth;
             toastEl.classList.add('show');
             toastTimer = setTimeout(function() {
@@ -1224,9 +1331,6 @@
             }, 3000);
         }
 
-        // ============================================================
-        // 登录
-        // ============================================================
         const loginScreen = document.getElementById('loginScreen');
         const mainApp = document.getElementById('mainApp');
         const passwordInput = document.getElementById('passwordInput');
@@ -1252,7 +1356,6 @@
             }
             loginBtn.disabled = true;
             loginError.textContent = '';
-
             try {
                 const res = await fetch('/api/auth', {
                     method: 'POST',
@@ -1262,6 +1365,7 @@
                 const data = await res.json();
                 if (data.success) {
                     sessionStorage.setItem('admin_logged_in', 'true');
+                    sessionStorage.setItem('admin_password', pwd);
                     loginScreen.classList.add('hidden');
                     mainApp.classList.add('active');
                     loadAll();
@@ -1273,33 +1377,26 @@
             }
             loginBtn.disabled = false;
         }
-
         loginBtn.addEventListener('click', doLogin);
         passwordInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') doLogin();
         });
 
-        // ============================================================
-        // 退出
-        // ============================================================
         document.getElementById('logoutBtn').addEventListener('click', function() {
             sessionStorage.removeItem('admin_logged_in');
+            sessionStorage.removeItem('admin_password');
             loginScreen.classList.remove('hidden');
             mainApp.classList.remove('active');
             passwordInput.value = '';
             loginError.textContent = '';
         });
 
-        // ============================================================
-        // Tab 切换
-        // ============================================================
         const tabs = document.querySelectorAll('.tab');
         const tabContents = {
             write: document.getElementById('tabWrite'),
             list: document.getElementById('tabList'),
             drafts: document.getElementById('tabDrafts')
         };
-
         tabs.forEach(function(tab) {
             tab.addEventListener('click', function() {
                 tabs.forEach(function(t) { t.classList.remove('active'); });
@@ -1313,162 +1410,43 @@
             });
         });
 
-        // ============================================================
-        // Markdown 工具栏
-        // ============================================================
-        const mdEditor = document.getElementById('mdEditor');
-
-        document.querySelectorAll('#mdToolbar button[data-cmd]').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                const cmd = this.dataset.cmd;
-                const start = mdEditor.selectionStart;
-                const end = mdEditor.selectionEnd;
-                const text = mdEditor.value;
-                let selected = text.substring(start, end);
-                let replacement = '';
-                let cursorOffset = 0;
-
-                switch (cmd) {
-                    case 'bold':
-                        replacement = '**' + selected + '**';
-                        cursorOffset = 2;
-                        break;
-                    case 'italic':
-                        replacement = '*' + selected + '*';
-                        cursorOffset = 1;
-                        break;
-                    case 'strike':
-                        replacement = '~~' + selected + '~~';
-                        cursorOffset = 2;
-                        break;
-                    case 'h1':
-                        replacement = '# ' + selected;
-                        cursorOffset = 2;
-                        break;
-                    case 'h2':
-                        replacement = '## ' + selected;
-                        cursorOffset = 3;
-                        break;
-                    case 'h3':
-                        replacement = '### ' + selected;
-                        cursorOffset = 4;
-                        break;
-                    case 'link':
-                        replacement = '[' + (selected || '链接文字') + '](url)';
-                        cursorOffset = 1;
-                        break;
-                    case 'image':
-                        replacement = '![' + (selected || '图片描述') + '](图片url)';
-                        cursorOffset = 2;
-                        break;
-                    case 'code':
-                        replacement = '`' + selected + '`';
-                        cursorOffset = 1;
-                        break;
-                    case 'codeblock':
-                        replacement = '\n```\n' + selected + '\n```\n';
-                        cursorOffset = 4;
-                        break;
-                    case 'quote':
-                        replacement = '> ' + selected;
-                        cursorOffset = 2;
-                        break;
-                    case 'ul':
-                        replacement = '- ' + selected;
-                        cursorOffset = 2;
-                        break;
-                    case 'ol':
-                        replacement = '1. ' + selected;
-                        cursorOffset = 3;
-                        break;
-                    default:
-                        return;
-                }
-
-                mdEditor.value = text.substring(0, start) + replacement + text.substring(end);
-                const newPos = start + replacement.length;
-                mdEditor.selectionStart = mdEditor.selectionEnd = newPos;
-                mdEditor.focus();
-                updatePreview();
-            });
+        // EasyMDE 初始化
+        const easyMDE = new EasyMDE({
+            element: document.getElementById('mdEditor'),
+            spellChecker: false,
+            autofocus: true,
+            indentWithTabs: false,
+            tabSize: 2,
+            placeholder: '用 Markdown 写文章...',
+            previewRender: function(plainText) {
+                return plainText;
+            },
+            renderingConfig: {
+                codeSyntaxHighlighting: true,
+                hljs: hljs
+            },
+            toolbar: [
+                'bold', 'italic', 'strikethrough', 'heading', '|',
+                'quote', 'unordered-list', 'ordered-list', '|',
+                'link', 'image', '|',
+                'code', 'code-block', 'table', 'horizontal-rule', '|',
+                'preview', 'side-by-side', 'fullscreen', '|',
+                'guide'
+            ]
         });
 
-        // ============================================================
-        // 实时预览
-        // ============================================================
-        const previewArea = document.getElementById('previewArea');
+        let editingIdx = -1;
 
-        function updatePreview() {
-            const text = mdEditor.value;
-            previewArea.innerHTML = renderMarkdown(text);
-            // 高亮代码块
-            previewArea.querySelectorAll('pre code').forEach(function(el) {
-                try { hljs.highlightElement(el); } catch (e) {}
-            });
+        function getEditorContent() {
+            return easyMDE.value();
         }
 
-        mdEditor.addEventListener('input', updatePreview);
-
-        // ============================================================
-        // 简单的 Markdown 渲染（足够预览用）
-        // ============================================================
-        function renderMarkdown(md) {
-            if (!md) return '<span style="color:#8A8AB5;font-size:0.85rem;">预览会显示在这里</span>';
-            let html = md;
-
-            // 代码块
-            html = html.replace(/```([\s\S]*?)```/g, function(match, code) {
-                return '<pre><code>' + escapeHtml(code) + '</code></pre>';
-            });
-
-            // 行内代码
-            html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-            // 粗体
-            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-            // 斜体
-            html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-
-            // 删除线
-            html = html.replace(/~~(.*?)~~/g, '<del>$1</del>');
-
-            // 标题
-            html = html.replace(/^### (.*$)/gm, '<h3>$1</h3>');
-            html = html.replace(/^## (.*$)/gm, '<h2>$1</h2>');
-            html = html.replace(/^# (.*$)/gm, '<h1>$1</h1>');
-
-            // 引用
-            html = html.replace(/^> (.*$)/gm, '<blockquote>$1</blockquote>');
-
-            // 链接
-            html = html.replace(/\[([^\]]*)\]\(([^)]*)\)/g, '<a href="$2" target="_blank">$1</a>');
-
-            // 图片
-            html = html.replace(/!\[([^\]]*)\]\(([^)]*)\)/g, '<img src="$2" alt="$1" />');
-
-            // 无序列表
-            html = html.replace(/^\- (.*$)/gm, '<li>$1</li>');
-            html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
-
-            // 有序列表
-            html = html.replace(/^\d+\. (.*$)/gm, '<li>$1</li>');
-
-            // 换行
-            html = html.replace(/\n/g, '<br />');
-
-            return html;
+        function setEditorContent(content) {
+            easyMDE.value(content || '');
         }
 
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
+        function updatePreview() {}
 
-        // ============================================================
-        // 与 API 交互
-        // ============================================================
         function getPassword() {
             return sessionStorage.getItem('admin_password') || PASSWORD;
         }
@@ -1496,15 +1474,15 @@
             return res;
         }
 
-        // ============================================================
-        // 文章列表
-        // ============================================================
         let allArticles = [];
         let currentFilter = 'all';
+        let currentSort = 'desc';
+        let allDrafts = [];
 
         async function loadAll() {
             await loadArticles();
             renderArticleList();
+            await loadDrafts();
             renderDraftList();
             updateBadges();
         }
@@ -1520,18 +1498,35 @@
             }
         }
 
+        async function loadDrafts() {
+            try {
+                const res = await apiCall('drafts', { method: 'GET' });
+                const data = await res.json();
+                allDrafts = data.drafts || [];
+            } catch (e) {
+                allDrafts = [];
+            }
+        }
+
         function getFilteredArticles(filter) {
-            if (filter === 'all') return allArticles;
-            if (filter === 'published') return allArticles.filter(function(a) { return !a.delete; });
-            if (filter === 'deleted') return allArticles.filter(function(a) { return a.delete; });
-            return allArticles;
+            let result = allArticles.slice();
+            if (filter === 'published') {
+                result = result.filter(function(a) { return !a.delete; });
+            } else if (filter === 'deleted') {
+                result = result.filter(function(a) { return a.delete; });
+            }
+            if (currentSort === 'desc') {
+                result.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
+            } else {
+                result.sort(function(a, b) { return (a.date || '').localeCompare(b.date || ''); });
+            }
+            return result;
         }
 
         function renderArticleList() {
             const list = document.getElementById('articleList');
             const search = document.getElementById('listSearch').value.trim().toLowerCase();
             let filtered = getFilteredArticles(currentFilter);
-
             if (search) {
                 filtered = filtered.filter(function(a) {
                     const title = (a.title || '').toLowerCase();
@@ -1539,25 +1534,20 @@
                     return title.indexOf(search) !== -1 || content.indexOf(search) !== -1;
                 });
             }
-
             document.getElementById('listCount').textContent = filtered.length + ' 篇';
-
             if (filtered.length === 0) {
                 list.innerHTML = '<div class="empty">没有文章</div>';
                 return;
             }
-
             let html = '';
-            filtered.forEach(function(article, idx) {
-                const realIdx = allArticles.indexOf(article);
+            filtered.forEach(function(article) {
+                const idx = allArticles.indexOf(article);
                 const tags = article.tags || [];
                 const tagsHtml = tags.map(function(t) {
                     return '<span class="tag">' + escapeHtml(t) + '</span>';
                 }).join(' ');
-
                 const deletedClass = article.delete ? 'deleted' : '';
                 const statusHtml = article.delete ? '<span class="status-deleted">已删除</span>' : '';
-
                 html += `
                     <div class="article-item-admin ${deletedClass}">
                         <div class="item-info">
@@ -1569,45 +1559,50 @@
                             </div>
                         </div>
                         <div class="item-actions">
-                            <button class="btn-edit" data-idx="${realIdx}">编辑</button>
+                            <button class="btn-edit" data-idx="${idx}">编辑</button>
                             ${article.delete ?
-                                '<button class="btn-restore" data-idx="' + realIdx + '">恢复</button>' :
-                                '<button class="btn-delete" data-idx="' + realIdx + '">删除</button>'
+                                '<button class="btn-restore" data-idx="' + idx + '">恢复</button>' :
+                                '<button class="btn-soft-delete" data-idx="' + idx + '">软删除</button>'
                             }
+                            <button class="btn-hard-delete" data-idx="${idx}" data-title="${escapeHtml(article.title || '无标题')}">硬删除</button>
                         </div>
                     </div>
                 `;
             });
-
             list.innerHTML = html;
-
-            // 事件绑定
             list.querySelectorAll('.btn-edit').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     const idx = parseInt(this.dataset.idx);
                     editArticle(idx);
                 });
             });
-
-            list.querySelectorAll('.btn-delete').forEach(function(btn) {
+            list.querySelectorAll('.btn-soft-delete').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     const idx = parseInt(this.dataset.idx);
-                    deleteArticle(idx);
+                    softDeleteArticle(idx);
                 });
             });
-
             list.querySelectorAll('.btn-restore').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     const idx = parseInt(this.dataset.idx);
                     restoreArticle(idx);
                 });
             });
+            list.querySelectorAll('.btn-hard-delete').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const idx = parseInt(this.dataset.idx);
+                    const title = this.dataset.title;
+                    showHardDeleteModal(idx, title);
+                });
+            });
         }
 
-        // ============================================================
-        // 文章操作
-        // ============================================================
-        let editingIdx = -1;
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
 
         function editArticle(idx) {
             const article = allArticles[idx];
@@ -1615,14 +1610,13 @@
             editingIdx = idx;
             document.getElementById('editTitle').value = article.title || '';
             document.getElementById('editTags').value = (article.tags || []).join('，');
-            mdEditor.value = article.content || '';
-            updatePreview();
+            setEditorContent(article.content || '');
             document.querySelector('.tab[data-tab="write"]').click();
-            showToast('已加载文章，修改后点击发布即可更新');
+            showToast('已加载文章，修改后点发布更新');
         }
 
-        async function deleteArticle(idx) {
-            if (!confirm('确定要删除这篇文章吗？')) return;
+        async function softDeleteArticle(idx) {
+            if (!confirm('确定要软删除这篇文章吗？')) return;
             try {
                 const res = await apiCall('posts', {
                     method: 'DELETE',
@@ -1630,7 +1624,7 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    showToast('已删除');
+                    showToast('已软删除');
                     await loadArticles();
                     renderArticleList();
                     updateBadges();
@@ -1662,100 +1656,67 @@
             }
         }
 
-        // ============================================================
-        // 发布/更新文章
-        // ============================================================
-        document.getElementById('publishBtn').addEventListener('click', async function() {
-            const title = document.getElementById('editTitle').value.trim();
-            const content = mdEditor.value.trim();
-            const tagsRaw = document.getElementById('editTags').value.trim();
-            const tags = tagsRaw ? tagsRaw.split(/[，,、\s]+/).filter(Boolean) : [];
+        let hardDeleteTarget = -1;
+        const hardDeleteOverlay = document.getElementById('hardDeleteOverlay');
+        const hardDeleteTitle = document.getElementById('hardDeleteTitle');
+        const hardDeleteConfirm = document.getElementById('hardDeleteConfirm');
+        const hardDeleteConfirmBtn = document.getElementById('hardDeleteConfirmBtn');
+        const hardDeleteCancel = document.getElementById('hardDeleteCancel');
 
-            if (!title) {
-                showToast('请输入标题', true);
-                return;
-            }
-            if (!content) {
-                showToast('请输入内容', true);
-                return;
-            }
-
-            this.disabled = true;
-
-            try {
-                let res, data;
-                if (editingIdx >= 0) {
-                    // 更新已有文章
-                    res = await apiCall('posts', {
-                        method: 'PUT',
-                        body: JSON.stringify({
-                            id: editingIdx,
-                            title: title,
-                            content: content,
-                            tags: tags
-                        })
-                    });
-                    data = await res.json();
-                    if (data.success) {
-                        showToast('文章已更新');
-                        editingIdx = -1;
-                        clearEditor();
-                        await loadArticles();
-                        renderArticleList();
-                        updateBadges();
-                    } else {
-                        showToast(data.error || '更新失败', true);
-                    }
-                } else {
-                    // 发布新文章
-                    res = await apiCall('posts', {
-                        method: 'POST',
-                        body: JSON.stringify({ title, content, tags })
-                    });
-                    data = await res.json();
-                    if (data.success) {
-                        showToast('发布成功！');
-                        clearEditor();
-                        await loadArticles();
-                        renderArticleList();
-                        updateBadges();
-                    } else {
-                        showToast(data.error || '发布失败', true);
-                    }
-                }
-            } catch (e) {
-                showToast('请求失败', true);
-            }
-            this.disabled = false;
-        });
-
-        function clearEditor() {
-            document.getElementById('editTitle').value = '';
-            document.getElementById('editTags').value = '';
-            mdEditor.value = '';
-            updatePreview();
-            editingIdx = -1;
+        function showHardDeleteModal(idx, title) {
+            hardDeleteTarget = idx;
+            hardDeleteTitle.textContent = title;
+            hardDeleteConfirm.value = '';
+            hardDeleteConfirmBtn.disabled = true;
+            hardDeleteOverlay.classList.add('active');
+            hardDeleteConfirm.focus();
         }
 
-        document.getElementById('cancelEditBtn').addEventListener('click', function() {
-            if (editingIdx >= 0 || mdEditor.value || document.getElementById('editTitle').value) {
-                if (!confirm('确定要清空当前内容吗？')) return;
-            }
-            clearEditor();
+        hardDeleteConfirm.addEventListener('input', function() {
+            hardDeleteConfirmBtn.disabled = this.value !== '删除';
         });
 
-        // ============================================================
-        // 草稿
-        // ============================================================
-        let allDrafts = [];
+        hardDeleteConfirm.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !hardDeleteConfirmBtn.disabled) {
+                confirmHardDelete();
+            }
+            if (e.key === 'Escape') {
+                closeHardDeleteModal();
+            }
+        });
 
-        async function loadDrafts() {
+        hardDeleteCancel.addEventListener('click', closeHardDeleteModal);
+        hardDeleteConfirmBtn.addEventListener('click', confirmHardDelete);
+        hardDeleteOverlay.addEventListener('click', function(e) {
+            if (e.target === this) closeHardDeleteModal();
+        });
+
+        function closeHardDeleteModal() {
+            hardDeleteOverlay.classList.remove('active');
+            hardDeleteTarget = -1;
+            hardDeleteConfirm.value = '';
+            hardDeleteConfirmBtn.disabled = true;
+        }
+
+        async function confirmHardDelete() {
+            if (hardDeleteTarget === -1) return;
             try {
-                const res = await apiCall('drafts', { method: 'GET' });
+                const res = await apiCall('posts', {
+                    method: 'DELETE',
+                    body: JSON.stringify({ id: hardDeleteTarget, hard: true })
+                });
                 const data = await res.json();
-                allDrafts = data.drafts || [];
+                if (data.success) {
+                    showToast('已硬删除');
+                    closeHardDeleteModal();
+                    await loadArticles();
+                    renderArticleList();
+                    updateBadges();
+                } else {
+                    showToast(data.error || '硬删除失败', true);
+                }
             } catch (e) {
-                allDrafts = [];
+                showToast('硬删除失败', true);
             }
         }
 
@@ -1773,10 +1734,7 @@
                     <div class="draft-item">
                         <div class="draft-info">
                             <div class="draft-title">${escapeHtml(draft.title || '无标题')}</div>
-                            <div class="draft-meta">
-                                创建于 ${draft.created || ''}
-                                ${draft.updated && draft.updated !== draft.created ? ' · 更新于 ' + draft.updated : ''}
-                            </div>
+                            <div class="draft-meta">创建于 ${draft.created || ''} ${draft.updated && draft.updated !== draft.created ? ' · 更新于 ' + draft.updated : ''}</div>
                             <div class="draft-preview">${escapeHtml(preview)}</div>
                         </div>
                         <div class="draft-actions">
@@ -1788,7 +1746,6 @@
                 `;
             });
             list.innerHTML = html;
-
             list.querySelectorAll('.btn-continue').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     const id = this.dataset.id;
@@ -1796,15 +1753,13 @@
                     if (draft) {
                         document.getElementById('editTitle').value = draft.title || '';
                         document.getElementById('editTags').value = (draft.tags || []).join('，');
-                        mdEditor.value = draft.content || '';
-                        updatePreview();
+                        setEditorContent(draft.content || '');
                         editingIdx = -1;
                         document.querySelector('.tab[data-tab="write"]').click();
                         showToast('已加载草稿');
                     }
                 });
             });
-
             list.querySelectorAll('.btn-publish-draft').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     const id = this.dataset.id;
@@ -1812,18 +1767,14 @@
                     if (draft) {
                         document.getElementById('editTitle').value = draft.title || '';
                         document.getElementById('editTags').value = (draft.tags || []).join('，');
-                        mdEditor.value = draft.content || '';
-                        updatePreview();
+                        setEditorContent(draft.content || '');
                         editingIdx = -1;
-                        // 删除草稿
                         deleteDraft(id);
                         document.querySelector('.tab[data-tab="write"]').click();
-                        // 自动点击发布
                         document.getElementById('publishBtn').click();
                     }
                 });
             });
-
             list.querySelectorAll('.btn-delete-draft').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     const id = this.dataset.id;
@@ -1854,20 +1805,88 @@
             }
         }
 
-        // ============================================================
-        // 保存草稿
-        // ============================================================
-        document.getElementById('saveDraftBtn').addEventListener('click', async function() {
-            const title = document.getElementById('editTitle').value.trim() || '无标题';
-            const content = mdEditor.value;
+        document.getElementById('publishBtn').addEventListener('click', async function() {
+            const title = document.getElementById('editTitle').value.trim();
+            const content = getEditorContent().trim();
             const tagsRaw = document.getElementById('editTags').value.trim();
             const tags = tagsRaw ? tagsRaw.split(/[，,、\s]+/).filter(Boolean) : [];
+            if (!title) {
+                showToast('请输入标题', true);
+                return;
+            }
+            if (!content) {
+                showToast('请输入内容', true);
+                return;
+            }
+            this.disabled = true;
+            try {
+                let res, data;
+                if (editingIdx >= 0) {
+                    res = await apiCall('posts', {
+                        method: 'PUT',
+                        body: JSON.stringify({
+                            id: editingIdx,
+                            title: title,
+                            content: content,
+                            tags: tags
+                        })
+                    });
+                    data = await res.json();
+                    if (data.success) {
+                        showToast('文章已更新');
+                        editingIdx = -1;
+                        clearEditor();
+                        await loadArticles();
+                        renderArticleList();
+                        updateBadges();
+                    } else {
+                        showToast(data.error || '更新失败', true);
+                    }
+                } else {
+                    res = await apiCall('posts', {
+                        method: 'POST',
+                        body: JSON.stringify({ title, content, tags })
+                    });
+                    data = await res.json();
+                    if (data.success) {
+                        showToast('发布成功！');
+                        clearEditor();
+                        await loadArticles();
+                        renderArticleList();
+                        updateBadges();
+                    } else {
+                        showToast(data.error || '发布失败', true);
+                    }
+                }
+            } catch (e) {
+                showToast('请求失败', true);
+            }
+            this.disabled = false;
+        });
 
+        function clearEditor() {
+            document.getElementById('editTitle').value = '';
+            document.getElementById('editTags').value = '';
+            setEditorContent('');
+            editingIdx = -1;
+        }
+
+        document.getElementById('cancelEditBtn').addEventListener('click', function() {
+            if (editingIdx >= 0 || getEditorContent() || document.getElementById('editTitle').value) {
+                if (!confirm('确定要清空当前内容吗？')) return;
+            }
+            clearEditor();
+        });
+
+        document.getElementById('saveDraftBtn').addEventListener('click', async function() {
+            const title = document.getElementById('editTitle').value.trim() || '无标题';
+            const content = getEditorContent();
+            const tagsRaw = document.getElementById('editTags').value.trim();
+            const tags = tagsRaw ? tagsRaw.split(/[，,、\s]+/).filter(Boolean) : [];
             if (!content) {
                 showToast('内容为空，无需保存', true);
                 return;
             }
-
             this.disabled = true;
             try {
                 const res = await apiCall('drafts', {
@@ -1889,9 +1908,6 @@
             this.disabled = false;
         });
 
-        // ============================================================
-        // 列表筛选和搜索
-        // ============================================================
         document.querySelectorAll('#tabList .filter-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('#tabList .filter-btn').forEach(function(b) {
@@ -1903,40 +1919,31 @@
             });
         });
 
+        document.getElementById('sortBtn').addEventListener('click', function() {
+            currentSort = currentSort === 'desc' ? 'asc' : 'desc';
+            this.innerHTML = currentSort === 'desc' ?
+                '<i class="fas fa-sort-amount-down"></i> 倒序' :
+                '<i class="fas fa-sort-amount-up"></i> 正序';
+            renderArticleList();
+        });
+
         document.getElementById('listSearch').addEventListener('input', function() {
             renderArticleList();
         });
 
-        // ============================================================
-        // Badge 更新
-        // ============================================================
         function updateBadges() {
             const published = allArticles.filter(function(a) { return !a.delete; }).length;
             const deleted = allArticles.filter(function(a) { return a.delete; }).length;
             document.getElementById('listBadge').textContent = allArticles.length;
-
-            const draftCount = allDrafts.length;
-            document.getElementById('draftBadge').textContent = draftCount;
+            document.getElementById('draftBadge').textContent = allDrafts.length;
         }
 
-        // ============================================================
-        // 初始化
-        // ============================================================
         if (checkLogin()) {
-            // 已经通过 checkLogin 加载了
+            // 已登录，loadAll 在 checkLogin 里调用
         } else {
-            // 显示登录界面
             loginScreen.classList.remove('hidden');
             mainApp.classList.remove('active');
         }
-
-        // 修复：如果登录成功后 loadAll 已在 checkLogin 里调用
-        // 但 checkLogin 里调用了 loadAll，loadAll 又调用了 loadArticles 和 loadDrafts
-        // 没问题
-
-        console.log('管理后台已加载');
-        console.log('密码: QwQ20141031.');
-        console.log('API 地址: /api/posts, /api/drafts, /api/auth');
     </script>
 </body>
 </html>
