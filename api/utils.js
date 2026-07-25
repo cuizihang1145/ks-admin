@@ -1,4 +1,6 @@
 const TOKEN = process.env.TOKEN;
+const MAIN_REPO = 'cuizihang1145/cuizihang1145.github.io';
+const ADMIN_REPO = 'cuizihang1145/ks-admin';
 const BRANCH = 'main';
 
 export async function readFile(repo, path) {
@@ -43,7 +45,23 @@ export async function writeFile(repo, path, jsonData, sha, commitMsg = '更新�
   return await res.json();
 }
 
+// ===== 验证：支持密码 + Token 两种方式 =====
 export function checkAuth(req) {
+  // 1. 先检查 Token
+  const token = req.headers['x-admin-token'] || '';
+  if (token) {
+    try {
+      const decoded = JSON.parse(Buffer.from(token, 'base64').toString('utf-8'));
+      // 检查是否过期（24小时）
+      if (decoded.authenticated === true && decoded.exp > Date.now()) {
+        return true;
+      }
+    } catch (e) {
+      // Token 解析失败，继续走密码验证
+    }
+  }
+
+  // 2. 再检查密码（兼容旧方式）
   const password = req.headers['x-admin-password'];
   return password === process.env.ADMIN_PASSWORD;
-}
+          }
