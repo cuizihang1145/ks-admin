@@ -1,6 +1,6 @@
 // api/auth.js
 const failedAttempts = {};
-const mathSessions = {}; // 存储题目答案，用 IP 做 key
+const mathSessions = {};
 
 function generateMathQuestion() {
   let a, b, answer, op, question;
@@ -38,6 +38,18 @@ function generateMathQuestion() {
 }
 
 export default async function handler(req, res) {
+  // ===== GET 请求：返回题目 =====
+  if (req.method === 'GET') {
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    const { question, answer } = generateMathQuestion();
+    mathSessions[ip] = {
+      answer: answer,
+      expires: Date.now() + 5 * 60 * 1000
+    };
+    return res.status(200).json({ question: question });
+  }
+
+  // ===== POST 请求：验证登录 =====
   if (req.method !== 'POST') {
     return res.status(405).json({ error: '方法不允许' });
   }
@@ -45,7 +57,7 @@ export default async function handler(req, res) {
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
   const now = Date.now();
 
-  // ===== 后端限流 =====
+  // 后端限流
   if (failedAttempts[ip] && failedAttempts[ip].lockedUntil > now) {
     const remaining = Math.ceil((failedAttempts[ip].lockedUntil - now) / 60000);
     return res.status(429).json({
@@ -53,7 +65,7 @@ export default async function handler(req, res) {
     });
   }
 
-  // ===== CSRF 防护：校验 Referer =====
+  // CSRF 防护
   const referer = req.headers.referer || '';
   const allowedDomains = ['admin.cuizi.top', 'cuizi.top', 'localhost'];
   let isAllowed = false;
@@ -67,28 +79,15 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: '请求来源不合法' });
   }
 
-  // ===== GET 请求：返回题目 =====
-  if (req.method === 'GET') {
-    const { question, answer } = generateMathQuestion();
-    mathSessions[ip] = {
-      answer: answer,
-      expires: Date.now() + 5 * 60 * 1000 // 5分钟有效期
-    };
-    return res.status(200).json({ question: question });
-  }
-
-  // ===== POST 请求：验证登录 =====
   const inviteCode = req.headers['x-invite-code'] || '';
   const password = req.headers['x-admin-password'] || '';
   const userAnswer = parseInt(req.headers['x-math-answer']) || 0;
 
-  // 从缓存中取正确答案
   const mathSession = mathSessions[ip];
   let validMath = false;
   if (mathSession && mathSession.expires > Date.now()) {
     validMath = userAnswer === mathSession.answer;
   }
-  // 无论验证是否通过，用完即销毁（防止重复使用）
   delete mathSessions[ip];
 
   if (!validMath) {
@@ -112,7 +111,6 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: '验证失败' });
   }
 
-  // ===== 登录成功 =====
   delete failedAttempts[ip];
 
   const token = Buffer.from(JSON.stringify({
