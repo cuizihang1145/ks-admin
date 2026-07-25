@@ -48,7 +48,6 @@
             padding: 2rem 1.5rem;
         }
 
-        /* ===== 登录 ===== */
         #loginScreen {
             display: flex;
             align-items: center;
@@ -193,7 +192,6 @@
             min-height: 1.5rem;
         }
 
-        /* ===== 主界面 ===== */
         #mainApp {
             display: none;
             animation: fadeIn 0.4s ease;
@@ -202,12 +200,24 @@
             display: block;
         }
         @keyframes fadeIn {
-            0% { opacity: 0; transform: translateY(12px); }
-            100% { opacity: 1; transform: translateY(0); }
+            0% {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         @keyframes slideDown {
-            0% { opacity: 0; transform: translateY(-10px); }
-            100% { opacity: 1; transform: translateY(0); }
+            0% {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .admin-header {
@@ -286,7 +296,6 @@
             background: rgba(255, 255, 255, 0.15);
         }
 
-        /* ===== Tabs ===== */
         .tabs {
             display: flex;
             gap: 0.3rem;
@@ -358,7 +367,6 @@
             display: block;
         }
 
-        /* ===== 编辑器 ===== */
         .editor-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -425,7 +433,6 @@
             margin-bottom: 0;
         }
 
-        /* ===== 工具栏 ===== */
         .md-toolbar {
             display: flex;
             flex-wrap: wrap;
@@ -574,37 +581,41 @@
         }
         .preview-area pre {
             background: #0d1117;
-            padding: 0.8rem 1rem;
+            padding: 0;
             border-radius: 8px;
             overflow: auto;
             margin: 0.5rem 0;
-            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
         .preview-area pre .code-lang {
             display: block;
             background: rgba(255, 255, 255, 0.06);
             color: #8b949e;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 600;
-            padding: 0.2rem 0.8rem;
+            padding: 0.15rem 0.8rem;
             border-radius: 4px 4px 0 0;
-            margin: -0.8rem -1rem 0.5rem -1rem;
-            font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            font-family: monospace;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         .preview-area pre code {
+            display: block;
             background: transparent;
-            padding: 0;
+            padding: 0.6rem 0.8rem;
             color: #e6edf3;
+            font-family: monospace;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-all;
         }
         .preview-area blockquote {
             border-left: 3px solid #6b5acf;
-            padding-left: 1rem;
-            margin: 0.5rem 0;
+            padding-left: 0.8rem;
+            margin: 0.4rem 0;
             color: #6a6a92;
             font-style: italic;
-            display: block;
         }
         body.dark .preview-area blockquote {
             border-left-color: #88ccff;
@@ -612,29 +623,29 @@
         }
         .preview-area img {
             max-width: 100%;
-            border-radius: 8px;
-            margin: 0.5rem 0;
+            border-radius: 6px;
+            margin: 0.4rem 0;
             display: block;
         }
         .preview-area ul,
         .preview-area ol {
             padding-left: 1.5rem;
-            margin: 0.4rem 0;
+            margin: 0.3rem 0;
         }
         .preview-area ul li,
         .preview-area ol li {
-            margin-bottom: 0.2rem;
+            margin-bottom: 0.1rem;
         }
         .preview-area table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.85rem;
-            margin: 0.5rem 0;
+            margin: 0.4rem 0;
         }
         .preview-area th,
         .preview-area td {
             border: 1px solid rgba(0, 0, 0, 0.08);
-            padding: 0.3rem 0.6rem;
+            padding: 0.2rem 0.5rem;
             text-align: left;
         }
         body.dark .preview-area th,
@@ -651,7 +662,7 @@
         .preview-area hr {
             border: none;
             border-top: 2px solid rgba(0, 0, 0, 0.08);
-            margin: 1rem 0;
+            margin: 0.8rem 0;
         }
         body.dark .preview-area hr {
             border-top-color: rgba(255, 255, 255, 0.08);
@@ -721,7 +732,6 @@
             color: #d0caf0;
         }
 
-        /* ===== 文章列表 ===== */
         .list-controls {
             display: flex;
             gap: 0.8rem;
@@ -949,7 +959,6 @@
             background: rgba(255, 152, 0, 0.22);
         }
 
-        /* ===== 草稿箱 ===== */
         .draft-item {
             background: rgba(255, 255, 255, 0.35);
             backdrop-filter: blur(8px);
@@ -1068,7 +1077,6 @@
             background: rgba(229, 115, 115, 0.22);
         }
 
-        /* ===== 弹窗 ===== */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -1089,8 +1097,12 @@
             display: flex;
         }
         @keyframes overlayFade {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
         }
         .modal-box {
             max-width: 460px;
@@ -1110,8 +1122,14 @@
             border-color: rgba(255, 255, 255, 0.06);
         }
         @keyframes modalSlide {
-            0% { opacity: 0; transform: scale(0.92) translateY(20px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
+            0% {
+                opacity: 0;
+                transform: scale(0.92) translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
         .modal-box .modal-icon {
             font-size: 2.5rem;
@@ -1196,7 +1214,6 @@
             transform: scale(1.02);
         }
 
-        /* ===== Toast ===== */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -1309,7 +1326,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- ===== 登录 ===== -->
         <div id="loginScreen">
             <div class="login-card">
                 <h1>管理后台</h1>
@@ -1326,7 +1342,6 @@
             </div>
         </div>
 
-        <!-- ===== 主应用 ===== -->
         <div id="mainApp">
             <div class="admin-header">
                 <span class="title">管理后台</span>
@@ -1344,7 +1359,6 @@
                 <button class="tab" data-tab="drafts">草稿箱 <span class="badge" id="draftBadge">0</span></button>
             </div>
 
-            <!-- ===== 写文章 ===== -->
             <div class="tab-content active" id="tabWrite">
                 <div class="editor-section">
                     <div class="editor-panel">
@@ -1398,7 +1412,6 @@
                 </div>
             </div>
 
-            <!-- ===== 文章列表 ===== -->
             <div class="tab-content" id="tabList">
                 <div class="list-controls">
                     <button class="filter-btn active" data-filter="all">全部</button>
@@ -1411,14 +1424,12 @@
                 <div class="article-list" id="articleList"></div>
             </div>
 
-            <!-- ===== 草稿箱 ===== -->
             <div class="tab-content" id="tabDrafts">
                 <div class="article-list" id="draftList"></div>
             </div>
         </div>
     </div>
 
-    <!-- ===== 弹窗 ===== -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-box">
             <span class="modal-icon" id="modalIcon"><i class="fas fa-exclamation-triangle"></i></span>
@@ -1629,39 +1640,38 @@
         // ================================================================
         function countWords(text) {
             if (!text) return 0;
-            // 去掉 Markdown 符号，只算纯文本字数
-            let clean = text
-                .replace(/```[\s\S]*?```/g, '') // 代码块
-                .replace(/`[^`]+`/g, '') // 行内代码
-                .replace(/\*\*(.*?)\*\*/g, '$1') // 粗体
-                .replace(/\*([^*]+)\*/g, '$1') // 斜体
-                .replace(/~~(.*?)~~/g, '$1') // 删除线
-                .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1') // 链接文字
-                .replace(/!\[([^\]]*)\]\([^)]*\)/g, '') // 图片
-                .replace(/^#{1,6}\s+/gm, '') // 标题标记
-                .replace(/^-\s+/gm, '') // 无序列表标记
-                .replace(/^\d+\.\s+/gm, '') // 有序列表标记
-                .replace(/^>\s+/gm, '') // 引用标记
-                .replace(/^---$/gm, '') // 分割线
+            var clean = text
+                .replace(/```[\s\S]*?```/g, '')
+                .replace(/`[^`]+`/g, '')
+                .replace(/\*\*(.*?)\*\*/g, '$1')
+                .replace(/\*([^*]+)\*/g, '$1')
+                .replace(/~~(.*?)~~/g, '$1')
+                .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+                .replace(/!\[([^\]]*)\]\([^)]*\)/g, '')
+                .replace(/^#{1,6}\s+/gm, '')
+                .replace(/^-\s+/gm, '')
+                .replace(/^\d+\.\s+/gm, '')
+                .replace(/^>\s+/gm, '')
+                .replace(/^---$/gm, '')
                 .replace(/\s+/g, ' ')
                 .trim();
             return clean.length;
         }
 
         function updateWordCount() {
-            const text = mdEditor.value;
-            const count = countWords(text);
+            var text = mdEditor.value;
+            var count = countWords(text);
             document.getElementById('wordCount').textContent = count;
         }
 
         // ================================================================
         // 日期默认今天
         // ================================================================
-        const editDateInput = document.getElementById('editDate');
+        var editDateInput = document.getElementById('editDate');
 
         function setDefaultDate() {
             if (!editDateInput.value) {
-                const today = new Date().toISOString().slice(0, 10);
+                var today = new Date().toISOString().slice(0, 10);
                 editDateInput.value = today;
             }
         }
@@ -1670,16 +1680,16 @@
         // ================================================================
         // Markdown 编辑器
         // ================================================================
-        const mdEditor = document.getElementById('mdEditor');
-        const previewArea = document.getElementById('previewArea');
-        const publishBtn = document.getElementById('publishBtn');
+        var mdEditor = document.getElementById('mdEditor');
+        var previewArea = document.getElementById('previewArea');
+        var publishBtn = document.getElementById('publishBtn');
 
         function insertText(text) {
-            const start = mdEditor.selectionStart;
-            const end = mdEditor.selectionEnd;
-            const value = mdEditor.value;
+            var start = mdEditor.selectionStart;
+            var end = mdEditor.selectionEnd;
+            var value = mdEditor.value;
             mdEditor.value = value.substring(0, start) + text + value.substring(end);
-            const pos = start + text.length;
+            var pos = start + text.length;
             mdEditor.selectionStart = mdEditor.selectionEnd = pos;
             mdEditor.focus();
             updatePreview();
@@ -1687,12 +1697,12 @@
         }
 
         function wrapText(before, after) {
-            const start = mdEditor.selectionStart;
-            const end = mdEditor.selectionEnd;
-            const value = mdEditor.value;
-            const selected = value.substring(start, end);
+            var start = mdEditor.selectionStart;
+            var end = mdEditor.selectionEnd;
+            var value = mdEditor.value;
+            var selected = value.substring(start, end);
             mdEditor.value = value.substring(0, start) + before + selected + after + value.substring(end);
-            const pos = start + before.length;
+            var pos = start + before.length;
             mdEditor.selectionStart = mdEditor.selectionEnd = (selected.length === 0) ? pos : pos + selected.length;
             mdEditor.focus();
             updatePreview();
@@ -1700,12 +1710,12 @@
         }
 
         function handleListContinuation() {
-            const value = mdEditor.value;
-            const cursorPos = mdEditor.selectionStart;
-            const lines = value.split('\n');
-            let lineIndex = 0;
-            let charCount = 0;
-            for (let i = 0; i < lines.length; i++) {
+            var value = mdEditor.value;
+            var cursorPos = mdEditor.selectionStart;
+            var lines = value.split('\n');
+            var lineIndex = 0;
+            var charCount = 0;
+            for (var i = 0; i < lines.length; i++) {
                 charCount += lines[i].length + 1;
                 if (cursorPos <= charCount) {
                     lineIndex = i;
@@ -1713,18 +1723,18 @@
                 }
             }
             if (lineIndex > lines.length - 1) return false;
-            const currentLine = lines[lineIndex] || '';
-            const olMatch = currentLine.match(/^(\s*)(\d+)\.\s+/);
+            var currentLine = lines[lineIndex] || '';
+            var olMatch = currentLine.match(/^(\s*)(\d+)\.\s+/);
             if (olMatch) {
-                const indent = olMatch[1];
-                const num = parseInt(olMatch[2]) + 1;
-                const prefix = indent + num + '. ';
-                const nextLine = lines[lineIndex + 1] || '';
+                var indent = olMatch[1];
+                var num = parseInt(olMatch[2]) + 1;
+                var prefix = indent + num + '. ';
+                var nextLine = lines[lineIndex + 1] || '';
                 if (nextLine.trim() === '') {
-                    const before = value.substring(0, cursorPos);
-                    const after = value.substring(cursorPos);
+                    var before = value.substring(0, cursorPos);
+                    var after = value.substring(cursorPos);
                     mdEditor.value = before + '\n' + prefix + after;
-                    const newPos = cursorPos + 1 + prefix.length;
+                    var newPos = cursorPos + 1 + prefix.length;
                     mdEditor.selectionStart = mdEditor.selectionEnd = newPos;
                     mdEditor.focus();
                     updatePreview();
@@ -1733,17 +1743,17 @@
                 }
                 return false;
             }
-            const ulMatch = currentLine.match(/^(\s*)([-*])\s+/);
+            var ulMatch = currentLine.match(/^(\s*)([-*])\s+/);
             if (ulMatch) {
-                const indent = ulMatch[1];
-                const marker = ulMatch[2];
-                const prefix = indent + marker + ' ';
-                const nextLine = lines[lineIndex + 1] || '';
+                var indent = ulMatch[1];
+                var marker = ulMatch[2];
+                var prefix = indent + marker + ' ';
+                var nextLine = lines[lineIndex + 1] || '';
                 if (nextLine.trim() === '') {
-                    const before = value.substring(0, cursorPos);
-                    const after = value.substring(cursorPos);
+                    var before = value.substring(0, cursorPos);
+                    var after = value.substring(cursorPos);
                     mdEditor.value = before + '\n' + prefix + after;
-                    const newPos = cursorPos + 1 + prefix.length;
+                    var newPos = cursorPos + 1 + prefix.length;
                     mdEditor.selectionStart = mdEditor.selectionEnd = newPos;
                     mdEditor.focus();
                     updatePreview();
@@ -1757,10 +1767,10 @@
 
         document.querySelectorAll('#mdToolbar button[data-cmd]').forEach(function(btn) {
             btn.addEventListener('click', function() {
-                const cmd = this.dataset.cmd;
-                const start = mdEditor.selectionStart;
-                const end = mdEditor.selectionEnd;
-                const selected = mdEditor.value.substring(start, end);
+                var cmd = this.dataset.cmd;
+                var start = mdEditor.selectionStart;
+                var end = mdEditor.selectionEnd;
+                var selected = mdEditor.value.substring(start, end);
 
                 switch (cmd) {
                     case 'bold':
@@ -1809,7 +1819,7 @@
                         break;
                     case 'codeblock':
                         insertText('\n```\n\n```\n');
-                        const pos = mdEditor.selectionStart;
+                        var pos = mdEditor.selectionStart;
                         mdEditor.selectionStart = mdEditor.selectionEnd = pos - 3;
                         mdEditor.focus();
                         break;
@@ -1838,7 +1848,7 @@
 
         mdEditor.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
-                const handled = handleListContinuation();
+                var handled = handleListContinuation();
                 if (handled) {
                     e.preventDefault();
                 }
@@ -1854,430 +1864,149 @@
         });
 
         // ================================================================
-        // Markdown 渲染器（直接照抄 article.html 的）
+        // Markdown 渲染器（纯手写，不卡死，不依赖外部DOM）
         // ================================================================
         function renderMarkdown(md) {
             if (!md) return '<span style="color:#8a8ab5;font-size:0.85rem;">预览会显示在这里</span>';
 
             function escapeHtml(text) {
                 if (!text) return '';
-                const div = document.createElement('div');
+                var div = document.createElement('div');
                 div.textContent = text;
                 return div.innerHTML;
             }
 
-            const escMap = {};
-            let escCounter = 0;
-            md = md.replace(/\\([\\`*_{}\[\]()#+\-.!|$])/g, function(match, char) {
-                const key = '\uE000' + (escCounter++) + '\uE001';
-                escMap[key] = char;
-                return key;
+            var html = md;
+
+            // 1. 代码块
+            html = html.replace(/```(\w*)\n([\s\S]*?)```/g, function(match, lang, code) {
+                var langLabel = lang ? '<span class="code-lang">' + lang + '</span>' : '';
+                return '<pre>' + langLabel + '<code>' + escapeHtml(code) + '</code></pre>';
             });
 
-            const lines = md.split('\n');
-            let result = '';
-            let inCodeBlock = false;
-            let codeBlockLines = [];
-            let codeLang = '';
-            let codeBlockCounter = 0;
-            let inTable = false;
-            let tableRows = [];
-            let tableAligns = [];
-            let footnotes = {};
-            let footnoteKeys = [];
+            // 2. 行内代码
+            html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
 
-            function restoreEscapes(text) {
-                let r = text;
-                for (const [key, char] of Object.entries(escMap)) {
-                    r = r.replace(new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), char);
-                }
-                return r;
-            }
+            // 3. 粗体
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
-            function renderInline(text) {
-                let html = escapeHtml(text);
-                html = html.replace(/&lt;(https?:\/\/[^\s<>]+)&gt;/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
-                html = html.replace(/&lt;([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})&gt;/g, '<a href="mailto:$1">$1</a>');
-                html = html.replace(/(?<!\]\()https?:\/\/[^\s<>]+/g, '<a href="$&" target="_blank" rel="noopener">$&</a>');
-                html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-                html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-                html = html.replace(/~~(.*?)~~/g, '<del>$1</del>');
-                html = html.replace(/!\[([^\]]*)\]\(([^)]*?)(?:\s+=\s*(\d*)(?:x(\d+))?)?\)/g, function(match, alt, src, w, h) {
-                    let style = '';
-                    if (w && h) style = ' style="width:' + w + 'px; height:' + h + 'px;"';
-                    else if (w) style = ' style="width:' + w + 'px; height:auto;"';
-                    else if (h) style = ' style="height:' + h + 'px; width:auto;"';
-                    return '<img src="' + src + '" alt="' + alt + '" loading="lazy"' + style + ' />';
+            // 4. 斜体
+            html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+
+            // 5. 删除线
+            html = html.replace(/~~(.*?)~~/g, '<del>$1</del>');
+
+            // 6. 标题
+            html = html.replace(/^###### (.+)$/gm, '<h6>$1</h6>');
+            html = html.replace(/^##### (.+)$/gm, '<h5>$1</h5>');
+            html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
+            html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+            html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+            html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+
+            // 7. 引用
+            html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+
+            // 8. 链接
+            html = html.replace(/\[([^\]]*)\]\(([^)]*)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+
+            // 9. 图片
+            html = html.replace(/!\[([^\]]*)\]\(([^)]*)\)/g, '<img src="$2" alt="$1" />');
+
+            // 10. 分割线
+            html = html.replace(/^---$/gm, '<hr />');
+
+            // 11. 表格
+            html = html.replace(/\|(.+)\|\n\|([\-:| ]+)\|\n((?:\|.+\|\n?)+)/g, function(match, header, align, rows) {
+                var headers = header.split('|').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
+                var aligns = align.split('|').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
+                var tableHtml = '<table><thead><tr>';
+                headers.forEach(function(h, i) {
+                    var alignStyle = (aligns[i] && aligns[i].endsWith(':')) ? ' style="text-align:' + (aligns[i].startsWith(':') ? 'center' : 'right') + ';"' : '';
+                    tableHtml += '<th' + alignStyle + '>' + h + '</th>';
                 });
-                html = html.replace(/\[([^\]]*)\]\(([^)]*)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-                html = html.replace(/\[\^([^\]]+)\]/g, function(match, key) {
-                    if (!footnoteKeys.includes(key)) footnoteKeys.push(key);
-                    return '<sup class="footnote-ref"><a href="#fn-' + key + '" id="fnref-' + key + '">' + key + '</a></sup>';
+                tableHtml += '</tr></thead><tbody>';
+                var rowLines = rows.split('\n').filter(function(r) { return r.trim(); });
+                rowLines.forEach(function(row) {
+                    var cells = row.split('|').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
+                    tableHtml += '<tr>';
+                    cells.forEach(function(cell, i) {
+                        var alignStyle = (aligns[i] && aligns[i].endsWith(':')) ? ' style="text-align:' + (aligns[i].startsWith(':') ? 'center' : 'right') + ';"' : '';
+                        tableHtml += '<td' + alignStyle + '>' + cell + '</td>';
+                    });
+                    tableHtml += '</tr>';
                 });
-                html = restoreEscapes(html);
-                return html;
-            }
+                tableHtml += '</tbody></table>';
+                return tableHtml;
+            });
 
-            function flushTable() {
-                if (tableRows.length === 0) return;
-                let html = '<table>';
-                for (let i = 0; i < tableRows.length; i++) {
-                    const cells = tableRows[i];
-                    const isHeader = i === 0;
-                    html += '<tr>';
-                    for (let j = 0; j < cells.length; j++) {
-                        const tag = isHeader ? 'th' : 'td';
-                        const align = (i === 1 && tableAligns[j]) ? ' style="text-align:' + tableAligns[j] + ';"' : '';
-                        const cellContent = cells[j].replace(/\\n/g, '\n').replace(/\n/g, '<br>');
-                        html += '<' + tag + align + '>' + renderInline(cellContent) + '</' + tag + '>';
-                    }
-                    html += '</tr>';
-                }
-                html += '</table>';
-                result += html;
-                tableRows = [];
-                tableAligns = [];
-                inTable = false;
-            }
+            // 12. 列表（用逐行解析，防止死循环）
+            var lines = html.split('\n');
+            var result = [];
+            var i = 0;
 
-            function flushCodeBlock() {
-                if (codeBlockLines.length === 0) {
-                    inCodeBlock = false;
-                    codeLang = '';
-                    return;
-                }
-                let code = codeBlockLines.join('\n');
-                code = code.replace(/^\s*\n/, '').replace(/\n\s*$/, '');
-
-                const langParts = codeLang.split(/\s+/);
-                const lang = langParts[0] || 'text';
-                const copyId = 'code-' + Date.now() + '-' + (codeBlockCounter++);
-
-                const lines = code.split('\n');
-                const lineCount = lines.length;
-                let maxLineLength = 0;
-                let totalChars = 0;
-                for (let j = 0; j < lines.length; j++) {
-                    const lineLen = lines[j].length;
-                    if (lineLen > maxLineLength) maxLineLength = lineLen;
-                    totalChars += lineLen;
-                }
-                totalChars += lineCount > 0 ? lineCount - 1 : 0;
-
-                const statsHtml = '<span>' + lineCount + ' 行</span> · <span>' + maxLineLength + ' 列</span> · <span>' + totalChars + ' 字符</span>';
-
-                let codeHtml = '';
-                for (let j = 0; j < lines.length; j++) {
-                    const lineNum = j + 1;
-                    const escapedLine = escapeHtml(lines[j]);
-                    codeHtml += `<span class="code-line"><span class="line-number">${lineNum}</span><span class="hljs">${escapedLine}</span></span>`;
-                }
-
-                result += `
-                    <div class="code-block-wrapper" id="cbw-${copyId}">
-                        <div class="code-block-header">
-                            <span class="lang-label">${escapeHtml(lang)}</span>
-                            <span class="code-stats">${statsHtml}</span>
-                            <span class="header-actions">
-                                <button class="copy-btn" data-copy="${copyId}"><i class="fas fa-copy"></i> 复制</button>
-                                <button class="collapse-btn" data-target="cbw-${copyId}">
-                                    <i class="fas fa-chevron-up"></i>
-                                </button>
-                            </span>
-                        </div>
-                        <div class="code-block-body-wrapper">
-                            <div class="code-block-body" id="code-body-${copyId}">
-                                ${codeHtml}
-                            </div>
-                        </div>
-                    </div>
-                `;
-                codeBlockLines = [];
-                inCodeBlock = false;
-                codeLang = '';
-            }
-
-            let i = 0;
             while (i < lines.length) {
-                const line = lines[i];
-                const trimmed = line.trim();
+                var line = lines[i];
+                var trimmed = line.trim();
 
-                const codeBlockStart = line.match(/^(```|~~~)(\w*)/);
-                if (codeBlockStart) {
-                    if (!inCodeBlock) {
-                        flushTable();
-                        inCodeBlock = true;
-                        codeLang = codeBlockStart[2] || 'text';
-                        i++;
-                        continue;
-                    } else {
-                        flushCodeBlock();
-                        i++;
-                        continue;
-                    }
-                }
-                if (inCodeBlock) {
-                    codeBlockLines.push(line);
-                    i++;
-                    continue;
-                }
-
+                // 空行直接跳过
                 if (trimmed === '') {
-                    flushTable();
+                    result.push(line);
                     i++;
                     continue;
                 }
 
-                const fnMatch = line.match(/^\[\^([^\]]+)\]:\s*(.+)/);
-                if (fnMatch) {
-                    flushTable();
-                    const key = fnMatch[1];
-                    const content = fnMatch[2];
-                    footnotes[key] = renderInline(content);
-                    if (!footnoteKeys.includes(key)) footnoteKeys.push(key);
-                    i++;
-                    continue;
-                }
-
-                if (line.includes('|') && trimmed.startsWith('|') && trimmed.endsWith('|')) {
-                    if (!inTable) {
-                        flushTable();
-                        inTable = true;
-                        tableRows = [];
-                        tableAligns = [];
-                    }
-                    const cells = trimmed.slice(1, -1).split('|').map(s => s.trim());
-                    if (cells.every(c => /^:?-+:?$/.test(c))) {
-                        tableAligns = cells.map(c => {
-                            if (c.startsWith(':') && c.endsWith(':')) return 'center';
-                            if (c.endsWith(':')) return 'right';
-                            if (c.startsWith(':')) return 'left';
-                            return '';
-                        });
-                        i++;
-                        continue;
-                    }
-                    tableRows.push(cells);
-                    i++;
-                    continue;
-                }
-                if (inTable) {
-                    flushTable();
-                    continue;
-                }
-
-                const headingMatch = line.match(/^(#{1,6})\s+(.+)/);
-                if (headingMatch) {
-                    flushTable();
-                    const level = headingMatch[1].length;
-                    const text = headingMatch[2];
-                    result += '<h' + level + '>' + renderInline(text) + '</h' + level + '>';
-                    i++;
-                    continue;
-                }
-
-                if (/^---$/.test(trimmed) || /^\*\*\*$/.test(trimmed) || /^___$/.test(trimmed)) {
-                    flushTable();
-                    result += '<hr />';
-                    i++;
-                    continue;
-                }
-
-                if (i + 1 < lines.length && lines[i + 1].match(/^:\s+/)) {
-                    flushTable();
-                    const term = renderInline(trimmed);
-                    let defs = [];
-                    i++;
-                    while (i < lines.length && lines[i].match(/^:\s+/)) {
-                        defs.push(renderInline(lines[i].replace(/^:\s+/, '')));
-                        i++;
-                    }
-                    while (i < lines.length && lines[i].trim() === '') i++;
-                    let ddHtml = defs.map(d => '<dd>' + d + '</dd>').join('');
-                    result += '<dl><dt>' + term + '</dt>' + ddHtml + '</dl>';
-                    continue;
-                }
-
-                function parseList(startIdx, parentIndent) {
-                    let html = '';
-                    let idx = startIdx;
-                    let currentListType = null;
-                    let items = [];
-                    let olStartNumber = null;
-                    let olValues = [];
-
-                    while (idx < lines.length) {
-                        const l = lines[idx];
-                        const t = l.trim();
-                        if (t === '') break;
-
-                        const ulMatch = l.match(/^(\s*)[-*+]\s+(.+)/);
-                        const olMatch = l.match(/^(\s*)(\d+)\.\s+(.+)/);
-                        const taskMatch = l.match(/^(\s*)[-*+]\s+\[([ x])\]\s+(.+)/);
-
-                        let match = null;
-                        let type = null;
-                        let content = '';
-                        let indent = 0;
-                        let olNumber = 0;
-
-                        if (taskMatch) {
-                            indent = taskMatch[1].length;
-                            if (indent < parentIndent) break;
-                            type = 'task';
-                            const checked = taskMatch[2] === 'x';
-                            content = '<input type="checkbox"' + (checked ? ' checked' : '') + ' disabled> ' + taskMatch[3];
-                        } else if (ulMatch) {
-                            indent = ulMatch[1].length;
-                            if (indent < parentIndent) break;
-                            type = 'ul';
-                            content = ulMatch[2];
-                        } else if (olMatch) {
-                            indent = olMatch[1].length;
-                            if (indent < parentIndent) break;
-                            type = 'ol';
-                            olNumber = parseInt(olMatch[2]);
-                            content = olMatch[3];
-                            if (olStartNumber === null) {
-                                olStartNumber = olNumber;
-                            }
-                            olValues.push(olNumber);
-                        } else {
-                            break;
-                        }
-
-                        let childHtml = '';
-                        let childIdx = idx + 1;
-                        while (childIdx < lines.length && lines[childIdx].trim() === '') childIdx++;
-                        if (childIdx < lines.length) {
-                            const nextLine = lines[childIdx];
-                            const nextUl = nextLine.match(/^(\s*)[-*+]\s+/);
-                            const nextOl = nextLine.match(/^(\s*)(\d+)\.\s+/);
-                            const nextTask = nextLine.match(/^(\s*)[-*+]\s+\[[ x]\]\s+/);
-                            if (nextUl || nextOl || nextTask) {
-                                const nextIndent = parseInt((nextUl || nextOl || nextTask)[1].length);
-                                if (nextIndent > indent) {
-                                    const [childHtmlResult, childConsumed] = parseList(childIdx, indent);
-                                    childHtml = childHtmlResult;
-                                    idx += childConsumed;
-                                }
-                            }
-                        }
-
-                        if (!currentListType) {
-                            currentListType = type === 'ol' ? 'ol' : 'ul';
-                        }
-
-                        const isTask = type === 'task';
-                        const liClass = isTask ? ' class="task-list-item"' : '';
-                        const renderedContent = renderInline(content);
-
-                        let liTag = '<li' + liClass;
-                        if (type === 'ol') {
-                            liTag += ' value="' + olNumber + '"';
-                        }
-                        liTag += '>' + renderedContent + childHtml + '</li>';
-
-                        items.push({
-                            type: type,
-                            olNumber: olNumber,
-                            html: liTag
-                        });
-
-                        idx++;
-                    }
-
-                    if (items.length === 0) {
-                        return ['', 0];
-                    }
-
-                    const listTag = currentListType === 'ol' ? 'ol' : 'ul';
-                    const listClass = currentListType === 'ol' ? '' : ' class="task-list"';
-                    let startAttr = '';
-                    if (currentListType === 'ol' && olStartNumber !== null && olStartNumber !== 1) {
-                        startAttr = ' start="' + olStartNumber + '"';
-                    }
-                    const itemsHtml = items.map(item => item.html).join('\n');
-                    html = '<' + listTag + listClass + startAttr + '>\n' + itemsHtml + '\n</' + listTag + '>';
-                    return [html, idx - startIdx];
-                }
-
-                const listCheck = line.match(/^(\s*)[-*+]\s+/);
-                const taskCheck = line.match(/^(\s*)[-*+]\s+\[[ x]\]\s+/);
-                const olCheck = line.match(/^(\s*)(\d+)\.\s+/);
-
-                if (taskCheck || listCheck || olCheck) {
-                    flushTable();
-                    const [listHtml, consumed] = parseList(i, 0);
-                    result += listHtml;
-                    i += consumed;
-                    continue;
-                }
-
-                if (line.startsWith('>')) {
-                    flushTable();
-                    let level = 0;
-                    let temp = line;
-                    while (temp.startsWith('>')) {
-                        level++;
-                        temp = temp.substring(1);
-                        if (temp.startsWith(' ')) temp = temp.substring(1);
-                    }
-                    const content = temp.trim();
-                    let quoteLines = [content];
-                    let j = i + 1;
-                    while (j < lines.length) {
-                        const nextLine = lines[j];
-                        if (nextLine.startsWith('>')) {
-                            let lv = 0;
-                            let tmp = nextLine;
-                            while (tmp.startsWith('>')) {
-                                lv++;
-                                tmp = tmp.substring(1);
-                                if (tmp.startsWith(' ')) tmp = tmp.substring(1);
-                            }
-                            quoteLines.push(tmp.trim());
-                            j++;
-                        } else if (nextLine.trim() === '') {
-                            quoteLines.push('');
-                            j++;
+                // 检查是否是无序列表项
+                var ulMatch = line.match(/^(\s*)[-*]\s+(.*)/);
+                if (ulMatch) {
+                    var ulItems = [];
+                    var ulIndent = ulMatch[1].length;
+                    while (i < lines.length) {
+                        var curLine = lines[i];
+                        var curUlMatch = curLine.match(/^(\s*)[-*]\s+(.*)/);
+                        if (curUlMatch && curUlMatch[1].length === ulIndent) {
+                            ulItems.push('<li>' + curUlMatch[2] + '</li>');
+                            i++;
                         } else {
                             break;
                         }
                     }
-                    let innerHtml = renderInline(quoteLines.join('\n'));
-                    for (let lv = 0; lv < level; lv++) {
-                        innerHtml = '<blockquote>' + innerHtml + '</blockquote>';
-                    }
-                    result += innerHtml;
-                    i = j;
+                    result.push('<ul>' + ulItems.join('') + '</ul>');
                     continue;
                 }
 
-                flushTable();
-                result += '<p>' + renderInline(line) + '</p>';
+                // 检查是否是有序列表项
+                var olMatch = line.match(/^(\s*)(\d+)\.\s+(.*)/);
+                if (olMatch) {
+                    var olItems = [];
+                    var olIndent = olMatch[1].length;
+                    var olStart = parseInt(olMatch[2]);
+                    while (i < lines.length) {
+                        var curLine = lines[i];
+                        var curOlMatch = curLine.match(/^(\s*)(\d+)\.\s+(.*)/);
+                        if (curOlMatch && curOlMatch[1].length === olIndent) {
+                            olItems.push('<li>' + curOlMatch[3] + '</li>');
+                            i++;
+                        } else {
+                            break;
+                        }
+                    }
+                    var startAttr = olStart !== 1 ? ' start="' + olStart + '"' : '';
+                    result.push('<ol' + startAttr + '>' + olItems.join('') + '</ol>');
+                    continue;
+                }
+
+                // 普通行直接保留
+                result.push(line);
                 i++;
             }
 
-            flushCodeBlock();
-            flushTable();
+            html = result.join('\n');
 
-            if (footnoteKeys.length > 0) {
-                result += '<div class="footnotes">\n';
-                for (const key of footnoteKeys) {
-                    if (footnotes[key]) {
-                        result += '<div class="footnote-def" id="fn-' + key + '">';
-                        result += '<a href="#fnref-' + key + '" class="footnote-back">↩</a> ';
-                        result += footnotes[key];
-                        result += '</div>\n';
-                    }
-                }
-                result += '</div>\n';
-            }
+            // 13. 换行
+            html = html.replace(/\n/g, '<br />');
 
-            result = restoreEscapes(result);
-            return result;
+            return html;
         }
 
         // ================================================================
@@ -2288,18 +2017,18 @@
         }
 
         async function apiCall(endpoint, options) {
-            const defaultOptions = {
+            var defaultOptions = {
                 headers: {
                     'X-Admin-Password': getPassword(),
                     'Content-Type': 'application/json'
                 }
             };
-            const merged = {
+            var merged = {
                 ...defaultOptions,
                 ...options,
                 headers: { ...defaultOptions.headers, ...(options?.headers || {}) }
             };
-            const res = await fetch('/api/' + endpoint, merged);
+            var res = await fetch('/api/' + endpoint, merged);
             if (res.status === 401) {
                 showToast('登录已过期，请重新登录', true);
                 sessionStorage.removeItem(STORAGE_KEY);
@@ -2313,12 +2042,12 @@
         // ================================================================
         // 数据
         // ================================================================
-        let allArticles = [];
-        let currentFilter = 'all';
-        let currentSort = 'desc';
-        let allDrafts = [];
-        let editingIdx = -1;
-        let previousVersion = null;
+        var allArticles = [];
+        var currentFilter = 'all';
+        var currentSort = 'desc';
+        var allDrafts = [];
+        var editingIdx = -1;
+        var previousVersion = null;
 
         async function loadAll() {
             await loadArticles();
@@ -2330,8 +2059,8 @@
 
         async function loadArticles() {
             try {
-                const res = await apiCall('posts', { method: 'GET' });
-                const data = await res.json();
+                var res = await apiCall('posts', { method: 'GET' });
+                var data = await res.json();
                 allArticles = data.announcements || [];
             } catch (e) {
                 showToast('加载文章失败', true);
@@ -2341,8 +2070,8 @@
 
         async function loadDrafts() {
             try {
-                const res = await apiCall('drafts', { method: 'GET' });
-                const data = await res.json();
+                var res = await apiCall('drafts', { method: 'GET' });
+                var data = await res.json();
                 allDrafts = data.drafts || [];
             } catch (e) {
                 allDrafts = [];
@@ -2350,7 +2079,7 @@
         }
 
         function getFilteredArticles(filter) {
-            let result = allArticles.slice();
+            var result = allArticles.slice();
             if (filter === 'published') {
                 result = result.filter(function(a) { return !a.delete; });
             } else if (filter === 'deleted') {
@@ -2366,7 +2095,7 @@
 
         function escapeHtml(text) {
             if (!text) return '';
-            const div = document.createElement('div');
+            var div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
@@ -2375,13 +2104,13 @@
         // 文章列表渲染
         // ================================================================
         function renderArticleList() {
-            const list = document.getElementById('articleList');
-            const search = document.getElementById('listSearch').value.trim().toLowerCase();
-            let filtered = getFilteredArticles(currentFilter);
+            var list = document.getElementById('articleList');
+            var search = document.getElementById('listSearch').value.trim().toLowerCase();
+            var filtered = getFilteredArticles(currentFilter);
             if (search) {
                 filtered = filtered.filter(function(a) {
-                    const title = (a.title || '').toLowerCase();
-                    const content = (a.content || '').toLowerCase();
+                    var title = (a.title || '').toLowerCase();
+                    var content = (a.content || '').toLowerCase();
                     return title.indexOf(search) !== -1 || content.indexOf(search) !== -1;
                 });
             }
@@ -2390,72 +2119,72 @@
                 list.innerHTML = '<div class="empty">没有文章</div>';
                 return;
             }
-            let html = '';
+            var html = '';
             filtered.forEach(function(article) {
-                const idx = allArticles.indexOf(article);
-                const tags = article.tags || [];
-                const tagsHtml = tags.map(function(t) {
+                var idx = allArticles.indexOf(article);
+                var tags = article.tags || [];
+                var tagsHtml = tags.map(function(t) {
                     return '<span class="tag">' + escapeHtml(t) + '</span>';
                 }).join(' ');
-                const deletedClass = article.delete ? 'deleted' : '';
-                const statusHtml = article.delete ? '<span class="status-deleted">已删除</span>' : '';
+                var deletedClass = article.delete ? 'deleted' : '';
+                var statusHtml = article.delete ? '<span class="status-deleted">已删除</span>' : '';
 
-                const undoBtn = (previousVersion && previousVersion.idx === idx) ?
+                var undoBtn = (previousVersion && previousVersion.idx === idx) ?
                     '<button class="btn-undo" data-idx="' + idx + '">撤销</button>' :
                     '';
 
                 html += `
-                    <div class="article-item-admin ${deletedClass}">
-                        <div class="item-info">
-                            <div class="item-title">${escapeHtml(article.title || '无标题')}</div>
-                            <div class="item-meta">
-                                ${article.date || ''}
-                                ${tagsHtml}
-                                ${statusHtml}
+                        <div class="article-item-admin ${deletedClass}">
+                            <div class="item-info">
+                                <div class="item-title">${escapeHtml(article.title || '无标题')}</div>
+                                <div class="item-meta">
+                                    ${article.date || ''}
+                                    ${tagsHtml}
+                                    ${statusHtml}
+                                </div>
+                            </div>
+                            <div class="item-actions">
+                                <button class="btn-edit" data-idx="${idx}">编辑</button>
+                                ${article.delete ?
+                                    '<button class="btn-restore" data-idx="' + idx + '">恢复</button>' :
+                                    '<button class="btn-soft-delete" data-idx="' + idx + '">软删除</button>'
+                                }
+                                <button class="btn-hard-delete" data-idx="${idx}" data-title="${escapeHtml(article.title || '无标题')}">硬删除</button>
+                                ${undoBtn}
                             </div>
                         </div>
-                        <div class="item-actions">
-                            <button class="btn-edit" data-idx="${idx}">编辑</button>
-                            ${article.delete ?
-                                '<button class="btn-restore" data-idx="' + idx + '">恢复</button>' :
-                                '<button class="btn-soft-delete" data-idx="' + idx + '">软删除</button>'
-                            }
-                            <button class="btn-hard-delete" data-idx="${idx}" data-title="${escapeHtml(article.title || '无标题')}">硬删除</button>
-                            ${undoBtn}
-                        </div>
-                    </div>
-                `;
+                    `;
             });
             list.innerHTML = html;
 
             list.querySelectorAll('.btn-edit').forEach(function(btn) {
                 btn.addEventListener('click', function() {
-                    const idx = parseInt(this.dataset.idx);
+                    var idx = parseInt(this.dataset.idx);
                     editArticle(idx);
                 });
             });
             list.querySelectorAll('.btn-soft-delete').forEach(function(btn) {
                 btn.addEventListener('click', function() {
-                    const idx = parseInt(this.dataset.idx);
+                    var idx = parseInt(this.dataset.idx);
                     softDeleteArticle(idx);
                 });
             });
             list.querySelectorAll('.btn-restore').forEach(function(btn) {
                 btn.addEventListener('click', function() {
-                    const idx = parseInt(this.dataset.idx);
+                    var idx = parseInt(this.dataset.idx);
                     restoreArticle(idx);
                 });
             });
             list.querySelectorAll('.btn-hard-delete').forEach(function(btn) {
                 btn.addEventListener('click', function() {
-                    const idx = parseInt(this.dataset.idx);
-                    const title = this.dataset.title;
+                    var idx = parseInt(this.dataset.idx);
+                    var title = this.dataset.title;
                     showHardDeleteModal(idx, title);
                 });
             });
             list.querySelectorAll('.btn-undo').forEach(function(btn) {
                 btn.addEventListener('click', function() {
-                    const idx = parseInt(this.dataset.idx);
+                    var idx = parseInt(this.dataset.idx);
                     undoArticle(idx);
                 });
             });
@@ -2465,7 +2194,7 @@
         // 文章操作
         // ================================================================
         function editArticle(idx) {
-            const article = allArticles[idx];
+            var article = allArticles[idx];
             if (!article) return;
             editingIdx = idx;
             document.getElementById('editTitle').value = article.title || '';
@@ -2480,7 +2209,7 @@
         }
 
         async function softDeleteArticle(idx) {
-            const result = await showModal(
+            var result = await showModal(
                 '<i class="fas fa-trash-alt"></i>',
                 '软删除',
                 '确定要软删除这篇文章吗？<br />软删除后文章仍可恢复。',
@@ -2489,11 +2218,11 @@
             );
             if (!result) return;
             try {
-                const res = await apiCall('posts', {
+                var res = await apiCall('posts', {
                     method: 'DELETE',
                     body: JSON.stringify({ id: idx })
                 });
-                const data = await res.json();
+                var data = await res.json();
                 if (data.success) {
                     showToast('已软删除');
                     await loadArticles();
@@ -2509,11 +2238,11 @@
 
         async function restoreArticle(idx) {
             try {
-                const res = await apiCall('posts', {
+                var res = await apiCall('posts', {
                     method: 'DELETE',
                     body: JSON.stringify({ id: idx, restore: true })
                 });
-                const data = await res.json();
+                var data = await res.json();
                 if (data.success) {
                     showToast('已恢复');
                     await loadArticles();
@@ -2532,7 +2261,7 @@
                 showToast('没有可撤销的版本', true);
                 return;
             }
-            const result = await showModal(
+            var result = await showModal(
                 '<i class="fas fa-undo-alt"></i>',
                 '撤销修改',
                 '确定要撤销对 <strong>' + escapeHtml(previousVersion.title) + '</strong> 的修改吗？<br />将恢复到修改前的版本。',
@@ -2541,7 +2270,7 @@
             );
             if (!result) return;
             try {
-                const res = await apiCall('posts', {
+                var res = await apiCall('posts', {
                     method: 'PUT',
                     body: JSON.stringify({
                         id: idx,
@@ -2551,7 +2280,7 @@
                         date: previousVersion.date
                     })
                 });
-                const data = await res.json();
+                var data = await res.json();
                 if (data.success) {
                     showToast('已撤销');
                     previousVersion = null;
@@ -2569,7 +2298,7 @@
         // ================================================================
         // 硬删除
         // ================================================================
-        let hardDeleteTarget = -1;
+        var hardDeleteTarget = -1;
 
         function showHardDeleteModal(idx, title) {
             hardDeleteTarget = idx;
@@ -2591,16 +2320,16 @@
         async function confirmHardDelete() {
             if (hardDeleteTarget === -1) return;
             try {
-                const idx = hardDeleteTarget;
+                var idx = hardDeleteTarget;
                 allArticles.splice(idx, 1);
-                const res = await apiCall('posts', {
+                var res = await apiCall('posts', {
                     method: 'PUT',
                     body: JSON.stringify({
                         hardDelete: true,
                         articles: allArticles
                     })
                 });
-                const data = await res.json();
+                var data = await res.json();
                 if (data.success) {
                     showToast('已硬删除');
                     await loadArticles();
@@ -2622,40 +2351,40 @@
         // 草稿箱
         // ================================================================
         function renderDraftList() {
-            const list = document.getElementById('draftList');
+            var list = document.getElementById('draftList');
             if (allDrafts.length === 0) {
                 list.innerHTML = '<div class="empty">没有草稿</div>';
                 return;
             }
-            let html = '';
+            var html = '';
             allDrafts.forEach(function(draft) {
-                const preview = (draft.content || '').replace(/\n/g, ' ').slice(0, 80) + (draft.content && draft.content
+                var preview = (draft.content || '').replace(/\n/g, ' ').slice(0, 80) + (draft.content && draft.content
                     .length > 80 ? '...' : '');
-                const tagsHtml = (draft.tags || []).map(function(t) {
+                var tagsHtml = (draft.tags || []).map(function(t) {
                     return '<span class="tag">' + escapeHtml(t) + '</span>';
                 }).join(' ');
                 html += `
-                    <div class="draft-item">
-                        <div class="draft-info">
-                            <div class="draft-title">${escapeHtml(draft.title || '无标题')}</div>
-                            <div class="draft-meta">创建于 ${draft.created || ''} ${draft.updated && draft.updated !== draft.created ? ' · 更新于 ' + draft.updated : ''}</div>
-                            ${tagsHtml ? '<div class="draft-tags">' + tagsHtml + '</div>' : ''}
-                            <div class="draft-preview">${escapeHtml(preview)}</div>
+                        <div class="draft-item">
+                            <div class="draft-info">
+                                <div class="draft-title">${escapeHtml(draft.title || '无标题')}</div>
+                                <div class="draft-meta">创建于 ${draft.created || ''} ${draft.updated && draft.updated !== draft.created ? ' · 更新于 ' + draft.updated : ''}</div>
+                                ${tagsHtml ? '<div class="draft-tags">' + tagsHtml + '</div>' : ''}
+                                <div class="draft-preview">${escapeHtml(preview)}</div>
+                            </div>
+                            <div class="draft-actions">
+                                <button class="btn-continue" data-id="${draft.id}">继续编辑</button>
+                                <button class="btn-publish-draft" data-id="${draft.id}">发布</button>
+                                <button class="btn-delete-draft" data-id="${draft.id}">删除</button>
+                            </div>
                         </div>
-                        <div class="draft-actions">
-                            <button class="btn-continue" data-id="${draft.id}">继续编辑</button>
-                            <button class="btn-publish-draft" data-id="${draft.id}">发布</button>
-                            <button class="btn-delete-draft" data-id="${draft.id}">删除</button>
-                        </div>
-                    </div>
-                `;
+                    `;
             });
             list.innerHTML = html;
 
             list.querySelectorAll('.btn-continue').forEach(function(btn) {
                 btn.addEventListener('click', function() {
-                    const id = this.dataset.id;
-                    const draft = allDrafts.find(function(d) { return d.id === id; });
+                    var id = this.dataset.id;
+                    var draft = allDrafts.find(function(d) { return d.id === id; });
                     if (draft) {
                         document.getElementById('editTitle').value = draft.title || '';
                         document.getElementById('editDate').value = draft.date || '';
@@ -2673,8 +2402,8 @@
 
             list.querySelectorAll('.btn-publish-draft').forEach(function(btn) {
                 btn.addEventListener('click', function() {
-                    const id = this.dataset.id;
-                    const draft = allDrafts.find(function(d) { return d.id === id; });
+                    var id = this.dataset.id;
+                    var draft = allDrafts.find(function(d) { return d.id === id; });
                     if (draft) {
                         document.getElementById('editTitle').value = draft.title || '';
                         document.getElementById('editDate').value = draft.date || '';
@@ -2693,7 +2422,7 @@
 
             list.querySelectorAll('.btn-delete-draft').forEach(function(btn) {
                 btn.addEventListener('click', function() {
-                    const id = this.dataset.id;
+                    var id = this.dataset.id;
                     if (isDeletingDraft) return;
                     showModal(
                         '<i class="fas fa-trash-alt"></i>',
@@ -2714,11 +2443,11 @@
 
         async function deleteDraft(id) {
             try {
-                const res = await apiCall('drafts', {
+                var res = await apiCall('drafts', {
                     method: 'DELETE',
                     body: JSON.stringify({ id: id })
                 });
-                const data = await res.json();
+                var data = await res.json();
                 if (data.success) {
                     showToast('草稿已删除');
                     await loadDrafts();
@@ -2736,11 +2465,11 @@
         // 发布 / 更新
         // ================================================================
         document.getElementById('publishBtn').addEventListener('click', async function() {
-            const title = document.getElementById('editTitle').value.trim();
-            const content = mdEditor.value.trim();
-            const tagsRaw = document.getElementById('editTags').value.trim();
-            const date = document.getElementById('editDate').value;
-            const tags = tagsRaw ? tagsRaw.split(/[，,、\s]+/).filter(Boolean) : [];
+            var title = document.getElementById('editTitle').value.trim();
+            var content = mdEditor.value.trim();
+            var tagsRaw = document.getElementById('editTags').value.trim();
+            var date = document.getElementById('editDate').value;
+            var tags = tagsRaw ? tagsRaw.split(/[，,、\s]+/).filter(Boolean) : [];
 
             if (!title) {
                 showToast('请输入标题', true);
@@ -2752,11 +2481,11 @@
             }
 
             if (editingIdx >= 0) {
-                const existing = allArticles.findIndex(function(a, i) {
+                var existing = allArticles.findIndex(function(a, i) {
                     return i !== editingIdx && a.title === title;
                 });
                 if (existing !== -1) {
-                    const confirmed = await showModal(
+                    var confirmed = await showModal(
                         '<i class="fas fa-exclamation-triangle"></i>',
                         '标题重复',
                         '已存在标题为 <strong>' + escapeHtml(title) + '</strong> 的文章。<br />确定要覆盖它吗？',
@@ -2764,7 +2493,7 @@
                         'btn-confirm-warning'
                     );
                     if (!confirmed) return;
-                    const current = allArticles[editingIdx];
+                    var current = allArticles[editingIdx];
                     previousVersion = {
                         idx: editingIdx,
                         title: current.title,
@@ -2777,7 +2506,7 @@
 
             this.disabled = true;
             try {
-                let res, data;
+                var res, data;
                 if (editingIdx >= 0) {
                     res = await apiCall('posts', {
                         method: 'PUT',
@@ -2861,22 +2590,22 @@
         // 保存草稿
         // ================================================================
         document.getElementById('saveDraftBtn').addEventListener('click', async function() {
-            const title = document.getElementById('editTitle').value.trim() || '无标题';
-            const content = mdEditor.value;
-            const tagsRaw = document.getElementById('editTags').value.trim();
-            const tags = tagsRaw ? tagsRaw.split(/[，,、\s]+/).filter(Boolean) : [];
-            const date = document.getElementById('editDate').value || '';
+            var title = document.getElementById('editTitle').value.trim() || '无标题';
+            var content = mdEditor.value;
+            var tagsRaw = document.getElementById('editTags').value.trim();
+            var tags = tagsRaw ? tagsRaw.split(/[，,、\s]+/).filter(Boolean) : [];
+            var date = document.getElementById('editDate').value || '';
             if (!content) {
                 showToast('内容为空，无需保存', true);
                 return;
             }
             this.disabled = true;
             try {
-                const res = await apiCall('drafts', {
+                var res = await apiCall('drafts', {
                     method: 'POST',
                     body: JSON.stringify({ title, content, tags, date })
                 });
-                const data = await res.json();
+                var data = await res.json();
                 if (data.success) {
                     showToast('草稿已保存');
                     await loadDrafts();
@@ -2905,7 +2634,7 @@
         });
 
         document.getElementById('sortBtn').addEventListener('click', function() {
-            const btn = this;
+            var btn = this;
             if (currentSort === 'desc') {
                 currentSort = 'asc';
                 btn.innerHTML = '<i class="fas fa-sort-amount-up"></i> 正序';
@@ -2936,7 +2665,6 @@
             mainApp.classList.remove('active');
         }
 
-        // 初始字数统计
         setTimeout(function() {
             updateWordCount();
         }, 100);
