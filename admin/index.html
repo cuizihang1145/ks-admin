@@ -68,10 +68,12 @@
             max-width: 380px;
             text-align: center;
             transition: background 0.4s ease, border-color 0.3s ease;
+            box-shadow: 0 20px 60px rgba(80, 60, 160, 0.08);
         }
         body.dark .login-card {
             background: rgba(30, 28, 50, 0.6);
             border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
         }
         .login-card h1 {
             font-size: 1.8rem;
@@ -79,6 +81,7 @@
             background: linear-gradient(135deg, #201D3A, #5B4DAF);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            margin-bottom: 0.1rem;
         }
         body.dark .login-card h1 {
             background: linear-gradient(135deg, #c8c0f0, #8f7be0);
@@ -93,27 +96,51 @@
         body.dark .login-card .sub {
             color: #9a96b8;
         }
-        .login-card input {
+        .login-card .input-group {
+            position: relative;
+            margin-bottom: 0.6rem;
+        }
+        .login-card .input-group input {
             width: 100%;
-            padding: 0.7rem 1rem;
+            padding: 0.75rem 1rem;
             border-radius: 60px;
             border: 1px solid rgba(0, 0, 0, 0.08);
             background: rgba(255, 255, 255, 0.5);
             font-size: 0.95rem;
-            margin-bottom: 0.6rem;
             color: #1a1a2e;
             transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
             -webkit-appearance: none;
             appearance: none;
         }
-        body.dark .login-card input {
+        body.dark .login-card .input-group input {
             background: rgba(255, 255, 255, 0.06);
             border-color: rgba(255, 255, 255, 0.08);
             color: #e8e6f0;
         }
-        .login-card input:focus {
+        .login-card .input-group input:focus {
             border-color: #6b5acf;
-            box-shadow: 0 0 0 3px rgba(107, 90, 207, 0.15);
+            box-shadow: 0 0 0 3px rgba(107, 90, 207, 0.12);
+        }
+        .login-card .input-group input::placeholder {
+            color: #aaaac0;
+        }
+        body.dark .login-card .input-group input::placeholder {
+            color: #6a6a8a;
+        }
+        .login-card .input-group .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8a8ab5;
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+        body.dark .login-card .input-group .input-icon {
+            color: #6a6a8a;
+        }
+        .login-card .input-group input {
+            padding-left: 2.6rem;
         }
         .login-card .math-row {
             display: flex;
@@ -122,34 +149,67 @@
             margin-bottom: 0.6rem;
         }
         .login-card .math-row .math-question {
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             font-weight: 600;
             color: #6b5acf;
             white-space: nowrap;
             flex-shrink: 0;
+            background: rgba(107, 90, 207, 0.08);
+            padding: 0.4rem 0.9rem;
+            border-radius: 40px;
         }
         body.dark .login-card .math-row .math-question {
             color: #88ccff;
+            background: rgba(136, 204, 255, 0.08);
         }
         .login-card .math-row input {
             flex: 1;
             margin-bottom: 0;
+            padding: 0.75rem 1rem;
+            border-radius: 60px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: rgba(255, 255, 255, 0.5);
+            font-size: 0.95rem;
+            color: #1a1a2e;
+            transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        body.dark .login-card .math-row input {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.08);
+            color: #e8e6f0;
+        }
+        .login-card .math-row input:focus {
+            border-color: #6b5acf;
+            box-shadow: 0 0 0 3px rgba(107, 90, 207, 0.12);
         }
         .login-card .math-row .refresh-btn {
-            background: transparent;
-            border: none;
-            color: #8a8ab5;
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            color: #6a6a92;
             cursor: pointer;
-            font-size: 1.2rem;
-            padding: 0.3rem;
-            transition: 0.2s;
+            transition: 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
             flex-shrink: 0;
         }
+        body.dark .login-card .math-row .refresh-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.08);
+            color: #9a96b8;
+        }
         .login-card .math-row .refresh-btn:hover {
+            background: rgba(107, 90, 207, 0.12);
             color: #6b5acf;
-            transform: rotate(60deg);
         }
         body.dark .login-card .math-row .refresh-btn:hover {
+            background: rgba(136, 204, 255, 0.12);
             color: #88ccff;
         }
         .login-card .login-options {
@@ -171,32 +231,11 @@
             user-select: none;
         }
         .login-card .login-options input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
             accent-color: #6b5acf;
             cursor: pointer;
-            -webkit-appearance: none;
-            appearance: none;
-            border: 2px solid #8a8ab5;
-            border-radius: 4px;
-            background: transparent;
-            transition: 0.2s ease;
-            position: relative;
+            width: 16px;
+            height: 16px;
             flex-shrink: 0;
-        }
-        .login-card .login-options input[type="checkbox"]:checked {
-            background: #6b5acf;
-            border-color: #6b5acf;
-        }
-        .login-card .login-options input[type="checkbox"]:checked::after {
-            content: '\2713';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #fff;
-            font-size: 11px;
-            font-weight: 700;
         }
         .login-card .btn-login {
             width: 100%;
@@ -1367,19 +1406,32 @@
             <div class="login-card">
                 <h1>管理后台</h1>
                 <p class="sub">ks · 内容管理</p>
-                <input type="text" id="inviteCode" placeholder="邀请码" />
-                <input type="password" id="passwordInput" placeholder="请输入密码" autocomplete="current-password" />
+
+                <div class="input-group">
+                    <span class="input-icon"><i class="fas fa-key"></i></span>
+                    <input type="password" id="inviteCode" placeholder="邀请码" autocomplete="off" />
+                </div>
+
+                <div class="input-group">
+                    <span class="input-icon"><i class="fas fa-lock"></i></span>
+                    <input type="password" id="passwordInput" placeholder="请输入密码" autocomplete="current-password" />
+                </div>
+
                 <div class="math-row">
                     <span class="math-question" id="mathQuestion">23 + 47 = ?</span>
-                    <input type="text" id="mathAnswer" placeholder="答案" />
-                    <button type="button" class="refresh-btn" id="refreshMathBtn">⟳</button>
+                    <input type="text" id="mathAnswer" placeholder="答案" autocomplete="off" />
+                    <button type="button" class="refresh-btn" id="refreshMathBtn" aria-label="刷新题目">
+                        <i class="fas fa-rotate-right"></i>
+                    </button>
                 </div>
+
                 <div class="login-options">
                     <label>
                         <input type="checkbox" id="keepLogin" checked />
                         保持登录
                     </label>
                 </div>
+
                 <button class="btn-login" id="loginBtn">登录</button>
                 <div class="error-msg" id="loginError"></div>
             </div>
@@ -1578,29 +1630,60 @@
         let lockUntil = 0;
 
         function generateMathQuestion() {
-            const a = Math.floor(Math.random() * 90) + 10;
-            const b = Math.floor(Math.random() * 90) + 10;
+            let a, b, answer, op, question;
             const operators = ['+', '-'];
-            const op = operators[Math.floor(Math.random() * operators.length)];
-            let question, answer;
-            if (op === '+') {
-                question = a + ' + ' + b + ' = ?';
-                answer = a + b;
-            } else {
-                const big = Math.max(a, b);
-                const small = Math.min(a, b);
-                question = big + ' - ' + small + ' = ?';
-                answer = big - small;
-            }
+
+            do {
+                a = Math.floor(Math.random() * 89) + 10;
+                b = Math.floor(Math.random() * 89) + 10;
+                op = operators[Math.floor(Math.random() * operators.length)];
+
+                if (op === '+') {
+                    answer = a + b;
+                    if (answer > 99) {
+                        a = Math.floor(Math.random() * (99 - 10 - b)) + 10;
+                        answer = a + b;
+                    }
+                    question = a + ' + ' + b + ' = ?';
+                } else {
+                    if (a < b) {
+                        var temp = a;
+                        a = b;
+                        b = temp;
+                    }
+                    if (a === b) {
+                        b = a - Math.floor(Math.random() * 20) - 1;
+                        if (b < 10) b = 10;
+                        if (a <= b) { a = b + Math.floor(Math.random() * 20) + 5; }
+                    }
+                    answer = a - b;
+                    question = a + ' - ' + b + ' = ?';
+                }
+            } while (answer < 10 || answer > 99 || a === b || b === 0 || a === 0);
+
             mathQuestionEl.textContent = question;
             mathAnswer = answer;
             mathAnswerInput.value = '';
         }
 
-        refreshMathBtn.addEventListener('click', generateMathQuestion);
+        refreshMathBtn.addEventListener('click', function() {
+            generateMathQuestion();
+            mathAnswerInput.focus();
+        });
+
         mathAnswerInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') doLogin();
         });
+
+        function resetLoginForm() {
+            inviteCodeInput.value = '';
+            passwordInput.value = '';
+            mathAnswerInput.value = '';
+            loginError.textContent = '';
+            loginAttempts = 0;
+            lockUntil = 0;
+            generateMathQuestion();
+        }
 
         function checkLogin() {
             const loggedIn = sessionStorage.getItem(STORAGE_KEY);
@@ -1705,6 +1788,7 @@
             }
             loginScreen.classList.remove('hidden');
             mainApp.classList.remove('active');
+            resetLoginForm();
             passwordInput.value = '';
             loginError.textContent = '';
         });
@@ -2999,6 +3083,7 @@
             document.getElementById('draftBadge').textContent = allDrafts.length;
         }
 
+        // 首次加载生成数学题
         generateMathQuestion();
 
         if (!checkLogin()) {
