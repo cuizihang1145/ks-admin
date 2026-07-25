@@ -1,4 +1,41 @@
+// api/auth.js
 const failedAttempts = {};
+const mathSessions = {}; // 存储题目答案，用 IP 做 key
+
+function generateMathQuestion() {
+  let a, b, answer, op, question;
+  const operators = ['+', '-'];
+
+  do {
+    a = Math.floor(Math.random() * 89) + 10;
+    b = Math.floor(Math.random() * 89) + 10;
+    op = operators[Math.floor(Math.random() * operators.length)];
+
+    if (op === '+') {
+      answer = a + b;
+      if (answer > 99) {
+        a = Math.floor(Math.random() * (99 - 10 - b)) + 10;
+        answer = a + b;
+      }
+      question = a + ' + ' + b + ' = ?';
+    } else {
+      if (a < b) {
+        var temp = a;
+        a = b;
+        b = temp;
+      }
+      if (a === b) {
+        b = a - Math.floor(Math.random() * 20) - 1;
+        if (b < 10) b = 10;
+        if (a <= b) { a = b + Math.floor(Math.random() * 20) + 5; }
+      }
+      answer = a - b;
+      question = a + ' - ' + b + ' = ?';
+    }
+  } while (answer < 10 || answer > 99 || a === b || b === 0 || a === 0);
+
+  return { question, answer };
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -30,19 +67,36 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: '请求来源不合法' });
   }
 
-  // ===== 获取请求参数 =====
+  // ===== GET 请求：返回题目 =====
+  if (req.method === 'GET') {
+    const { question, answer } = generateMathQuestion();
+    mathSessions[ip] = {
+      answer: answer,
+      expires: Date.now() + 5 * 60 * 1000 // 5分钟有效期
+    };
+    return res.status(200).json({ question: question });
+  }
+
+  // ===== POST 请求：验证登录 =====
   const inviteCode = req.headers['x-invite-code'] || '';
   const password = req.headers['x-admin-password'] || '';
-  const mathAnswer = parseInt(req.headers['x-math-answer']) || 0;
-  const mathExpected = parseInt(req.headers['x-math-expected']) || 0;
+  const userAnswer = parseInt(req.headers['x-math-answer']) || 0;
+
+  // 从缓存中取正确答案
+  const mathSession = mathSessions[ip];
+  let validMath = false;
+  if (mathSession && mathSession.expires > Date.now()) {
+    validMath = userAnswer === mathSession.answer;
+  }
+  // 无论验证是否通过，用完即销毁（防止重复使用）
+  delete mathSessions[ip];
+
+  if (!validMath) {
+    return res.status(400).json({ error: '数学题答错了或已过期，请刷新重试' });
+  }
 
   const validInvite = inviteCode === (process.env.INVITE_CODE || '').trim();
   const validPassword = password === (process.env.ADMIN_PASSWORD || '').trim();
-  const validMath = mathAnswer === mathExpected;
-
-  if (!validMath) {
-    return res.status(400).json({ error: '数学题答错了' });
-  }
 
   if (!validInvite || !validPassword) {
     if (!failedAttempts[ip]) {
@@ -58,7 +112,7 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: '验证失败' });
   }
 
-  // ===== 登录成功，生成 Token =====
+  // ===== 登录成功 =====
   delete failedAttempts[ip];
 
   const token = Buffer.from(JSON.stringify({
@@ -67,4 +121,4 @@ export default async function handler(req, res) {
   })).toString('base64');
 
   return res.status(200).json({ success: true, token: token });
-}
+        }
