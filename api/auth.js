@@ -8,6 +8,7 @@ export default async function handler(req, res) {
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
   const now = Date.now();
 
+  // ===== 后端限流 =====
   if (failedAttempts[ip] && failedAttempts[ip].lockedUntil > now) {
     const remaining = Math.ceil((failedAttempts[ip].lockedUntil - now) / 60000);
     return res.status(429).json({
@@ -15,6 +16,21 @@ export default async function handler(req, res) {
     });
   }
 
+  // ===== CSRF 防护：校验 Referer =====
+  const referer = req.headers.referer || '';
+  const allowedDomains = ['admin.cuizi.top', 'cuizi.top', 'localhost'];
+  let isAllowed = false;
+  for (const domain of allowedDomains) {
+    if (referer.includes(domain)) {
+      isAllowed = true;
+      break;
+    }
+  }
+  if (!isAllowed) {
+    return res.status(403).json({ error: '请求来源不合法' });
+  }
+
+  // ===== 获取请求参数 =====
   const inviteCode = req.headers['x-invite-code'] || '';
   const password = req.headers['x-admin-password'] || '';
   const mathAnswer = parseInt(req.headers['x-math-answer']) || 0;
@@ -42,6 +58,13 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: '验证失败' });
   }
 
+  // ===== 登录成功，生成 Token =====
   delete failedAttempts[ip];
-  return res.status(200).json({ success: true });
+
+  const token = Buffer.from(JSON.stringify({
+    authenticated: true,
+    exp: Date.now() + 24 * 60 * 60 * 1000
+  })).toString('base64');
+
+  return res.status(200).json({ success: true, token: token });
 }
