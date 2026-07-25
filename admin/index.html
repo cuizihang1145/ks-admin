@@ -93,27 +93,64 @@
         body.dark .login-card .sub {
             color: #9a96b8;
         }
-        .login-card input[type="password"] {
+        .login-card input {
             width: 100%;
-            padding: 0.9rem 1.2rem;
+            padding: 0.7rem 1rem;
             border-radius: 60px;
             border: 1px solid rgba(0, 0, 0, 0.08);
             background: rgba(255, 255, 255, 0.5);
-            font-size: 1rem;
-            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+            margin-bottom: 0.6rem;
             color: #1a1a2e;
             transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
             -webkit-appearance: none;
             appearance: none;
         }
-        body.dark .login-card input[type="password"] {
+        body.dark .login-card input {
             background: rgba(255, 255, 255, 0.06);
             border-color: rgba(255, 255, 255, 0.08);
             color: #e8e6f0;
         }
-        .login-card input[type="password"]:focus {
+        .login-card input:focus {
             border-color: #6b5acf;
             box-shadow: 0 0 0 3px rgba(107, 90, 207, 0.15);
+        }
+        .login-card .math-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-bottom: 0.6rem;
+        }
+        .login-card .math-row .math-question {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #6b5acf;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        body.dark .login-card .math-row .math-question {
+            color: #88ccff;
+        }
+        .login-card .math-row input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        .login-card .math-row .refresh-btn {
+            background: transparent;
+            border: none;
+            color: #8a8ab5;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.3rem;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+        .login-card .math-row .refresh-btn:hover {
+            color: #6b5acf;
+            transform: rotate(60deg);
+        }
+        body.dark .login-card .math-row .refresh-btn:hover {
+            color: #88ccff;
         }
         .login-card .login-options {
             display: flex;
@@ -1330,7 +1367,13 @@
             <div class="login-card">
                 <h1>管理后台</h1>
                 <p class="sub">ks · 内容管理</p>
+                <input type="text" id="inviteCode" placeholder="邀请码" />
                 <input type="password" id="passwordInput" placeholder="请输入密码" autocomplete="current-password" />
+                <div class="math-row">
+                    <span class="math-question" id="mathQuestion">23 + 47 = ?</span>
+                    <input type="text" id="mathAnswer" placeholder="答案" />
+                    <button type="button" class="refresh-btn" id="refreshMathBtn">⟳</button>
+                </div>
                 <div class="login-options">
                     <label>
                         <input type="checkbox" id="keepLogin" checked />
@@ -1519,12 +1562,45 @@
         const loginBtn = document.getElementById('loginBtn');
         const loginError = document.getElementById('loginError');
         const keepLoginCheck = document.getElementById('keepLogin');
+        const inviteCodeInput = document.getElementById('inviteCode');
+        const mathAnswerInput = document.getElementById('mathAnswer');
+        const mathQuestionEl = document.getElementById('mathQuestion');
+        const refreshMathBtn = document.getElementById('refreshMathBtn');
 
         if (localStorage.getItem(KEEP_LOGIN_KEY) === 'false') {
             keepLoginCheck.checked = false;
         } else {
             keepLoginCheck.checked = true;
         }
+
+        let mathAnswer = 0;
+        let loginAttempts = 0;
+        let lockUntil = 0;
+
+        function generateMathQuestion() {
+            const a = Math.floor(Math.random() * 90) + 10;
+            const b = Math.floor(Math.random() * 90) + 10;
+            const operators = ['+', '-'];
+            const op = operators[Math.floor(Math.random() * operators.length)];
+            let question, answer;
+            if (op === '+') {
+                question = a + ' + ' + b + ' = ?';
+                answer = a + b;
+            } else {
+                const big = Math.max(a, b);
+                const small = Math.min(a, b);
+                question = big + ' - ' + small + ' = ?';
+                answer = big - small;
+            }
+            mathQuestionEl.textContent = question;
+            mathAnswer = answer;
+            mathAnswerInput.value = '';
+        }
+
+        refreshMathBtn.addEventListener('click', generateMathQuestion);
+        mathAnswerInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') doLogin();
+        });
 
         function checkLogin() {
             const loggedIn = sessionStorage.getItem(STORAGE_KEY);
@@ -1542,21 +1618,54 @@
         }
 
         async function doLogin() {
+            const inviteCode = inviteCodeInput.value.trim();
             const pwd = passwordInput.value.trim();
+            const userAnswer = parseInt(mathAnswerInput.value.trim());
+
+            if (!inviteCode) {
+                loginError.textContent = '请输入邀请码';
+                return;
+            }
             if (!pwd) {
                 loginError.textContent = '请输入密码';
                 return;
             }
+            if (isNaN(userAnswer)) {
+                loginError.textContent = '请输入数学题答案';
+                return;
+            }
+
+            if (Date.now() < lockUntil) {
+                const remaining = Math.ceil((lockUntil - Date.now()) / 60000);
+                loginError.textContent = '尝试次数过多，请 ' + remaining + ' 分钟后重试';
+                return;
+            }
+
             loginBtn.disabled = true;
             loginError.textContent = '';
             try {
                 const res = await fetch('/api/auth', {
                     method: 'POST',
-                    headers: { 'X-Admin-Password': pwd, 'Content-Type': 'application/json' },
+                    headers: {
+                        'X-Invite-Code': inviteCode,
+                        'X-Admin-Password': pwd,
+                        'X-Math-Answer': String(userAnswer),
+                        'X-Math-Expected': String(mathAnswer),
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({})
                 });
                 const data = await res.json();
+
+                if (data.error === '数学题答错了') {
+                    loginError.textContent = '数学题答错了，再试试';
+                    generateMathQuestion();
+                    loginBtn.disabled = false;
+                    return;
+                }
+
                 if (data.success) {
+                    loginAttempts = 0;
                     const keepLogin = keepLoginCheck.checked;
                     localStorage.setItem(KEEP_LOGIN_KEY, String(keepLogin));
                     sessionStorage.setItem('admin_password', pwd);
@@ -1565,7 +1674,14 @@
                     mainApp.classList.add('active');
                     loadAll();
                 } else {
-                    loginError.textContent = '密码错误';
+                    loginAttempts++;
+                    if (loginAttempts >= 5) {
+                        lockUntil = Date.now() + 15 * 60 * 1000;
+                        loginError.textContent = '尝试次数过多，请 15 分钟后重试';
+                    } else {
+                        loginError.textContent = '验证失败（' + loginAttempts + '/5）';
+                    }
+                    generateMathQuestion();
                 }
             } catch (e) {
                 loginError.textContent = '网络错误，请重试';
@@ -1575,6 +1691,9 @@
 
         loginBtn.addEventListener('click', doLogin);
         passwordInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') doLogin();
+        });
+        inviteCodeInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') doLogin();
         });
 
@@ -2879,6 +2998,8 @@
             document.getElementById('listBadge').textContent = allArticles.length;
             document.getElementById('draftBadge').textContent = allDrafts.length;
         }
+
+        generateMathQuestion();
 
         if (!checkLogin()) {
             loginScreen.classList.remove('hidden');
