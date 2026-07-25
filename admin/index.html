@@ -1540,9 +1540,76 @@
     <div class="toast" id="toast"></div>
 
     <script>
+        // ================================================================
+        // 数学验证码（闭包封装，不暴露 mathAnswer 到全局）
+        // ================================================================
+        const MathCaptcha = (function() {
+            let answer = 0;
+            let questionEl = null;
+            let inputEl = null;
+
+            function generate() {
+                let a, b, result, op, question;
+                const operators = ['+', '-'];
+
+                do {
+                    a = Math.floor(Math.random() * 89) + 10;
+                    b = Math.floor(Math.random() * 89) + 10;
+                    op = operators[Math.floor(Math.random() * operators.length)];
+
+                    if (op === '+') {
+                        result = a + b;
+                        if (result > 99) {
+                            a = Math.floor(Math.random() * (99 - 10 - b)) + 10;
+                            result = a + b;
+                        }
+                        question = a + ' + ' + b + ' = ?';
+                    } else {
+                        if (a < b) {
+                            var temp = a;
+                            a = b;
+                            b = temp;
+                        }
+                        if (a === b) {
+                            b = a - Math.floor(Math.random() * 20) - 1;
+                            if (b < 10) b = 10;
+                            if (a <= b) { a = b + Math.floor(Math.random() * 20) + 5; }
+                        }
+                        result = a - b;
+                        question = a + ' - ' + b + ' = ?';
+                    }
+                } while (result < 10 || result > 99 || a === b || b === 0 || a === 0);
+
+                answer = result;
+                if (questionEl) questionEl.textContent = question;
+                if (inputEl) inputEl.value = '';
+                return question;
+            }
+
+            function getAnswer() {
+                return answer;
+            }
+
+            function setElements(qEl, iEl) {
+                questionEl = qEl;
+                inputEl = iEl;
+            }
+
+            return {
+                generate: generate,
+                getAnswer: getAnswer,
+                setElements: setElements
+            };
+        })();
+
+        // ================================================================
+        // 主程序
+        // ================================================================
         const STORAGE_KEY = 'admin_logged_in';
         const KEEP_LOGIN_KEY = 'admin_keep_login';
+        const TOKEN_KEY = 'admin_token';
 
+        // 主题
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = document.getElementById('themeIcon');
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -1559,6 +1626,7 @@
             setTheme(currentTheme === 'dark' ? 'light' : 'dark');
         });
 
+        // Toast
         const toastEl = document.getElementById('toast');
         let toastTimer = null;
 
@@ -1574,6 +1642,7 @@
             }, 3000);
         }
 
+        // Modal
         const modalOverlay = document.getElementById('modalOverlay');
         const modalIcon = document.getElementById('modalIcon');
         const modalTitle = document.getElementById('modalTitle');
@@ -1608,6 +1677,7 @@
             if (e.target === this) closeModal(false);
         });
 
+        // Login
         const loginScreen = document.getElementById('loginScreen');
         const mainApp = document.getElementById('mainApp');
         const passwordInput = document.getElementById('passwordInput');
@@ -1619,61 +1689,27 @@
         const mathQuestionEl = document.getElementById('mathQuestion');
         const refreshMathBtn = document.getElementById('refreshMathBtn');
 
-        if (localStorage.getItem(KEEP_LOGIN_KEY) === 'false') {
-            keepLoginCheck.checked = false;
-        } else {
-            keepLoginCheck.checked = true;
-        }
-
-        let mathAnswer = 0;
-        let loginAttempts = 0;
-        let lockUntil = 0;
-
-        function generateMathQuestion() {
-            let a, b, answer, op, question;
-            const operators = ['+', '-'];
-
-            do {
-                a = Math.floor(Math.random() * 89) + 10;
-                b = Math.floor(Math.random() * 89) + 10;
-                op = operators[Math.floor(Math.random() * operators.length)];
-
-                if (op === '+') {
-                    answer = a + b;
-                    if (answer > 99) {
-                        a = Math.floor(Math.random() * (99 - 10 - b)) + 10;
-                        answer = a + b;
-                    }
-                    question = a + ' + ' + b + ' = ?';
-                } else {
-                    if (a < b) {
-                        var temp = a;
-                        a = b;
-                        b = temp;
-                    }
-                    if (a === b) {
-                        b = a - Math.floor(Math.random() * 20) - 1;
-                        if (b < 10) b = 10;
-                        if (a <= b) { a = b + Math.floor(Math.random() * 20) + 5; }
-                    }
-                    answer = a - b;
-                    question = a + ' - ' + b + ' = ?';
-                }
-            } while (answer < 10 || answer > 99 || a === b || b === 0 || a === 0);
-
-            mathQuestionEl.textContent = question;
-            mathAnswer = answer;
-            mathAnswerInput.value = '';
-        }
+        // 设置数学验证码元素
+        MathCaptcha.setElements(mathQuestionEl, mathAnswerInput);
+        MathCaptcha.generate();
 
         refreshMathBtn.addEventListener('click', function() {
-            generateMathQuestion();
+            MathCaptcha.generate();
             mathAnswerInput.focus();
         });
 
         mathAnswerInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') doLogin();
         });
+
+        if (localStorage.getItem(KEEP_LOGIN_KEY) === 'false') {
+            keepLoginCheck.checked = false;
+        } else {
+            keepLoginCheck.checked = true;
+        }
+
+        let loginAttempts = 0;
+        let lockUntil = 0;
 
         function resetLoginForm() {
             inviteCodeInput.value = '';
@@ -1682,13 +1718,14 @@
             loginError.textContent = '';
             loginAttempts = 0;
             lockUntil = 0;
-            generateMathQuestion();
+            MathCaptcha.generate();
         }
 
         function checkLogin() {
             const loggedIn = sessionStorage.getItem(STORAGE_KEY);
             const keepLogin = localStorage.getItem(KEEP_LOGIN_KEY) !== 'false';
-            if (loggedIn === 'true' && keepLogin) {
+            const token = sessionStorage.getItem(TOKEN_KEY);
+            if (loggedIn === 'true' && keepLogin && token) {
                 loginScreen.classList.add('hidden');
                 mainApp.classList.add('active');
                 loadAll();
@@ -1696,6 +1733,7 @@
             }
             if (!keepLogin) {
                 sessionStorage.removeItem(STORAGE_KEY);
+                sessionStorage.removeItem(TOKEN_KEY);
             }
             return false;
         }
@@ -1733,7 +1771,7 @@
                         'X-Invite-Code': inviteCode,
                         'X-Admin-Password': pwd,
                         'X-Math-Answer': String(userAnswer),
-                        'X-Math-Expected': String(mathAnswer),
+                        'X-Math-Expected': String(MathCaptcha.getAnswer()),
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({})
@@ -1742,7 +1780,7 @@
 
                 if (data.error === '数学题答错了') {
                     loginError.textContent = '数学题答错了，再试试';
-                    generateMathQuestion();
+                    MathCaptcha.generate();
                     loginBtn.disabled = false;
                     return;
                 }
@@ -1751,7 +1789,8 @@
                     loginAttempts = 0;
                     const keepLogin = keepLoginCheck.checked;
                     localStorage.setItem(KEEP_LOGIN_KEY, String(keepLogin));
-                    sessionStorage.setItem('admin_password', pwd);
+                    // 存 Token，不存密码
+                    sessionStorage.setItem(TOKEN_KEY, data.token);
                     sessionStorage.setItem(STORAGE_KEY, 'true');
                     loginScreen.classList.add('hidden');
                     mainApp.classList.add('active');
@@ -1764,7 +1803,7 @@
                     } else {
                         loginError.textContent = '验证失败（' + loginAttempts + '/5）';
                     }
-                    generateMathQuestion();
+                    MathCaptcha.generate();
                 }
             } catch (e) {
                 loginError.textContent = '网络错误，请重试';
@@ -1782,9 +1821,10 @@
 
         document.getElementById('logoutBtn').addEventListener('click', function() {
             sessionStorage.removeItem(STORAGE_KEY);
-            sessionStorage.removeItem('admin_password');
+            sessionStorage.removeItem(TOKEN_KEY);
             if (localStorage.getItem(KEEP_LOGIN_KEY) === 'false') {
                 sessionStorage.removeItem(STORAGE_KEY);
+                sessionStorage.removeItem(TOKEN_KEY);
             }
             loginScreen.classList.remove('hidden');
             mainApp.classList.remove('active');
@@ -1793,6 +1833,7 @@
             loginError.textContent = '';
         });
 
+        // Tabs
         const tabs = document.querySelectorAll('.tab');
         const tabContents = {
             write: document.getElementById('tabWrite'),
@@ -1819,6 +1860,7 @@
             });
         });
 
+        // 字数统计
         function countWords(text) {
             if (!text) return 0;
             var clean = text
@@ -1855,6 +1897,7 @@
         }
         setDefaultDate();
 
+        // Markdown 编辑器
         var mdEditor = document.getElementById('mdEditor');
         var previewArea = document.getElementById('previewArea');
         var publishBtn = document.getElementById('publishBtn');
@@ -2038,6 +2081,9 @@
             updateWordCount();
         });
 
+        // ================================================================
+        // Markdown 渲染器
+        // ================================================================
         function renderMarkdown(md) {
             if (!md) return '';
 
@@ -2465,14 +2511,18 @@
             return result;
         }
 
-        function getPassword() {
-            return sessionStorage.getItem('admin_password') || '';
+        // ================================================================
+        // API 调用（用 Token 不用密码）
+        // ================================================================
+        function getToken() {
+            return sessionStorage.getItem(TOKEN_KEY) || '';
         }
 
         async function apiCall(endpoint, options) {
+            var token = getToken();
             var defaultOptions = {
                 headers: {
-                    'X-Admin-Password': getPassword(),
+                    'X-Admin-Token': token,
                     'Content-Type': 'application/json'
                 }
             };
@@ -2485,19 +2535,28 @@
             if (res.status === 401) {
                 showToast('登录已过期，请重新登录', true);
                 sessionStorage.removeItem(STORAGE_KEY);
+                sessionStorage.removeItem(TOKEN_KEY);
                 loginScreen.classList.remove('hidden');
                 mainApp.classList.remove('active');
                 throw new Error('Unauthorized');
             }
+            if (res.status === 403) {
+                showToast('请求来源不合法，请从 admin.cuizi.top 访问', true);
+                throw new Error('Forbidden');
+            }
             return res;
         }
 
+        // ================================================================
+        // 数据
+        // ================================================================
         var allArticles = [];
         var currentFilter = 'all';
         var currentSort = 'desc';
         var allDrafts = [];
         var editingIdx = -1;
         var previousVersion = null;
+        var hardDeleteTarget = -1;
 
         async function loadAll() {
             await loadArticles();
@@ -2550,6 +2609,9 @@
             return div.innerHTML;
         }
 
+        // ================================================================
+        // 文章列表渲染
+        // ================================================================
         function renderArticleList() {
             var list = document.getElementById('articleList');
             var search = document.getElementById('listSearch').value.trim().toLowerCase();
@@ -2637,6 +2699,9 @@
             });
         }
 
+        // ================================================================
+        // 文章操作
+        // ================================================================
         function editArticle(idx) {
             var article = allArticles[idx];
             if (!article) return;
@@ -2739,20 +2804,26 @@
             }
         }
 
-        var hardDeleteTarget = -1;
-
+        // ================================================================
+        // 硬删除（输入标题确认）
+        // ================================================================
         function showHardDeleteModal(idx, title) {
             hardDeleteTarget = idx;
+            var descHtml = '你正在执行<strong>硬删除</strong>操作，该文章将从数据中<strong>彻底移除</strong>，无法恢复。<br /><br />输入文章标题 <strong style="color:#e53935;">' + escapeHtml(title) + '</strong> 确认删除：<br /><br /><input type="text" id="hardDeleteConfirmInput" placeholder="输入文章标题..." style="width:100%;padding:0.6rem 1rem;border-radius:60px;border:2px solid #e53935;font-size:0.9rem;font-family:inherit;background:rgba(255,255,255,0.5);color:#1a1a2e;text-align:center;outline:none;" />';
             showModal(
                 '<i class="fas fa-exclamation-triangle"></i>',
                 '危险操作',
-                '你正在执行<strong>硬删除</strong>操作，该文章将从数据中<strong>彻底移除</strong>，无法恢复。<br /><br />确定要硬删除 <strong>' +
-                escapeHtml(title) + '</strong> 吗？',
+                descHtml,
                 '确认硬删除',
                 'btn-confirm'
             ).then(async function(confirmed) {
                 if (confirmed) {
-                    await confirmHardDelete();
+                    var confirmInput = document.getElementById('hardDeleteConfirmInput');
+                    if (confirmInput && confirmInput.value.trim() === title) {
+                        await confirmHardDelete();
+                    } else {
+                        showToast('标题输入不正确，取消删除', true);
+                    }
                 }
                 hardDeleteTarget = -1;
             });
@@ -2788,6 +2859,9 @@
             }
         }
 
+        // ================================================================
+        // 草稿箱
+        // ================================================================
         function renderDraftList() {
             var list = document.getElementById('draftList');
             if (allDrafts.length === 0) {
@@ -2899,6 +2973,9 @@
             }
         }
 
+        // ================================================================
+        // 发布 / 更新
+        // ================================================================
         document.getElementById('publishBtn').addEventListener('click', async function() {
             var title = document.getElementById('editTitle').value.trim();
             var content = mdEditor.value.trim();
@@ -3052,6 +3129,9 @@
             this.disabled = false;
         });
 
+        // ================================================================
+        // 筛选 / 搜索 / 排序
+        // ================================================================
         document.querySelectorAll('#tabList .filter-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('#tabList .filter-btn').forEach(function(b) { b.classList.remove(
@@ -3083,8 +3163,9 @@
             document.getElementById('draftBadge').textContent = allDrafts.length;
         }
 
-        generateMathQuestion();
-
+        // ================================================================
+        // 启动
+        // ================================================================
         if (!checkLogin()) {
             loginScreen.classList.remove('hidden');
             mainApp.classList.remove('active');
@@ -3097,6 +3178,7 @@
         window.addEventListener('beforeunload', function() {
             if (localStorage.getItem(KEEP_LOGIN_KEY) === 'false') {
                 sessionStorage.removeItem(STORAGE_KEY);
+                sessionStorage.removeItem(TOKEN_KEY);
             }
         });
     </script>
