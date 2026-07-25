@@ -283,6 +283,15 @@
             outline: none;
             border-color: #6b5acf;
         }
+        .editor-row {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 0.8rem;
+        }
+        .editor-row input {
+            flex: 1;
+            margin-bottom: 0;
+        }
         .md-toolbar {
             display: flex;
             flex-wrap: wrap;
@@ -408,6 +417,20 @@
             border-radius: 8px;
             overflow: auto;
             margin: 0.5rem 0;
+            position: relative;
+        }
+        .preview-area pre .code-lang {
+            display: block;
+            background: rgba(255, 255, 255, 0.06);
+            color: #8b949e;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.8rem;
+            border-radius: 4px 4px 0 0;
+            margin: -0.8rem -1rem 0.5rem -1rem;
+            font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .preview-area pre code {
             background: transparent;
@@ -1034,6 +1057,9 @@
             .hard-delete-box .actions {
                 flex-direction: column;
             }
+            .editor-row {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -1069,7 +1095,10 @@
                     <div class="editor-panel">
                         <div class="panel-label">编辑</div>
                         <input type="text" id="editTitle" placeholder="文章标题" />
-                        <input type="text" id="editTags" placeholder="标签，用逗号分隔" />
+                        <div class="editor-row">
+                            <input type="date" id="editDate" />
+                            <input type="text" id="editTags" placeholder="标签，用逗号分隔" style="flex:2;" />
+                        </div>
                         <div class="md-toolbar" id="mdToolbar">
                             <button data-cmd="bold" title="粗体"><b>B</b></button>
                             <button data-cmd="italic" title="斜体"><i>I</i></button>
@@ -1265,7 +1294,6 @@
         const mdEditor = document.getElementById('mdEditor');
         const previewArea = document.getElementById('previewArea');
 
-        // 插入文本（保留光标位置）
         function insertText(text) {
             const start = mdEditor.selectionStart;
             const end = mdEditor.selectionEnd;
@@ -1277,7 +1305,6 @@
             updatePreview();
         }
 
-        // 包裹选中文本
         function wrapText(before, after) {
             const start = mdEditor.selectionStart;
             const end = mdEditor.selectionEnd;
@@ -1290,7 +1317,6 @@
             updatePreview();
         }
 
-        // 列表自动延续
         function handleListContinuation() {
             const value = mdEditor.value;
             const cursorPos = mdEditor.selectionStart;
@@ -1306,16 +1332,13 @@
             }
             if (lineIndex > lines.length - 1) return false;
             const currentLine = lines[lineIndex] || '';
-            // 有序列表匹配：数字. 空格
             const olMatch = currentLine.match(/^(\s*)(\d+)\.\s+/);
             if (olMatch) {
                 const indent = olMatch[1];
                 const num = parseInt(olMatch[2]) + 1;
                 const prefix = indent + num + '. ';
-                // 检查下一行是否已经有内容
                 const nextLine = lines[lineIndex + 1] || '';
                 if (nextLine.trim() === '') {
-                    // 插入新行并自动补全
                     const before = value.substring(0, cursorPos);
                     const after = value.substring(cursorPos);
                     mdEditor.value = before + '\n' + prefix + after;
@@ -1327,7 +1350,6 @@
                 }
                 return false;
             }
-            // 无序列表匹配：- 或 * 空格
             const ulMatch = currentLine.match(/^(\s*)([-*])\s+/);
             if (ulMatch) {
                 const indent = ulMatch[1];
@@ -1349,7 +1371,6 @@
             return false;
         }
 
-        // 工具栏按钮
         document.querySelectorAll('#mdToolbar button[data-cmd]').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 const cmd = this.dataset.cmd;
@@ -1404,7 +1425,6 @@
                         break;
                     case 'codeblock':
                         insertText('\n```\n\n```\n');
-                        // 将光标定位到两个换行之间
                         const pos = mdEditor.selectionStart;
                         mdEditor.selectionStart = mdEditor.selectionEnd = pos - 3;
                         mdEditor.focus();
@@ -1431,7 +1451,6 @@
             });
         });
 
-        // 键盘事件：监听 Enter 键自动延续列表
         mdEditor.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 const handled = handleListContinuation();
@@ -1441,74 +1460,97 @@
             }
         });
 
-        // 预览更新
         function updatePreview() {
             previewArea.innerHTML = renderMarkdown(mdEditor.value);
         }
         mdEditor.addEventListener('input', updatePreview);
 
-        // ===== Markdown 渲染 =====
+        // ===== 完整的 Markdown 渲染器 =====
         function renderMarkdown(md) {
             if (!md) return '<span style="color:#8a8ab5;font-size:0.85rem;">预览会显示在这里</span>';
 
-            let html = md;
+            // 先转义 HTML
+            let html = md.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-            // 转义 HTML 特殊字符（防止 XSS）
-            html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-            // 代码块（必须放最前面，防止内部被解析）
-            html = html.replace(/```([\s\S]*?)```/g, function(match, code) {
-                return '<pre><code>' + code + '</code></pre>';
+            // 1. 代码块（必须最先处理，防止内部被解析）
+            html = html.replace(/```(\w*)\n([\s\S]*?)```/g, function(match, lang, code) {
+                const langLabel = lang ? '<span class="code-lang">' + lang + '</span>' : '';
+                return '<pre>' + langLabel + '<code>' + code + '</code></pre>';
             });
 
-            // 行内代码
+            // 2. 行内代码
             html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
 
-            // 粗体
+            // 3. 粗体
             html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
-            // 斜体
+            // 4. 斜体
             html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
 
-            // 删除线
+            // 5. 删除线
             html = html.replace(/~~(.*?)~~/g, '<del>$1</del>');
 
-            // 标题
-            html = html.replace(/^###### (.*$)/gm, '<h6>$1</h6>');
-            html = html.replace(/^##### (.*$)/gm, '<h5>$1</h5>');
-            html = html.replace(/^#### (.*$)/gm, '<h4>$1</h4>');
-            html = html.replace(/^### (.*$)/gm, '<h3>$1</h3>');
-            html = html.replace(/^## (.*$)/gm, '<h2>$1</h2>');
-            html = html.replace(/^# (.*$)/gm, '<h1>$1</h1>');
+            // 6. 标题
+            html = html.replace(/^###### (.+)$/gm, '<h6>$1</h6>');
+            html = html.replace(/^##### (.+)$/gm, '<h5>$1</h5>');
+            html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
+            html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+            html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+            html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
 
-            // 引用
-            html = html.replace(/^> (.*$)/gm, '<blockquote>$1</blockquote>');
+            // 7. 引用
+            html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
 
-            // 链接
+            // 8. 链接
             html = html.replace(/\[([^\]]*)\]\(([^)]*)\)/g, '<a href="$2" target="_blank">$1</a>');
 
-            // 图片
+            // 9. 图片
             html = html.replace(/!\[([^\]]*)\]\(([^)]*)\)/g, '<img src="$2" alt="$1" />');
 
-            // 无序列表：将连续的 - 或 * 行转为 ul
+            // 10. 分割线
+            html = html.replace(/^---$/gm, '<hr />');
+
+            // 11. 表格（复杂但完整）
+            html = html.replace(/\|(.+)\|\n\|([\-:| ]+)\|\n((?:\|.+\|\n?)+)/g, function(match, header, align, rows) {
+                const headers = header.split('|').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
+                const aligns = align.split('|').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
+                let tableHtml = '<table><thead><tr>';
+                headers.forEach(function(h, i) {
+                    const alignStyle = aligns[i] && aligns[i].endsWith(':') ? ' style="text-align:' + (aligns[i]
+                        .startsWith(':') ? 'center' : 'right') + ';"' : '';
+                    tableHtml += '<th' + alignStyle + '>' + h + '</th>';
+                });
+                tableHtml += '</tr></thead><tbody>';
+                const rowLines = rows.split('\n').filter(function(r) { return r.trim(); });
+                rowLines.forEach(function(row) {
+                    const cells = row.split('|').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
+                    tableHtml += '<tr>';
+                    cells.forEach(function(cell, i) {
+                        const alignStyle = aligns[i] && aligns[i].endsWith(':') ? ' style="text-align:' + (aligns[i]
+                            .startsWith(':') ? 'center' : 'right') + ';"' : '';
+                        tableHtml += '<td' + alignStyle + '>' + cell + '</td>';
+                    });
+                    tableHtml += '</tr>';
+                });
+                tableHtml += '</tbody></table>';
+                return tableHtml;
+            });
+
+            // 12. 无序列表
             html = html.replace(/^[-*] (.+)$/gm, '<li>$1</li>');
-            // 将连续的 li 包裹成 ul
-            html = html.replace(/(<li>.*<\/li>\s*)+/g, function(match) {
+            html = html.replace(/((?:<li>.*<\/li>\s*)+)/g, function(match) {
+                if (match.indexOf('<ul>') !== -1 || match.indexOf('<ol>') !== -1) return match;
                 return '<ul>' + match.trim() + '</ul>';
             });
 
-            // 有序列表：将连续的数字. 行转为 ol
+            // 13. 有序列表
             html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
-            html = html.replace(/(<li>.*<\/li>\s*)+/g, function(match) {
-                // 检查是否已经被 ul 包裹了
-                if (match.indexOf('<ul>') !== -1) return match;
+            html = html.replace(/((?:<li>.*<\/li>\s*)+)/g, function(match) {
+                if (match.indexOf('<ul>') !== -1 || match.indexOf('<ol>') !== -1) return match;
                 return '<ol>' + match.trim() + '</ol>';
             });
 
-            // 分割线
-            html = html.replace(/^---$/gm, '<hr />');
-
-            // 换行转为 <br />（但不破坏已有的块级元素）
+            // 14. 换行
             html = html.replace(/\n/g, '<br />');
 
             return html;
@@ -1679,6 +1721,7 @@
             if (!article) return;
             editingIdx = idx;
             document.getElementById('editTitle').value = article.title || '';
+            document.getElementById('editDate').value = article.date || '';
             document.getElementById('editTags').value = (article.tags || []).join('，');
             mdEditor.value = article.content || '';
             updatePreview();
@@ -1727,7 +1770,7 @@
             }
         }
 
-        // ===== 硬删除 =====
+        // ===== 硬删除（真正从数组中移除） =====
         let hardDeleteTarget = -1;
         const hardDeleteOverlay = document.getElementById('hardDeleteOverlay');
         const hardDeleteTitle = document.getElementById('hardDeleteTitle');
@@ -1767,9 +1810,18 @@
         async function confirmHardDelete() {
             if (hardDeleteTarget === -1) return;
             try {
+                // 直接从数组中移除
+                const idx = hardDeleteTarget;
+                const title = allArticles[idx]?.title || '文章';
+                allArticles.splice(idx, 1);
+                // 更新 JSON
                 const res = await apiCall('posts', {
-                    method: 'DELETE',
-                    body: JSON.stringify({ id: hardDeleteTarget, hard: true })
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        hardDelete: true,
+                        index: idx,
+                        articles: allArticles
+                    })
                 });
                 const data = await res.json();
                 if (data.success) {
@@ -1779,10 +1831,15 @@
                     renderArticleList();
                     updateBadges();
                 } else {
-                    showToast(data.error || '硬删除失败', true);
+                    showToast(data.error || '硬删除失败，请重试', true);
+                    // 回滚本地状态
+                    await loadArticles();
+                    renderArticleList();
                 }
             } catch (e) {
                 showToast('硬删除失败', true);
+                await loadArticles();
+                renderArticleList();
             }
         }
 
@@ -1819,6 +1876,7 @@
                     const draft = allDrafts.find(function(d) { return d.id === id; });
                     if (draft) {
                         document.getElementById('editTitle').value = draft.title || '';
+                        document.getElementById('editDate').value = '';
                         document.getElementById('editTags').value = (draft.tags || []).join('，');
                         mdEditor.value = draft.content || '';
                         updatePreview();
@@ -1834,6 +1892,7 @@
                     const draft = allDrafts.find(function(d) { return d.id === id; });
                     if (draft) {
                         document.getElementById('editTitle').value = draft.title || '';
+                        document.getElementById('editDate').value = '';
                         document.getElementById('editTags').value = (draft.tags || []).join('，');
                         mdEditor.value = draft.content || '';
                         updatePreview();
@@ -1879,6 +1938,7 @@
             const title = document.getElementById('editTitle').value.trim();
             const content = mdEditor.value.trim();
             const tagsRaw = document.getElementById('editTags').value.trim();
+            const date = document.getElementById('editDate').value;
             const tags = tagsRaw ? tagsRaw.split(/[，,、\s]+/).filter(Boolean) : [];
             if (!title) {
                 showToast('请输入标题', true);
@@ -1898,7 +1958,8 @@
                             id: editingIdx,
                             title: title,
                             content: content,
-                            tags: tags
+                            tags: tags,
+                            date: date || undefined
                         })
                     });
                     data = await res.json();
@@ -1915,7 +1976,12 @@
                 } else {
                     res = await apiCall('posts', {
                         method: 'POST',
-                        body: JSON.stringify({ title, content, tags })
+                        body: JSON.stringify({
+                            title: title,
+                            content: content,
+                            tags: tags,
+                            date: date || undefined
+                        })
                     });
                     data = await res.json();
                     if (data.success) {
@@ -1936,6 +2002,7 @@
 
         function clearEditor() {
             document.getElementById('editTitle').value = '';
+            document.getElementById('editDate').value = '';
             document.getElementById('editTags').value = '';
             mdEditor.value = '';
             updatePreview();
@@ -1990,7 +2057,6 @@
             });
         });
 
-        // ===== 排序切换 =====
         document.getElementById('sortBtn').addEventListener('click', function() {
             const btn = this;
             if (currentSort === 'desc') {
