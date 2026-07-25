@@ -1418,7 +1418,7 @@
                 </div>
 
                 <div class="math-row">
-                    <span class="math-question" id="mathQuestion">23 + 47 = ?</span>
+                    <span class="math-question" id="mathQuestion">加载题目中...</span>
                     <input type="text" id="mathAnswer" placeholder="答案" autocomplete="off" />
                     <button type="button" class="refresh-btn" id="refreshMathBtn" aria-label="刷新题目">
                         <i class="fas fa-rotate-right"></i>
@@ -1541,66 +1541,27 @@
 
     <script>
         // ================================================================
-        // 数学验证码（闭包封装，不暴露 mathAnswer 到全局）
+        // 数学验证码（后端生成）
         // ================================================================
-        const MathCaptcha = (function() {
-            let answer = 0;
-            let questionEl = null;
-            let inputEl = null;
+        let mathQuestionText = '';
 
-            function generate() {
-                let a, b, result, op, question;
-                const operators = ['+', '-'];
-
-                do {
-                    a = Math.floor(Math.random() * 89) + 10;
-                    b = Math.floor(Math.random() * 89) + 10;
-                    op = operators[Math.floor(Math.random() * operators.length)];
-
-                    if (op === '+') {
-                        result = a + b;
-                        if (result > 99) {
-                            a = Math.floor(Math.random() * (99 - 10 - b)) + 10;
-                            result = a + b;
-                        }
-                        question = a + ' + ' + b + ' = ?';
-                    } else {
-                        if (a < b) {
-                            var temp = a;
-                            a = b;
-                            b = temp;
-                        }
-                        if (a === b) {
-                            b = a - Math.floor(Math.random() * 20) - 1;
-                            if (b < 10) b = 10;
-                            if (a <= b) { a = b + Math.floor(Math.random() * 20) + 5; }
-                        }
-                        result = a - b;
-                        question = a + ' - ' + b + ' = ?';
-                    }
-                } while (result < 10 || result > 99 || a === b || b === 0 || a === 0);
-
-                answer = result;
-                if (questionEl) questionEl.textContent = question;
-                if (inputEl) inputEl.value = '';
-                return question;
+        async function fetchMathQuestion() {
+            try {
+                const res = await fetch('/api/auth', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                if (data.question) {
+                    mathQuestionText = data.question;
+                    document.getElementById('mathQuestion').textContent = data.question;
+                    document.getElementById('mathAnswer').value = '';
+                    document.getElementById('mathAnswer').focus();
+                }
+            } catch (e) {
+                document.getElementById('mathQuestion').textContent = '加载题目失败，请刷新';
             }
-
-            function getAnswer() {
-                return answer;
-            }
-
-            function setElements(qEl, iEl) {
-                questionEl = qEl;
-                inputEl = iEl;
-            }
-
-            return {
-                generate: generate,
-                getAnswer: getAnswer,
-                setElements: setElements
-            };
-        })();
+        }
 
         // ================================================================
         // 主程序
@@ -1686,15 +1647,10 @@
         const keepLoginCheck = document.getElementById('keepLogin');
         const inviteCodeInput = document.getElementById('inviteCode');
         const mathAnswerInput = document.getElementById('mathAnswer');
-        const mathQuestionEl = document.getElementById('mathQuestion');
         const refreshMathBtn = document.getElementById('refreshMathBtn');
 
-        // 设置数学验证码元素
-        MathCaptcha.setElements(mathQuestionEl, mathAnswerInput);
-        MathCaptcha.generate();
-
         refreshMathBtn.addEventListener('click', function() {
-            MathCaptcha.generate();
+            fetchMathQuestion();
             mathAnswerInput.focus();
         });
 
@@ -1718,7 +1674,7 @@
             loginError.textContent = '';
             loginAttempts = 0;
             lockUntil = 0;
-            MathCaptcha.generate();
+            fetchMathQuestion();
         }
 
         function checkLogin() {
@@ -1771,16 +1727,15 @@
                         'X-Invite-Code': inviteCode,
                         'X-Admin-Password': pwd,
                         'X-Math-Answer': String(userAnswer),
-                        'X-Math-Expected': String(MathCaptcha.getAnswer()),
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({})
                 });
                 const data = await res.json();
 
-                if (data.error === '数学题答错了') {
-                    loginError.textContent = '数学题答错了，再试试';
-                    MathCaptcha.generate();
+                if (data.error && data.error.includes('数学题')) {
+                    loginError.textContent = data.error;
+                    fetchMathQuestion();
                     loginBtn.disabled = false;
                     return;
                 }
@@ -1789,7 +1744,6 @@
                     loginAttempts = 0;
                     const keepLogin = keepLoginCheck.checked;
                     localStorage.setItem(KEEP_LOGIN_KEY, String(keepLogin));
-                    // 存 Token，不存密码
                     sessionStorage.setItem(TOKEN_KEY, data.token);
                     sessionStorage.setItem(STORAGE_KEY, 'true');
                     loginScreen.classList.add('hidden');
@@ -1803,7 +1757,7 @@
                     } else {
                         loginError.textContent = '验证失败（' + loginAttempts + '/5）';
                     }
-                    MathCaptcha.generate();
+                    fetchMathQuestion();
                 }
             } catch (e) {
                 loginError.textContent = '网络错误，请重试';
@@ -3166,6 +3120,9 @@
         // ================================================================
         // 启动
         // ================================================================
+        // 获取数学题
+        fetchMathQuestion();
+
         if (!checkLogin()) {
             loginScreen.classList.remove('hidden');
             mainApp.classList.remove('active');
