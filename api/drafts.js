@@ -23,13 +23,14 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-      const { id, title, content, tags } = req.body;
+      const { id, title, content, tags, date } = req.body;
       if (id) {
         const idx = drafts.drafts.findIndex(d => d.id === id);
         if (idx === -1) return res.status(404).json({ error: '草稿不存在' });
         if (title !== undefined) drafts.drafts[idx].title = title;
         if (content !== undefined) drafts.drafts[idx].content = content;
         if (tags !== undefined) drafts.drafts[idx].tags = tags;
+        if (date !== undefined) drafts.drafts[idx].date = date;
         drafts.drafts[idx].updated = new Date().toISOString();
       } else {
         drafts.drafts.push({
@@ -37,6 +38,7 @@ export default async function handler(req, res) {
           title: title || '无标题',
           content: content || '',
           tags: tags || [],
+          date: date || '',
           created: new Date().toISOString(),
           updated: new Date().toISOString()
         });
@@ -57,4 +59,4 @@ export default async function handler(req, res) {
     console.error('Error:', error.message);
     return res.status(500).json({ error: error.message });
   }
-  }
+}
