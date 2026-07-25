@@ -8,7 +8,6 @@ export default async function handler(req, res) {
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
   const now = Date.now();
 
-  // 检查是否被锁定
   if (failedAttempts[ip] && failedAttempts[ip].lockedUntil > now) {
     const remaining = Math.ceil((failedAttempts[ip].lockedUntil - now) / 60000);
     return res.status(429).json({
@@ -16,10 +15,20 @@ export default async function handler(req, res) {
     });
   }
 
-  const pwd = req.headers['x-admin-password'];
-  const valid = pwd === process.env.ADMIN_PASSWORD;
+  const inviteCode = req.headers['x-invite-code'] || '';
+  const password = req.headers['x-admin-password'] || '';
+  const mathAnswer = parseInt(req.headers['x-math-answer']) || 0;
+  const mathExpected = parseInt(req.headers['x-math-expected']) || 0;
 
-  if (!valid) {
+  const validInvite = inviteCode === (process.env.INVITE_CODE || '').trim();
+  const validPassword = password === (process.env.ADMIN_PASSWORD || '').trim();
+  const validMath = mathAnswer === mathExpected;
+
+  if (!validMath) {
+    return res.status(400).json({ error: '数学题答错了' });
+  }
+
+  if (!validInvite || !validPassword) {
     if (!failedAttempts[ip]) {
       failedAttempts[ip] = { count: 0, lockedUntil: 0 };
     }
@@ -30,10 +39,9 @@ export default async function handler(req, res) {
         error: '尝试次数过多，请 15 分钟后重试'
       });
     }
-    return res.status(401).json({ error: '密码错误' });
+    return res.status(401).json({ error: '验证失败' });
   }
 
-  // 登录成功，重置失败计数
   delete failedAttempts[ip];
   return res.status(200).json({ success: true });
-      }
+}
