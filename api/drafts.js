@@ -4,6 +4,20 @@ const ADMIN_REPO = 'cuizihang1145/ks-admin';
 
 export default async function handler(req, res) {
   try {
+    // ===== CSRF 防护：校验 Referer =====
+    const referer = req.headers.referer || '';
+    const allowedDomains = ['admin.cuizi.top', 'cuizi.top', 'localhost'];
+    let isAllowed = false;
+    for (const domain of allowedDomains) {
+      if (referer.includes(domain)) {
+        isAllowed = true;
+        break;
+      }
+    }
+    if (!isAllowed) {
+      return res.status(403).json({ error: '请求来源不合法' });
+    }
+
     if (!checkAuth(req)) {
       return res.status(401).json({ error: '密码错误' });
     }
@@ -59,4 +73,4 @@ export default async function handler(req, res) {
     console.error('Error:', error.message);
     return res.status(500).json({ error: error.message });
   }
-}
+                                           }
