@@ -6,7 +6,6 @@
     <title>管理后台 · ks</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
-        /* ===== 禁用所有蓝色点击高亮 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -50,7 +49,6 @@
             padding: 2rem 1.5rem;
         }
 
-        /* ===== 登录界面 ===== */
         #loginScreen {
             display: flex;
             align-items: center;
@@ -157,7 +155,7 @@
             border-color: #6b5acf;
         }
         .login-card .login-options input[type="checkbox"]:checked::after {
-            content: '✓';
+            content: '\2713';
             position: absolute;
             top: 50%;
             left: 50%;
@@ -197,7 +195,6 @@
             min-height: 1.5rem;
         }
 
-        /* ===== 主界面 ===== */
         #mainApp {
             display: none;
             animation: fadeIn 0.4s ease;
@@ -292,7 +289,6 @@
             background: rgba(255, 255, 255, 0.15);
         }
 
-        /* ===== Tabs ===== */
         .tabs {
             display: flex;
             gap: 0.3rem;
@@ -364,7 +360,6 @@
             display: block;
         }
 
-        /* ===== 编辑器 ===== */
         .editor-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -432,7 +427,6 @@
             margin-bottom: 0;
         }
 
-        /* ===== 工具栏 ===== */
         .md-toolbar {
             display: flex;
             flex-wrap: wrap;
@@ -593,6 +587,7 @@
             margin: 0.5rem 0;
             color: #6a6a92;
             font-style: italic;
+            display: block;
         }
         body.dark .preview-area blockquote {
             border-left-color: #88ccff;
@@ -602,6 +597,7 @@
             max-width: 100%;
             border-radius: 8px;
             margin: 0.5rem 0;
+            display: block;
         }
         .preview-area ul,
         .preview-area ol {
@@ -642,6 +638,14 @@
         }
         body.dark .preview-area hr {
             border-top-color: rgba(255, 255, 255, 0.08);
+        }
+        .preview-area a {
+            color: #6b5acf;
+            text-decoration: underline;
+            word-break: break-all;
+        }
+        body.dark .preview-area a {
+            color: #88ccff;
         }
 
         .editor-actions {
@@ -700,7 +704,6 @@
             color: #d0caf0;
         }
 
-        /* ===== 文章列表 ===== */
         .list-controls {
             display: flex;
             gap: 0.8rem;
@@ -928,7 +931,6 @@
             background: rgba(255, 152, 0, 0.22);
         }
 
-        /* ===== 草稿箱 ===== */
         .draft-item {
             background: rgba(255, 255, 255, 0.35);
             backdrop-filter: blur(8px);
@@ -1047,7 +1049,6 @@
             background: rgba(229, 115, 115, 0.22);
         }
 
-        /* ===== 弹窗 ===== */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -1171,7 +1172,6 @@
             transform: scale(1.02);
         }
 
-        /* ===== Toast ===== */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -1208,7 +1208,6 @@
             background: rgba(180, 40, 40, 0.95);
         }
 
-        /* ===== 响应式 ===== */
         @media (max-width: 600px) {
             .container {
                 padding: 1.2rem 0.8rem;
@@ -1285,7 +1284,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- ===== 登录界面 ===== -->
         <div id="loginScreen">
             <div class="login-card">
                 <h1>管理后台</h1>
@@ -1302,7 +1300,6 @@
             </div>
         </div>
 
-        <!-- ===== 主应用 ===== -->
         <div id="mainApp">
             <div class="admin-header">
                 <span class="title">管理后台</span>
@@ -1320,7 +1317,6 @@
                 <button class="tab" data-tab="drafts">草稿箱 <span class="badge" id="draftBadge">0</span></button>
             </div>
 
-            <!-- ===== Tab: 写文章 ===== -->
             <div class="tab-content active" id="tabWrite">
                 <div class="editor-section">
                     <div class="editor-panel">
@@ -1371,7 +1367,6 @@
                 </div>
             </div>
 
-            <!-- ===== Tab: 文章列表 ===== -->
             <div class="tab-content" id="tabList">
                 <div class="list-controls">
                     <button class="filter-btn active" data-filter="all">全部</button>
@@ -1384,17 +1379,15 @@
                 <div class="article-list" id="articleList"></div>
             </div>
 
-            <!-- ===== Tab: 草稿箱 ===== -->
             <div class="tab-content" id="tabDrafts">
                 <div class="article-list" id="draftList"></div>
             </div>
         </div>
     </div>
 
-    <!-- ===== 通用弹窗 ===== -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-box">
-            <span class="modal-icon" id="modalIcon">⚠️</span>
+            <span class="modal-icon" id="modalIcon"><i class="fas fa-exclamation-triangle"></i></span>
             <div class="modal-title" id="modalTitle">确认操作</div>
             <div class="modal-desc" id="modalDesc">确定要执行此操作吗？</div>
             <div class="modal-actions">
@@ -1464,7 +1457,7 @@
 
         function showModal(icon, title, desc, confirmText, confirmClass) {
             return new Promise((resolve) => {
-                modalIcon.textContent = icon || '⚠️';
+                modalIcon.innerHTML = icon || '<i class="fas fa-exclamation-triangle"></i>';
                 modalTitle.textContent = title || '确认操作';
                 modalDesc.innerHTML = desc || '确定要执行此操作吗？';
                 modalConfirm.textContent = confirmText || '确认';
@@ -1498,7 +1491,6 @@
         const loginError = document.getElementById('loginError');
         const keepLoginCheck = document.getElementById('keepLogin');
 
-        // 加载保存的"保持登录"状态
         if (localStorage.getItem(KEEP_LOGIN_KEY) === 'false') {
             keepLoginCheck.checked = false;
         } else {
@@ -1514,7 +1506,6 @@
                 loadAll();
                 return true;
             }
-            // 如果 keepLogin 为 false，清除 session
             if (!keepLogin) {
                 sessionStorage.removeItem(STORAGE_KEY);
             }
@@ -1539,11 +1530,7 @@
                 if (data.success) {
                     const keepLogin = keepLoginCheck.checked;
                     localStorage.setItem(KEEP_LOGIN_KEY, String(keepLogin));
-                    if (keepLogin) {
-                        sessionStorage.setItem(STORAGE_KEY, 'true');
-                    } else {
-                        sessionStorage.setItem(STORAGE_KEY, 'true');
-                    }
+                    sessionStorage.setItem(STORAGE_KEY, 'true');
                     sessionStorage.setItem('admin_password', pwd);
                     loginScreen.classList.add('hidden');
                     mainApp.classList.add('active');
@@ -1562,13 +1549,9 @@
             if (e.key === 'Enter') doLogin();
         });
 
-        // ================================================================
-        // 退出
-        // ================================================================
         document.getElementById('logoutBtn').addEventListener('click', function() {
             sessionStorage.removeItem(STORAGE_KEY);
             sessionStorage.removeItem('admin_password');
-            // 如果"保持登录"未勾选，清除 session
             if (localStorage.getItem(KEEP_LOGIN_KEY) === 'false') {
                 sessionStorage.removeItem(STORAGE_KEY);
             }
@@ -1588,8 +1571,15 @@
             drafts: document.getElementById('tabDrafts')
         };
 
+        // 删除草稿锁
+        let isDeletingDraft = false;
+
         tabs.forEach(function(tab) {
             tab.addEventListener('click', function() {
+                if (isDeletingDraft) {
+                    showToast('正在删除草稿，请稍候', true);
+                    return;
+                }
                 tabs.forEach(function(t) { t.classList.remove('active'); });
                 this.classList.add('active');
                 const target = this.dataset.tab;
@@ -1607,6 +1597,16 @@
         const mdEditor = document.getElementById('mdEditor');
         const previewArea = document.getElementById('previewArea');
         const publishBtn = document.getElementById('publishBtn');
+        const editDateInput = document.getElementById('editDate');
+
+        // 日期默认今天
+        function setDefaultDate() {
+            if (!editDateInput.value) {
+                const today = new Date().toISOString().slice(0, 10);
+                editDateInput.value = today;
+            }
+        }
+        setDefaultDate();
 
         function insertText(text) {
             const start = mdEditor.selectionStart;
@@ -1780,23 +1780,29 @@
         mdEditor.addEventListener('input', updatePreview);
 
         // ================================================================
-        // Markdown 渲染器
+        // Markdown 渲染器（完整修复版）
         // ================================================================
         function renderMarkdown(md) {
             if (!md) return '<span style="color:#8a8ab5;font-size:0.85rem;">预览会显示在这里</span>';
 
             let html = md.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+            // 代码块
             html = html.replace(/```(\w*)\n([\s\S]*?)```/g, function(match, lang, code) {
                 const langLabel = lang ? '<span class="code-lang">' + lang + '</span>' : '';
                 return '<pre>' + langLabel + '<code>' + code + '</code></pre>';
             });
 
+            // 行内代码
             html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+            // 粗体
             html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // 斜体
             html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+            // 删除线
             html = html.replace(/~~(.*?)~~/g, '<del>$1</del>');
 
+            // 标题
             html = html.replace(/^###### (.+)$/gm, '<h6>$1</h6>');
             html = html.replace(/^##### (.+)$/gm, '<h5>$1</h5>');
             html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
@@ -1804,9 +1810,24 @@
             html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
             html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
 
-            html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
-            html = html.replace(/\[([^\]]*)\]\(([^)]*)\)/g, '<a href="$2" target="_blank">$1</a>');
+            // 引用 - 用占位符保护
+            html = html.replace(/^> (.+)$/gm, '___BLOCKQUOTE___$1___BLOCKQUOTE_END___');
+
+            // 链接（完整 URL 支持）
+            html = html.replace(/\[([^\]]*)\]\(([^)]*)\)/g, function(match, text, url) {
+                if (url.startsWith('http://') || url.startsWith('https://')) {
+                    return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + text + '</a>';
+                } else if (url.startsWith('/')) {
+                    return '<a href="' + url + '" target="_blank">' + text + '</a>';
+                } else {
+                    return '<a href="' + url + '" target="_blank">' + text + '</a>';
+                }
+            });
+
+            // 图片
             html = html.replace(/!\[([^\]]*)\]\(([^)]*)\)/g, '<img src="$2" alt="$1" />');
+
+            // 分割线
             html = html.replace(/^---$/gm, '<hr />');
 
             // 表格
@@ -1815,8 +1836,7 @@
                 const aligns = align.split('|').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
                 let tableHtml = '<table><thead><tr>';
                 headers.forEach(function(h, i) {
-                    const alignStyle = aligns[i] && aligns[i].endsWith(':') ? ' style="text-align:' + (aligns[i]
-                        .startsWith(':') ? 'center' : 'right') + ';"' : '';
+                    const alignStyle = aligns[i] && aligns[i].endsWith(':') ? ' style="text-align:' + (aligns[i].startsWith(':') ? 'center' : 'right') + ';"' : '';
                     tableHtml += '<th' + alignStyle + '>' + h + '</th>';
                 });
                 tableHtml += '</tr></thead><tbody>';
@@ -1825,8 +1845,7 @@
                     const cells = row.split('|').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
                     tableHtml += '<tr>';
                     cells.forEach(function(cell, i) {
-                        const alignStyle = aligns[i] && aligns[i].endsWith(':') ? ' style="text-align:' + (aligns[i]
-                            .startsWith(':') ? 'center' : 'right') + ';"' : '';
+                        const alignStyle = aligns[i] && aligns[i].endsWith(':') ? ' style="text-align:' + (aligns[i].startsWith(':') ? 'center' : 'right') + ';"' : '';
                         tableHtml += '<td' + alignStyle + '>' + cell + '</td>';
                     });
                     tableHtml += '</tr>';
@@ -1835,17 +1854,22 @@
                 return tableHtml;
             });
 
-            // 列表
+            // 无序列表（先处理，防止与有序冲突）
             html = html.replace(/^[-*] (.+)$/gm, '<li>$1</li>');
             html = html.replace(/((?:<li>.*<\/li>\s*)+)/g, function(match) {
                 if (match.indexOf('<ul>') !== -1 || match.indexOf('<ol>') !== -1) return match;
                 return '<ul>' + match.trim() + '</ul>';
             });
+
+            // 有序列表
             html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
             html = html.replace(/((?:<li>.*<\/li>\s*)+)/g, function(match) {
                 if (match.indexOf('<ul>') !== -1 || match.indexOf('<ol>') !== -1) return match;
                 return '<ol>' + match.trim() + '</ol>';
             });
+
+            // 恢复引用
+            html = html.replace(/___BLOCKQUOTE___(.+?)___BLOCKQUOTE_END___/g, '<blockquote>$1</blockquote>');
 
             html = html.replace(/\n/g, '<br />');
             return html;
@@ -1971,7 +1995,6 @@
                 const deletedClass = article.delete ? 'deleted' : '';
                 const statusHtml = article.delete ? '<span class="status-deleted">已删除</span>' : '';
 
-                // 撤销按钮：如果有上一个版本且当前文章被修改过
                 const undoBtn = (previousVersion && previousVersion.idx === idx) ?
                     '<button class="btn-undo" data-idx="' + idx + '">撤销</button>' :
                     '';
@@ -2051,7 +2074,13 @@
         }
 
         async function softDeleteArticle(idx) {
-            const result = await showModal('📌', '软删除', '确定要软删除这篇文章吗？<br />软删除后文章仍可恢复。', '确认软删除', 'btn-confirm-warning');
+            const result = await showModal(
+                '<i class="fas fa-trash-alt"></i>',
+                '软删除',
+                '确定要软删除这篇文章吗？<br />软删除后文章仍可恢复。',
+                '确认软删除',
+                'btn-confirm-warning'
+            );
             if (!result) return;
             try {
                 const res = await apiCall('posts', {
@@ -2097,8 +2126,13 @@
                 showToast('没有可撤销的版本', true);
                 return;
             }
-            const result = await showModal('↩️', '撤销修改', '确定要撤销对 <strong>' + escapeHtml(previousVersion.title) +
-                '</strong> 的修改吗？<br />将恢复到修改前的版本。', '确认撤销', 'btn-confirm-warning');
+            const result = await showModal(
+                '<i class="fas fa-undo-alt"></i>',
+                '撤销修改',
+                '确定要撤销对 <strong>' + escapeHtml(previousVersion.title) + '</strong> 的修改吗？<br />将恢复到修改前的版本。',
+                '确认撤销',
+                'btn-confirm-warning'
+            );
             if (!result) return;
             try {
                 const res = await apiCall('posts', {
@@ -2133,8 +2167,13 @@
 
         function showHardDeleteModal(idx, title) {
             hardDeleteTarget = idx;
-            showModal('⚠️', '危险操作', '你正在执行<strong>硬删除</strong>操作，该文章将从数据中<strong>彻底移除</strong>，无法恢复。<br /><br />确定要硬删除 <strong>' +
-                escapeHtml(title) + '</strong> 吗？', '确认硬删除', 'btn-confirm'
+            showModal(
+                '<i class="fas fa-exclamation-triangle"></i>',
+                '危险操作',
+                '你正在执行<strong>硬删除</strong>操作，该文章将从数据中<strong>彻底移除</strong>，无法恢复。<br /><br />确定要硬删除 <strong>' +
+                escapeHtml(title) + '</strong> 吗？',
+                '确认硬删除',
+                'btn-confirm'
             ).then(async function(confirmed) {
                 if (confirmed) {
                     await confirmHardDelete();
@@ -2184,8 +2223,7 @@
             }
             let html = '';
             allDrafts.forEach(function(draft) {
-                const preview = (draft.content || '').replace(/\n/g, ' ').slice(0, 80) + (draft.content && draft.content
-                    .length > 80 ? '...' : '');
+                const preview = (draft.content || '').replace(/\n/g, ' ').slice(0, 80) + (draft.content && draft.content.length > 80 ? '...' : '');
                 const tagsHtml = (draft.tags || []).map(function(t) {
                     return '<span class="tag">' + escapeHtml(t) + '</span>';
                 }).join(' ');
@@ -2213,7 +2251,7 @@
                     const draft = allDrafts.find(function(d) { return d.id === id; });
                     if (draft) {
                         document.getElementById('editTitle').value = draft.title || '';
-                        document.getElementById('editDate').value = '';
+                        document.getElementById('editDate').value = draft.date || '';
                         document.getElementById('editTags').value = (draft.tags || []).join('，');
                         mdEditor.value = draft.content || '';
                         updatePreview();
@@ -2245,9 +2283,19 @@
             list.querySelectorAll('.btn-delete-draft').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     const id = this.dataset.id;
-                    showModal('🗑️', '删除草稿', '确定要删除这个草稿吗？', '确认删除', 'btn-confirm'
-                    ).then(function(confirmed) {
-                        if (confirmed) deleteDraft(id);
+                    if (isDeletingDraft) return;
+                    showModal(
+                        '<i class="fas fa-trash-alt"></i>',
+                        '删除草稿',
+                        '确定要删除这个草稿吗？',
+                        '确认删除',
+                        'btn-confirm'
+                    ).then(async function(confirmed) {
+                        if (confirmed) {
+                            isDeletingDraft = true;
+                            await deleteDraft(id);
+                            isDeletingDraft = false;
+                        }
                     });
                 });
             });
@@ -2292,18 +2340,19 @@
                 return;
             }
 
-            // 如果是编辑模式且标题与已有文章重叠（但不是自己）
             if (editingIdx >= 0) {
                 const existing = allArticles.findIndex(function(a, i) {
                     return i !== editingIdx && a.title === title;
                 });
                 if (existing !== -1) {
-                    const confirmed = await showModal('⚠️', '标题重复',
+                    const confirmed = await showModal(
+                        '<i class="fas fa-exclamation-triangle"></i>',
+                        '标题重复',
                         '已存在标题为 <strong>' + escapeHtml(title) + '</strong> 的文章。<br />确定要覆盖它吗？',
-                        '确认覆盖', 'btn-confirm-warning'
+                        '确认覆盖',
+                        'btn-confirm-warning'
                     );
                     if (!confirmed) return;
-                    // 保存当前版本用于撤销
                     const current = allArticles[editingIdx];
                     previousVersion = {
                         idx: editingIdx,
@@ -2376,11 +2425,17 @@
             updatePreview();
             editingIdx = -1;
             publishBtn.textContent = '发布文章';
+            setDefaultDate();
         }
 
         document.getElementById('cancelEditBtn').addEventListener('click', function() {
             if (editingIdx >= 0 || mdEditor.value || document.getElementById('editTitle').value) {
-                showModal('🗑️', '清空内容', '确定要清空当前编辑的内容吗？<br />未保存的修改将丢失。', '确认清空', 'btn-confirm-warning'
+                showModal(
+                    '<i class="fas fa-trash-alt"></i>',
+                    '清空内容',
+                    '确定要清空当前编辑的内容吗？<br />未保存的修改将丢失。',
+                    '确认清空',
+                    'btn-confirm-warning'
                 ).then(function(confirmed) {
                     if (confirmed) {
                         clearEditor();
@@ -2398,6 +2453,7 @@
             const content = mdEditor.value;
             const tagsRaw = document.getElementById('editTags').value.trim();
             const tags = tagsRaw ? tagsRaw.split(/[，,、\s]+/).filter(Boolean) : [];
+            const date = document.getElementById('editDate').value;
             if (!content) {
                 showToast('内容为空，无需保存', true);
                 return;
@@ -2406,7 +2462,7 @@
             try {
                 const res = await apiCall('drafts', {
                     method: 'POST',
-                    body: JSON.stringify({ title, content, tags })
+                    body: JSON.stringify({ title, content, tags, date })
                 });
                 const data = await res.json();
                 if (data.success) {
@@ -2428,8 +2484,7 @@
         // ================================================================
         document.querySelectorAll('#tabList .filter-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
-                document.querySelectorAll('#tabList .filter-btn').forEach(function(b) { b.classList.remove(
-                        'active'); });
+                document.querySelectorAll('#tabList .filter-btn').forEach(function(b) { b.classList.remove('active'); });
                 this.classList.add('active');
                 currentFilter = this.dataset.filter;
                 renderArticleList();
@@ -2468,7 +2523,6 @@
             mainApp.classList.remove('active');
         }
 
-        // 监听页面关闭：如果"保持登录"未勾选，清除 session
         window.addEventListener('beforeunload', function() {
             if (localStorage.getItem(KEEP_LOGIN_KEY) === 'false') {
                 sessionStorage.removeItem(STORAGE_KEY);
