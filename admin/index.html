@@ -668,11 +668,11 @@
             background: transparent;
             padding: 0.6rem 0.8rem;
             color: #e6edf3;
-            font-family: monospace;
-            font-size: 0.8rem;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            word-break: break-all;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            white-space: pre;
+            overflow-x: auto;
         }
         .preview-area blockquote {
             border-left: 3px solid #6b5acf;
@@ -1964,7 +1964,7 @@
         });
 
         // ================================================================
-        // Markdown 渲染器
+        // Markdown 渲染器（从 article.html 抠来的完整版）
         // ================================================================
         function renderMarkdown(md) {
             if (!md) return '';
