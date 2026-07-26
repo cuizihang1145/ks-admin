@@ -1,4 +1,5 @@
 // api/auth.js
+const crypto = require('crypto');
 const failedAttempts = {};
 const mathSessions = {};
 
@@ -37,8 +38,15 @@ function generateMathQuestion() {
   return { question, answer };
 }
 
+function generateToken(payload) {
+  const secret = process.env.TOKEN_SECRET || 'ks-admin-secret-key-change-me';
+  const payloadBase64 = Buffer.from(JSON.stringify(payload)).toString('base64');
+  const signature = crypto.createHmac('sha256', secret).update(payloadBase64).digest('hex');
+  return payloadBase64 + '.' + signature;
+}
+
 export default async function handler(req, res) {
-  // ===== GET 请求：返回题目 =====
+  // GET：获取数学题
   if (req.method === 'GET') {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
     const { question, answer } = generateMathQuestion();
@@ -49,7 +57,6 @@ export default async function handler(req, res) {
     return res.status(200).json({ question: question });
   }
 
-  // ===== POST 请求：验证登录 =====
   if (req.method !== 'POST') {
     return res.status(405).json({ error: '方法不允许' });
   }
@@ -113,10 +120,11 @@ export default async function handler(req, res) {
 
   delete failedAttempts[ip];
 
-  const token = Buffer.from(JSON.stringify({
+  // 生成带签名的 Token
+  const token = generateToken({
     authenticated: true,
     exp: Date.now() + 24 * 60 * 60 * 1000
-  })).toString('base64');
+  });
 
   return res.status(200).json({ success: true, token: token });
-        }
+            }
