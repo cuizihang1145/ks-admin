@@ -1880,9 +1880,6 @@
             updateWordCount();
         }
 
-        // ================================================================
-        // 插入列表标记（工具栏按钮用）
-        // ================================================================
         function insertListMarker(marker) {
             var start = mdEditor.selectionStart;
             var value = mdEditor.value;
@@ -1901,7 +1898,6 @@
             var currentLine = lines[lineIndex];
             var indent = currentLine.match(/^(\s*)/)[1];
 
-            // 如果当前行已经是列表，不重复插入
             if (/^(\s*)([-*+]|\d+\.)\s+/.test(currentLine)) {
                 showToast('当前行已是列表', true);
                 return;
@@ -1918,9 +1914,6 @@
             updateWordCount();
         }
 
-        // ================================================================
-        // 回车续行 + 空项退出
-        // ================================================================
         function handleListEnter() {
             var value = mdEditor.value;
             var cursorPos = mdEditor.selectionStart;
@@ -1937,7 +1930,6 @@
             if (lineIndex >= lines.length) return false;
             var currentLine = lines[lineIndex];
 
-            // 空列表项 → 退出列表
             var emptyUl = currentLine.match(/^(\s*)([-*+])\s*$/);
             var emptyOl = currentLine.match(/^(\s*)(\d+)\.\s*$/);
             if (emptyUl || emptyOl) {
@@ -1952,7 +1944,6 @@
                 return true;
             }
 
-            // 续行：无序列表
             var ulMatch = currentLine.match(/^(\s*)([-*+])\s+/);
             if (ulMatch) {
                 var indent = ulMatch[1];
@@ -1969,7 +1960,6 @@
                 return true;
             }
 
-            // 续行：有序列表
             var olMatch = currentLine.match(/^(\s*)(\d+)\.\s+/);
             if (olMatch) {
                 var indent = olMatch[1];
@@ -2229,6 +2219,138 @@
                 codeLang = '';
             }
 
+            // ================================================================
+            // 修复 parseList 函数 - 防止无限递归
+            // ================================================================
+            function parseList(startIdx, parentIndent) {
+                var html = '';
+                var idx = startIdx;
+                var currentListType = null;
+                var items = [];
+                var olStartNumber = null;
+                var olValues = [];
+                var maxDepth = 50;
+                var depth = 0;
+
+                while (idx < lines.length && depth < maxDepth) {
+                    var l = lines[idx];
+                    var t = l.trim();
+                    if (t === '') {
+                        var nextIdx = idx + 1;
+                        while (nextIdx < lines.length && lines[nextIdx].trim() === '') nextIdx++;
+                        if (nextIdx < lines.length) {
+                            var nextLine = lines[nextIdx];
+                            var nextUl = nextLine.match(/^(\s*)[-*+]\s+/);
+                            var nextOl = nextLine.match(/^(\s*)(\d+)\.\s+/);
+                            var nextTask = nextLine.match(/^(\s*)[-*+]\s+\[[ x]\]\s+/);
+                            if (nextUl || nextOl || nextTask) {
+                                var nextIndent = parseInt((nextUl || nextOl || nextTask)[1].length);
+                                if (nextIndent <= parentIndent) {
+                                    break;
+                                }
+                            } else {
+                                break;
+                            }
+                        } else {
+                            break;
+                        }
+                        idx++;
+                        continue;
+                    }
+
+                    var ulMatch = l.match(/^(\s*)[-*+]\s+(.+)/);
+                    var olMatch = l.match(/^(\s*)(\d+)\.\s+(.+)/);
+                    var taskMatch = l.match(/^(\s*)[-*+]\s+\[([ x])\]\s+(.+)/);
+
+                    var match = null;
+                    var type = null;
+                    var content = '';
+                    var indent = 0;
+                    var olNumber = 0;
+
+                    if (taskMatch) {
+                        indent = taskMatch[1].length;
+                        if (indent < parentIndent) break;
+                        type = 'task';
+                        var checked = taskMatch[2] === 'x';
+                        content = '<input type="checkbox"' + (checked ? ' checked' : '') + ' disabled> ' + taskMatch[3];
+                    } else if (ulMatch) {
+                        indent = ulMatch[1].length;
+                        if (indent < parentIndent) break;
+                        type = 'ul';
+                        content = ulMatch[2];
+                    } else if (olMatch) {
+                        indent = olMatch[1].length;
+                        if (indent < parentIndent) break;
+                        type = 'ol';
+                        olNumber = parseInt(olMatch[2]);
+                        content = olMatch[3];
+                        if (olStartNumber === null) {
+                            olStartNumber = olNumber;
+                        }
+                        olValues.push(olNumber);
+                    } else {
+                        break;
+                    }
+
+                    var childHtml = '';
+                    var childIdx = idx + 1;
+                    while (childIdx < lines.length && lines[childIdx].trim() === '') childIdx++;
+                    if (childIdx < lines.length) {
+                        var nextLine = lines[childIdx];
+                        var nextUl = nextLine.match(/^(\s*)[-*+]\s+/);
+                        var nextOl = nextLine.match(/^(\s*)(\d+)\.\s+/);
+                        var nextTask = nextLine.match(/^(\s*)[-*+]\s+\[[ x]\]\s+/);
+                        if (nextUl || nextOl || nextTask) {
+                            var nextIndent = parseInt((nextUl || nextOl || nextTask)[1].length);
+                            if (nextIndent > indent) {
+                                depth++;
+                                var childResult = parseList(childIdx, indent);
+                                childHtml = childResult[0];
+                                idx += childResult[1];
+                                depth--;
+                            }
+                        }
+                    }
+
+                    if (!currentListType) {
+                        currentListType = type === 'ol' ? 'ol' : 'ul';
+                    }
+
+                    var isTask = type === 'task';
+                    var liClass = isTask ? ' class="task-list-item"' : '';
+                    var renderedContent = renderInline(content);
+
+                    var liTag = '<li' + liClass;
+                    if (type === 'ol') {
+                        liTag += ' value="' + olNumber + '"';
+                    }
+                    liTag += '>' + renderedContent + childHtml + '</li>';
+
+                    items.push({
+                        type: type,
+                        olNumber: olNumber,
+                        html: liTag
+                    });
+
+                    idx++;
+                }
+
+                if (items.length === 0) {
+                    return ['', 0];
+                }
+
+                var listTag = currentListType === 'ol' ? 'ol' : 'ul';
+                var listClass = currentListType === 'ol' ? '' : ' class="task-list"';
+                var startAttr = '';
+                if (currentListType === 'ol' && olStartNumber !== null && olStartNumber !== 1) {
+                    startAttr = ' start="' + olStartNumber + '"';
+                }
+                var itemsHtml = items.map(function(item) { return item.html; }).join('\n');
+                html = '<' + listTag + listClass + startAttr + '>\n' + itemsHtml + '\n</' + listTag + '>';
+                return [html, idx - startIdx];
+            }
+
             var i = 0;
             while (i < lines.length) {
                 var line = lines[i];
@@ -2328,110 +2450,6 @@
                     var ddHtml = defs.map(function(d) { return '<dd>' + d + '</dd>'; }).join('');
                     result += '<dl><dt>' + term + '</dt>' + ddHtml + '</dl>';
                     continue;
-                }
-
-                function parseList(startIdx, parentIndent) {
-                    var html = '';
-                    var idx = startIdx;
-                    var currentListType = null;
-                    var items = [];
-                    var olStartNumber = null;
-                    var olValues = [];
-
-                    while (idx < lines.length) {
-                        var l = lines[idx];
-                        var t = l.trim();
-                        if (t === '') break;
-
-                        var ulMatch = l.match(/^(\s*)[-*+]\s+(.+)/);
-                        var olMatch = l.match(/^(\s*)(\d+)\.\s+(.+)/);
-                        var taskMatch = l.match(/^(\s*)[-*+]\s+\[([ x])\]\s+(.+)/);
-
-                        var match = null;
-                        var type = null;
-                        var content = '';
-                        var indent = 0;
-                        var olNumber = 0;
-
-                        if (taskMatch) {
-                            indent = taskMatch[1].length;
-                            if (indent < parentIndent) break;
-                            type = 'task';
-                            var checked = taskMatch[2] === 'x';
-                            content = '<input type="checkbox"' + (checked ? ' checked' : '') + ' disabled> ' + taskMatch[3];
-                        } else if (ulMatch) {
-                            indent = ulMatch[1].length;
-                            if (indent < parentIndent) break;
-                            type = 'ul';
-                            content = ulMatch[2];
-                        } else if (olMatch) {
-                            indent = olMatch[1].length;
-                            if (indent < parentIndent) break;
-                            type = 'ol';
-                            olNumber = parseInt(olMatch[2]);
-                            content = olMatch[3];
-                            if (olStartNumber === null) {
-                                olStartNumber = olNumber;
-                            }
-                            olValues.push(olNumber);
-                        } else {
-                            break;
-                        }
-
-                        var childHtml = '';
-                        var childIdx = idx + 1;
-                        while (childIdx < lines.length && lines[childIdx].trim() === '') childIdx++;
-                        if (childIdx < lines.length) {
-                            var nextLine = lines[childIdx];
-                            var nextUl = nextLine.match(/^(\s*)[-*+]\s+/);
-                            var nextOl = nextLine.match(/^(\s*)(\d+)\.\s+/);
-                            var nextTask = nextLine.match(/^(\s*)[-*+]\s+\[[ x]\]\s+/);
-                            if (nextUl || nextOl || nextTask) {
-                                var nextIndent = parseInt((nextUl || nextOl || nextTask)[1].length);
-                                if (nextIndent > indent) {
-                                    var childResult = parseList(childIdx, indent);
-                                    childHtml = childResult[0];
-                                    idx += childResult[1];
-                                }
-                            }
-                        }
-
-                        if (!currentListType) {
-                            currentListType = type === 'ol' ? 'ol' : 'ul';
-                        }
-
-                        var isTask = type === 'task';
-                        var liClass = isTask ? ' class="task-list-item"' : '';
-                        var renderedContent = renderInline(content);
-
-                        var liTag = '<li' + liClass;
-                        if (type === 'ol') {
-                            liTag += ' value="' + olNumber + '"';
-                        }
-                        liTag += '>' + renderedContent + childHtml + '</li>';
-
-                        items.push({
-                            type: type,
-                            olNumber: olNumber,
-                            html: liTag
-                        });
-
-                        idx++;
-                    }
-
-                    if (items.length === 0) {
-                        return ['', 0];
-                    }
-
-                    var listTag = currentListType === 'ol' ? 'ol' : 'ul';
-                    var listClass = currentListType === 'ol' ? '' : ' class="task-list"';
-                    var startAttr = '';
-                    if (currentListType === 'ol' && olStartNumber !== null && olStartNumber !== 1) {
-                        startAttr = ' start="' + olStartNumber + '"';
-                    }
-                    var itemsHtml = items.map(function(item) { return item.html; }).join('\n');
-                    html = '<' + listTag + listClass + startAttr + '>\n' + itemsHtml + '\n</' + listTag + '>';
-                    return [html, idx - startIdx];
                 }
 
                 var listCheck = line.match(/^(\s*)[-*+]\s+/);
