@@ -2503,6 +2503,9 @@
         var previousVersion = null;
         var hardDeleteTarget = -1;
 
+        // 48小时毫秒数
+        var EXPIRE_TIME = 48 * 60 * 60 * 1000;
+
         async function loadAll() {
             await loadArticles();
             renderArticleList();
@@ -2580,9 +2583,18 @@
                 var deletedClass = article.delete ? 'deleted' : '';
                 var statusHtml = article.delete ? '<span class="status-deleted">已删除</span>' : '';
 
-                var undoBtn = (previousVersion && previousVersion.idx === idx) ?
-                    '<button class="btn-undo" data-idx="' + idx + '">撤销</button>' :
-                    '';
+                // 检查撤销按钮：存在且未过期（48小时）
+                var undoBtn = '';
+                if (previousVersion && previousVersion.idx === idx) {
+                    var elapsed = Date.now() - previousVersion.savedAt;
+                    if (elapsed < EXPIRE_TIME) {
+                        var remainHours = Math.ceil((EXPIRE_TIME - elapsed) / (60 * 60 * 1000));
+                        undoBtn = '<button class="btn-undo" data-idx="' + idx + '" title="还剩 ' + remainHours + ' 小时可撤销">撤销</button>';
+                    } else {
+                        // 已过期，清除
+                        previousVersion = null;
+                    }
+                }
 
                 html += '<div class="article-item-admin ' + deletedClass + '">' +
                     '<div class="item-info">' +
@@ -2704,6 +2716,14 @@
         async function undoArticle(idx) {
             if (!previousVersion || previousVersion.idx !== idx) {
                 showToast('没有可撤销的版本', true);
+                return;
+            }
+            // 检查是否过期
+            var elapsed = Date.now() - previousVersion.savedAt;
+            if (elapsed >= EXPIRE_TIME) {
+                showToast('撤销已过期（超过48小时）', true);
+                previousVersion = null;
+                renderArticleList();
                 return;
             }
             var result = await showModal(
@@ -2916,6 +2936,7 @@
                 return;
             }
 
+            // 检查标题是否重复
             if (editingIdx >= 0) {
                 var existing = allArticles.findIndex(function(a, i) {
                     return i !== editingIdx && a.title === title;
@@ -2929,15 +2950,18 @@
                         'btn-confirm-warning'
                     );
                     if (!confirmed) return;
-                    var current = allArticles[editingIdx];
-                    previousVersion = {
-                        idx: editingIdx,
-                        title: current.title,
-                        content: current.content,
-                        tags: current.tags,
-                        date: current.date
-                    };
                 }
+
+                // ★ 每次更新都保存旧版本（带时间戳，48小时有效）★
+                var current = allArticles[editingIdx];
+                previousVersion = {
+                    idx: editingIdx,
+                    title: current.title,
+                    content: current.content,
+                    tags: current.tags,
+                    date: current.date,
+                    savedAt: Date.now()
+                };
             }
 
             this.disabled = true;
