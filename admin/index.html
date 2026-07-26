@@ -276,24 +276,12 @@
             display: block;
         }
         @keyframes fadeIn {
-            0% {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            0% { opacity: 0; transform: translateY(12px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
         @keyframes slideDown {
-            0% {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
         .admin-header {
@@ -1173,12 +1161,8 @@
             display: flex;
         }
         @keyframes overlayFade {
-            0% {
-                opacity: 0;
-            }
-            100% {
-                opacity: 1;
-            }
+            0% { opacity: 0; }
+            100% { opacity: 1; }
         }
         .modal-box {
             max-width: 460px;
@@ -1198,14 +1182,8 @@
             border-color: rgba(255, 255, 255, 0.06);
         }
         @keyframes modalSlide {
-            0% {
-                opacity: 0;
-                transform: scale(0.92) translateY(20px);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
+            0% { opacity: 0; transform: scale(0.92) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
         }
         .modal-box .modal-icon {
             font-size: 2.5rem;
@@ -1327,76 +1305,25 @@
         }
 
         @media (max-width: 600px) {
-            .container {
-                padding: 1.2rem 0.8rem;
-            }
-            .admin-header .title {
-                font-size: 1.2rem;
-            }
-            .login-card {
-                padding: 2rem 1.5rem;
-            }
-            .editor-panel {
-                padding: 1rem;
-            }
-            .md-editor {
-                min-height: 250px;
-            }
-            .preview-area {
-                min-height: 250px;
-                max-height: 350px;
-            }
-            .article-item-admin {
-                flex-wrap: wrap;
-                padding: 0.8rem 1rem;
-            }
-            .article-item-admin .item-actions {
-                width: 100%;
-                justify-content: flex-end;
-            }
-            .draft-item {
-                flex-wrap: wrap;
-                padding: 0.8rem 1rem;
-            }
-            .draft-item .draft-actions {
-                width: 100%;
-                justify-content: flex-end;
-            }
-            .tabs .tab {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.75rem;
-            }
-            .toast {
-                font-size: 0.8rem;
-                padding: 0.6rem 1.5rem;
-                white-space: normal;
-                max-width: 90%;
-            }
-            .editor-actions button {
-                padding: 0.6rem 1.2rem;
-                font-size: 0.8rem;
-            }
-            .modal-box {
-                padding: 1.6rem 1.2rem;
-            }
-            .modal-box .modal-actions {
-                flex-direction: column;
-            }
-            .editor-row {
-                flex-direction: column;
-            }
-            .admin-header .right-group {
-                gap: 0.4rem;
-            }
-            .admin-header .theme-toggle {
-                width: 36px;
-                height: 36px;
-                font-size: 1rem;
-            }
-            .admin-header .btn-logout {
-                font-size: 0.75rem;
-                padding: 0.3rem 0.8rem;
-            }
+            .container { padding: 1.2rem 0.8rem; }
+            .admin-header .title { font-size: 1.2rem; }
+            .login-card { padding: 2rem 1.5rem; }
+            .editor-panel { padding: 1rem; }
+            .md-editor { min-height: 250px; }
+            .preview-area { min-height: 250px; max-height: 350px; }
+            .article-item-admin { flex-wrap: wrap; padding: 0.8rem 1rem; }
+            .article-item-admin .item-actions { width: 100%; justify-content: flex-end; }
+            .draft-item { flex-wrap: wrap; padding: 0.8rem 1rem; }
+            .draft-item .draft-actions { width: 100%; justify-content: flex-end; }
+            .tabs .tab { padding: 0.4rem 0.8rem; font-size: 0.75rem; }
+            .toast { font-size: 0.8rem; padding: 0.6rem 1.5rem; white-space: normal; max-width: 90%; }
+            .editor-actions button { padding: 0.6rem 1.2rem; font-size: 0.8rem; }
+            .modal-box { padding: 1.6rem 1.2rem; }
+            .modal-box .modal-actions { flex-direction: column; }
+            .editor-row { flex-direction: column; }
+            .admin-header .right-group { gap: 0.4rem; }
+            .admin-header .theme-toggle { width: 36px; height: 36px; font-size: 1rem; }
+            .admin-header .btn-logout { font-size: 0.75rem; padding: 0.3rem 0.8rem; }
         }
     </style>
 </head>
@@ -1889,6 +1816,9 @@
             updateWordCount();
         }
 
+        // ================================================================
+        // 列表自动延续（无死循环版本）
+        // ================================================================
         function handleListContinuation() {
             var value = mdEditor.value;
             var cursorPos = mdEditor.selectionStart;
@@ -1904,47 +1834,58 @@
             }
             if (lineIndex > lines.length - 1) return false;
             var currentLine = lines[lineIndex] || '';
+
+            // 检查当前行是否以数字开头（有序列表）
             var olMatch = currentLine.match(/^(\s*)(\d+)\.\s+/);
             if (olMatch) {
                 var indent = olMatch[1];
                 var num = parseInt(olMatch[2]) + 1;
                 var prefix = indent + num + '. ';
-                var nextLine = lines[lineIndex + 1] || '';
-                if (nextLine.trim() === '') {
-                    var before = value.substring(0, cursorPos);
-                    var after = value.substring(cursorPos);
-                    mdEditor.value = before + '\n' + prefix + after;
-                    var newPos = cursorPos + 1 + prefix.length;
-                    mdEditor.selectionStart = mdEditor.selectionEnd = newPos;
-                    mdEditor.focus();
-                    updatePreview();
-                    updateWordCount();
-                    return true;
+                if (lineIndex + 1 < lines.length) {
+                    var nextLine = lines[lineIndex + 1] || '';
+                    if (nextLine.trim() === '') {
+                        var before = value.substring(0, cursorPos);
+                        var after = value.substring(cursorPos);
+                        mdEditor.value = before + '\n' + prefix + after;
+                        var newPos = cursorPos + 1 + prefix.length;
+                        mdEditor.selectionStart = mdEditor.selectionEnd = newPos;
+                        mdEditor.focus();
+                        updatePreview();
+                        updateWordCount();
+                        return true;
+                    }
                 }
                 return false;
             }
+
+            // 检查当前行是否以 - 或 * 开头（无序列表）
             var ulMatch = currentLine.match(/^(\s*)([-*])\s+/);
             if (ulMatch) {
                 var indent = ulMatch[1];
                 var marker = ulMatch[2];
                 var prefix = indent + marker + ' ';
-                var nextLine = lines[lineIndex + 1] || '';
-                if (nextLine.trim() === '') {
-                    var before = value.substring(0, cursorPos);
-                    var after = value.substring(cursorPos);
-                    mdEditor.value = before + '\n' + prefix + after;
-                    var newPos = cursorPos + 1 + prefix.length;
-                    mdEditor.selectionStart = mdEditor.selectionEnd = newPos;
-                    mdEditor.focus();
-                    updatePreview();
-                    updateWordCount();
-                    return true;
+                if (lineIndex + 1 < lines.length) {
+                    var nextLine = lines[lineIndex + 1] || '';
+                    if (nextLine.trim() === '') {
+                        var before = value.substring(0, cursorPos);
+                        var after = value.substring(cursorPos);
+                        mdEditor.value = before + '\n' + prefix + after;
+                        var newPos = cursorPos + 1 + prefix.length;
+                        mdEditor.selectionStart = mdEditor.selectionEnd = newPos;
+                        mdEditor.focus();
+                        updatePreview();
+                        updateWordCount();
+                        return true;
+                    }
                 }
                 return false;
             }
             return false;
         }
 
+        // ================================================================
+        // 工具栏按钮
+        // ================================================================
         document.querySelectorAll('#mdToolbar button[data-cmd]').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 var cmd = this.dataset.cmd;
@@ -1981,18 +1922,10 @@
                         insertText('###### ');
                         break;
                     case 'link':
-                        if (selected) {
-                            wrapText('[', '](url)');
-                        } else {
-                            insertText('[](url)');
-                        }
+                        if (selected) { wrapText('[', '](url)'); } else { insertText('[](url)'); }
                         break;
                     case 'image':
-                        if (selected) {
-                            wrapText('![', '](图片url)');
-                        } else {
-                            insertText('![](图片url)');
-                        }
+                        if (selected) { wrapText('![', '](图片url)'); } else { insertText('![](图片url)'); }
                         break;
                     case 'code':
                         wrapText('`', '`');
@@ -2827,8 +2760,7 @@
             }
             var html = '';
             allDrafts.forEach(function(draft) {
-                var preview = (draft.content || '').replace(/\n/g, ' ').slice(0, 80) + (draft.content && draft.content
-                    .length > 80 ? '...' : '');
+                var preview = (draft.content || '').replace(/\n/g, ' ').slice(0, 80) + (draft.content && draft.content.length > 80 ? '...' : '');
                 var tagsHtml = (draft.tags || []).map(function(t) {
                     return '<span class="tag">' + escapeHtml(t) + '</span>';
                 }).join(' ');
@@ -3091,8 +3023,7 @@
         // ================================================================
         document.querySelectorAll('#tabList .filter-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
-                document.querySelectorAll('#tabList .filter-btn').forEach(function(b) { b.classList.remove(
-                        'active'); });
+                document.querySelectorAll('#tabList .filter-btn').forEach(function(b) { b.classList.remove('active'); });
                 this.classList.add('active');
                 currentFilter = this.dataset.filter;
                 renderArticleList();
@@ -3123,7 +3054,6 @@
         // ================================================================
         // 启动
         // ================================================================
-        // 获取数学题
         fetchMathQuestion();
 
         if (!checkLogin()) {
