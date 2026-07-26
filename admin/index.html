@@ -657,13 +657,16 @@
             background: rgba(255, 255, 255, 0.06);
         }
 
-        /* ===== 代码块样式（纯展示） ===== */
+        /* ===== 代码块样式（横竖都限制） ===== */
         .preview-area .code-block-wrapper {
             background: #0D1117 !important;
             border-radius: 12px;
             margin: 0.8rem 0;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.06);
+            max-height: 460px;
+            display: flex;
+            flex-direction: column;
         }
         .preview-area .code-block-header {
             display: flex;
@@ -698,15 +701,17 @@
         }
         .preview-area .code-block-body-wrapper {
             overflow: hidden;
-            max-height: 3000px;
-            opacity: 1;
+            flex: 1;
+            min-height: 0;
         }
         .preview-area .code-block-body {
             display: block;
             overflow: auto;
-            max-height: 500px;
+            max-height: 400px;
+            min-height: 60px;
+            overflow-x: auto;
+            overflow-y: auto;
             background: #0D1117 !important;
-            border-radius: 0 0 12px 12px;
             padding: 0.4rem 0;
             font-size: 0;
             line-height: 0;
@@ -720,6 +725,7 @@
             white-space: pre;
             min-height: 1.7em;
             padding: 0 1.2rem;
+            min-width: max-content;
         }
         .preview-area .code-block-body .code-line .line-number {
             flex-shrink: 0;
@@ -2164,7 +2170,6 @@
                     codeHtml += '<span class="code-line"><span class="line-number">' + lineNum + '</span><span class="hljs">' + escapedLine + '</span></span>';
                 }
 
-                // 代码块：只有语言标签和统计，没有复制和折叠按钮
                 result += '<div class="code-block-wrapper" id="cbw-' + copyId + '">' +
                     '<div class="code-block-header">' +
                     '<span class="lang-label">' + escapeHtml(lang) + '</span>' +
