@@ -433,7 +433,7 @@
 
         .editor-section {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
             gap: 1.2rem;
         }
         @media (max-width: 768px) {
@@ -497,7 +497,7 @@
             margin-bottom: 0;
         }
 
-        /* ===== 新的编辑器样式 ===== */
+        /* ===== 编辑器样式 ===== */
         .editor-split {
             display: flex;
             height: 420px;
@@ -578,6 +578,20 @@
         }
         body.dark .editor-split .preview code {
             background: rgba(255, 255, 255, 0.06);
+        }
+        .editor-split .preview pre {
+            background: rgba(0, 0, 0, 0.06);
+            padding: 12px 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 0.5rem 0;
+        }
+        body.dark .editor-split .preview pre {
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .editor-split .preview pre code {
+            background: transparent;
+            padding: 0;
         }
         .editor-split .preview blockquote {
             border-left: 3px solid #6b5acf;
@@ -1376,7 +1390,7 @@
                             <input type="text" id="editTags" placeholder="标签，用逗号分隔" style="flex:2;" />
                         </div>
 
-                        <!-- 自定义工具栏 -->
+                        <!-- 自定义工具栏（含 H1-H6） -->
                         <div class="custom-toolbar" id="customToolbar">
                             <button data-cmd="bold" title="加粗"><b>B</b></button>
                             <button data-cmd="italic" title="斜体"><i>I</i></button>
@@ -1385,6 +1399,9 @@
                             <button data-cmd="h1">H1</button>
                             <button data-cmd="h2">H2</button>
                             <button data-cmd="h3">H3</button>
+                            <button data-cmd="h4">H4</button>
+                            <button data-cmd="h5">H5</button>
+                            <button data-cmd="h6">H6</button>
                             <span class="sep"></span>
                             <button data-cmd="ul" title="无序列表"><i class="fas fa-list-ul"></i></button>
                             <button data-cmd="ol" title="有序列表"><i class="fas fa-list-ol"></i></button>
@@ -1416,14 +1433,6 @@
                             <button class="btn-publish" id="publishBtn">发布文章</button>
                             <button class="btn-save-draft" id="saveDraftBtn">存草稿</button>
                             <button class="btn-cancel" id="cancelEditBtn">清空</button>
-                        </div>
-                    </div>
-
-                    <!-- 右侧：预览区（已合并到左侧分屏，保留占位） -->
-                    <div class="editor-panel">
-                        <div class="panel-label">预览</div>
-                        <div style="min-height:400px; border-radius:12px; background:rgba(255,255,255,0.2); padding:20px; color:#8a8ab5; font-size:0.85rem;">
-                            预览已合并到左侧分屏模式
                         </div>
                     </div>
                 </div>
@@ -1471,10 +1480,8 @@
 
     <script>
         // ================================================================
-        // 以下所有代码完全保留原样，只有编辑器相关逻辑替换为本地依赖
+        // 登录相关
         // ================================================================
-
-        // ---------- 登录相关（完全保留） ----------
         var mathQuestionText = '';
 
         async function fetchMathQuestion() {
@@ -1717,7 +1724,6 @@
             resetLoginForm();
             passwordInput.value = '';
             loginError.textContent = '';
-            // 清空编辑器
             if (editor) {
                 editor.value = '';
                 updatePreview();
@@ -1725,7 +1731,7 @@
             }
         });
 
-        // ---------- Tab 切换（完全保留） ----------
+        // ---------- Tab 切换 ----------
         var tabs = document.querySelectorAll('.tab');
         var tabContents = {
             write: document.getElementById('tabWrite'),
@@ -1753,7 +1759,7 @@
         });
 
         // ================================================================
-        // 新的编辑器逻辑（基于 marked + DOMPurify，无 CDN）
+        // 编辑器逻辑
         // ================================================================
 
         var editor = document.getElementById('mdEditor');
@@ -1762,7 +1768,6 @@
         var publishBtn = document.getElementById('publishBtn');
         var editDateInput = document.getElementById('editDate');
 
-        // ---------- 设置默认日期 ----------
         function setDefaultDate() {
             if (!editDateInput.value) {
                 var today = new Date().toISOString().slice(0, 10);
@@ -1771,7 +1776,6 @@
         }
         setDefaultDate();
 
-        // ---------- 字数统计 ----------
         function countWords(text) {
             if (!text) return 0;
             var clean = text
@@ -1797,13 +1801,17 @@
             wordCountEl.textContent = countWords(text);
         }
 
-        // ---------- 渲染预览 ----------
+        // ================================================================
+        // 核心渲染函数（已修复 H4-H6、代码块、右侧预览框）
+        // ================================================================
         function updatePreview() {
             try {
                 var raw = editor.value || '';
-                // 用 marked 解析
-                var html = marked.parse(raw);
-                // 用 DOMPurify 净化
+                // 开启 GFM 支持，让 marked 识别 ``` 代码块
+                var html = marked.parse(raw, {
+                    gfm: true,
+                    breaks: true
+                });
                 var clean = DOMPurify.sanitize(html);
                 previewArea.innerHTML = clean || '<span style="color:#8a8ab5;font-size:0.85rem;">预览会显示在这里</span>';
             } catch (e) {
@@ -1917,7 +1925,6 @@
             if (lineIndex >= lines.length) return false;
             var currentLine = lines[lineIndex];
 
-            // 空列表项 → 退出列表
             var emptyUl = currentLine.match(/^(\s*)([-*+])\s*$/);
             var emptyOl = currentLine.match(/^(\s*)(\d+)\.\s*$/);
             if (emptyUl || emptyOl) {
@@ -1932,7 +1939,6 @@
                 return true;
             }
 
-            // 续行：无序列表
             var ulMatch = currentLine.match(/^(\s*)([-*+])\s+/);
             if (ulMatch) {
                 var indent = ulMatch[1];
@@ -1949,7 +1955,6 @@
                 return true;
             }
 
-            // 续行：有序列表
             var olMatch = currentLine.match(/^(\s*)(\d+)\.\s+/);
             if (olMatch) {
                 var indent = olMatch[1];
@@ -1981,7 +1986,9 @@
             });
         }
 
-        // ---------- 工具栏按钮 ----------
+        // ================================================================
+        // 工具栏按钮（含 H1-H6）
+        // ================================================================
         document.querySelectorAll('#customToolbar button[data-cmd]').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 try {
@@ -2013,6 +2020,15 @@
                             break;
                         case 'h3':
                             insertText('### ');
+                            break;
+                        case 'h4':
+                            insertText('#### ');
+                            break;
+                        case 'h5':
+                            insertText('##### ');
+                            break;
+                        case 'h6':
+                            insertText('###### ');
                             break;
                         case 'ul':
                             insertListMarker('- ');
@@ -2071,7 +2087,9 @@
             setDefaultDate();
         }
 
-        // ---------- API 调用（完全保留） ----------
+        // ================================================================
+        // API 调用
+        // ================================================================
         async function apiCall(endpoint, options) {
             var token = getToken();
             var defaultOptions = {
@@ -2100,7 +2118,9 @@
             return res;
         }
 
-        // ---------- 数据（完全保留） ----------
+        // ================================================================
+        // 数据
+        // ================================================================
         var allArticles = [];
         var currentFilter = 'all';
         var currentSort = 'desc';
@@ -2110,7 +2130,6 @@
         var hardDeleteTarget = -1;
         var EXPIRE_TIME = 48 * 60 * 60 * 1000;
 
-        // ---------- 加载数据（完全保留） ----------
         async function loadAll() {
             await loadArticles();
             renderArticleList();
@@ -2140,7 +2159,6 @@
             }
         }
 
-        // ---------- 工具函数（完全保留） ----------
         function escapeHtml(text) {
             if (!text) return '';
             var div = document.createElement('div');
@@ -2163,7 +2181,9 @@
             return result;
         }
 
-        // ---------- 渲染文章列表（完全保留） ----------
+        // ================================================================
+        // 渲染文章列表
+        // ================================================================
         function renderArticleList() {
             var list = document.getElementById('articleList');
             var search = document.getElementById('listSearch').value.trim().toLowerCase();
@@ -2255,7 +2275,9 @@
             });
         }
 
-        // ---------- 文章操作（完全保留，只修改了编辑器取值/赋值） ----------
+        // ================================================================
+        // 文章操作
+        // ================================================================
         function editArticle(idx) {
             var article = allArticles[idx];
             if (!article) return;
@@ -2419,7 +2441,9 @@
             }
         }
 
-        // ---------- 草稿（完全保留，只修改了编辑器取值/赋值） ----------
+        // ================================================================
+        // 草稿
+        // ================================================================
         function renderDraftList() {
             var list = document.getElementById('draftList');
             if (allDrafts.length === 0) {
@@ -2532,7 +2556,9 @@
             }
         }
 
-        // ---------- 发布/更新（完全保留，只修改了编辑器取值） ----------
+        // ================================================================
+        // 发布
+        // ================================================================
         document.getElementById('publishBtn').addEventListener('click', async function() {
             var title = document.getElementById('editTitle').value.trim();
             var content = editor ? editor.value.trim() : '';
@@ -2628,7 +2654,9 @@
             this.disabled = false;
         });
 
-        // ---------- 清空按钮（完全保留） ----------
+        // ================================================================
+        // 清空
+        // ================================================================
         document.getElementById('cancelEditBtn').addEventListener('click', function() {
             if (editingIdx >= 0 || (editor && editor.value) || document.getElementById('editTitle').value) {
                 showModal(
@@ -2646,7 +2674,9 @@
             }
         });
 
-        // ---------- 保存草稿（完全保留，只修改了编辑器取值） ----------
+        // ================================================================
+        // 保存草稿
+        // ================================================================
         document.getElementById('saveDraftBtn').addEventListener('click', async function() {
             var title = document.getElementById('editTitle').value.trim() || '无标题';
             var content = editor ? editor.value : '';
@@ -2678,7 +2708,9 @@
             this.disabled = false;
         });
 
-        // ---------- 列表筛选/排序/搜索（完全保留） ----------
+        // ================================================================
+        // 筛选/排序/搜索
+        // ================================================================
         document.querySelectorAll('#tabList .filter-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('#tabList .filter-btn').forEach(function(b) { b.classList.remove('active'); });
@@ -2704,16 +2736,16 @@
             renderArticleList();
         });
 
-        // ---------- 更新角标（完全保留） ----------
         function updateBadges() {
             document.getElementById('listBadge').textContent = allArticles.length;
             document.getElementById('draftBadge').textContent = allDrafts.length;
         }
 
-        // ---------- 初始化 ----------
+        // ================================================================
+        // 启动
+        // ================================================================
         fetchMathQuestion();
 
-        // 初始化预览
         if (editor) {
             updatePreview();
             updateWordCount();
@@ -2724,12 +2756,10 @@
             mainApp.classList.remove('active');
         }
 
-        // 延迟更新字数
         setTimeout(function() {
             updateWordCount();
         }, 500);
 
-        // 页面关闭前清理
         window.addEventListener('beforeunload', function() {
             if (localStorage.getItem(KEEP_LOGIN_KEY) === 'false') {
                 clearToken();
