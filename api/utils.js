@@ -1,3 +1,6 @@
+// api/utils.js
+const crypto = require('crypto');
+
 const TOKEN = process.env.TOKEN;
 const MAIN_REPO = 'cuizihang1145/cuizihang1145.github.io';
 const ADMIN_REPO = 'cuizihang1145/ks-admin';
@@ -45,23 +48,42 @@ export async function writeFile(repo, path, jsonData, sha, commitMsg = '更新�
   return await res.json();
 }
 
-// ===== 验证：支持密码 + Token 两种方式 =====
+// ===== 验证 Token（带签名校验） =====
+function verifyToken(token) {
+  if (!token) return false;
+  
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 2) return false;
+    
+    const payloadBase64 = parts[0];
+    const signature = parts[1];
+    
+    // 验证签名
+    const secret = process.env.TOKEN_SECRET || 'ks-admin-secret-key-change-me';
+    const expected = crypto.createHmac('sha256', secret).update(payloadBase64).digest('hex');
+    if (signature !== expected) return false;
+    
+    // 验证过期时间
+    const payload = JSON.parse(Buffer.from(payloadBase64, 'base64').toString('utf-8'));
+    if (payload.authenticated !== true) return false;
+    if (payload.exp < Date.now()) return false;
+    
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+// ===== 验证：支持 Token + 密码两种方式 =====
 export function checkAuth(req) {
-  // 1. 先检查 Token
+  // 1. 先检查带签名的 Token
   const token = req.headers['x-admin-token'] || '';
-  if (token) {
-    try {
-      const decoded = JSON.parse(Buffer.from(token, 'base64').toString('utf-8'));
-      // 检查是否过期（24小时）
-      if (decoded.authenticated === true && decoded.exp > Date.now()) {
-        return true;
-      }
-    } catch (e) {
-      // Token 解析失败，继续走密码验证
-    }
+  if (token && verifyToken(token)) {
+    return true;
   }
 
   // 2. 再检查密码（兼容旧方式）
   const password = req.headers['x-admin-password'];
   return password === process.env.ADMIN_PASSWORD;
-          }
+}
