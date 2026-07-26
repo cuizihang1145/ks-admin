@@ -740,6 +740,155 @@
             color: #88ccff;
         }
 
+        /* ===== 预览区代码块样式（完整版） ===== */
+        .preview-area .code-block-wrapper {
+            background: #0D1117 !important;
+            border-radius: 12px;
+            margin: 0.8rem 0;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .preview-area .code-block-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 14px;
+            background: rgba(255, 255, 255, 0.04) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+            flex-shrink: 0;
+            min-height: 40px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .preview-area .code-block-header .lang-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #8B949E !important;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-family: 'Inter', sans-serif;
+        }
+        .preview-area .code-block-header .code-stats {
+            font-size: 0.65rem;
+            color: #484F58 !important;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.3px;
+            flex: 1;
+            text-align: center;
+        }
+        .preview-area .code-block-header .code-stats span {
+            margin: 0 2px;
+        }
+        .preview-area .code-block-header .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .preview-area .code-block-header .copy-btn {
+            background: rgba(255, 255, 255, 0.08) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 6px;
+            padding: 2px 10px;
+            font-size: 0.65rem;
+            font-weight: 500;
+            color: #8B949E !important;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.8;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .preview-area .code-block-header .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.15) !important;
+            color: #E8E6F0 !important;
+        }
+        .preview-area .code-block-header .copy-btn.copied {
+            background: rgba(46, 204, 113, 0.2) !important;
+            color: #2ecc71 !important;
+            border-color: rgba(46, 204, 113, 0.2) !important;
+        }
+        .preview-area .code-block-header .copy-btn i {
+            font-size: 0.7rem;
+        }
+        .preview-area .code-block-header .collapse-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 50%;
+            background: transparent;
+            color: #8B949E;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: background 0.2s ease, color 0.2s ease;
+            font-family: 'Inter', sans-serif;
+            padding: 0;
+            flex-shrink: 0;
+            user-select: none;
+        }
+        .preview-area .code-block-header .collapse-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #E8E6F0;
+        }
+        .preview-area .code-block-body-wrapper {
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+            max-height: 3000px;
+            opacity: 1;
+        }
+        .preview-area .code-block-wrapper.collapsed .code-block-body-wrapper {
+            max-height: 0 !important;
+            opacity: 0;
+            padding: 0;
+        }
+        .preview-area .code-block-body {
+            display: block;
+            overflow: auto;
+            max-height: 500px;
+            background: #0D1117 !important;
+            border-radius: 0 0 12px 12px;
+            padding: 0.4rem 0;
+            font-size: 0;
+            line-height: 0;
+        }
+        .preview-area .code-block-body .code-line {
+            display: flex;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            color: #E6EDF3;
+            white-space: pre;
+            min-height: 1.7em;
+            padding: 0 1.2rem;
+        }
+        .preview-area .code-block-body .code-line .line-number {
+            flex-shrink: 0;
+            width: 3.2rem;
+            text-align: right;
+            color: #484F58 !important;
+            user-select: none;
+            padding-right: 0.8rem;
+            border-right: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 0.85rem;
+            line-height: 1.7;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            margin-right: 1.2rem;
+        }
+        .preview-area .code-block-body .code-line .hljs {
+            background: transparent !important;
+            padding: 0 !important;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            flex: 1;
+            white-space: pre;
+        }
+
         .editor-actions {
             display: flex;
             gap: 0.8rem;
@@ -1795,6 +1944,10 @@
             var start = mdEditor.selectionStart;
             var end = mdEditor.selectionEnd;
             var value = mdEditor.value;
+            if (typeof start !== 'number' || typeof end !== 'number') {
+                start = 0;
+                end = 0;
+            }
             mdEditor.value = value.substring(0, start) + text + value.substring(end);
             var pos = start + text.length;
             mdEditor.selectionStart = mdEditor.selectionEnd = pos;
@@ -1807,18 +1960,27 @@
             var start = mdEditor.selectionStart;
             var end = mdEditor.selectionEnd;
             var value = mdEditor.value;
-            var selected = value.substring(start, end);
-            mdEditor.value = value.substring(0, start) + before + selected + after + value.substring(end);
+            var selected = '';
+            try {
+                selected = value.substring(start, end) || '';
+            } catch (e) {
+                selected = '';
+            }
+            var newValue = value.substring(0, start) + before + selected + after + value.substring(end);
+            mdEditor.value = newValue;
             var pos = start + before.length;
-            mdEditor.selectionStart = mdEditor.selectionEnd = (selected.length === 0) ? pos : pos + selected.length;
+            if (selected.length > 0) {
+                mdEditor.selectionStart = pos;
+                mdEditor.selectionEnd = pos + selected.length;
+            } else {
+                mdEditor.selectionStart = mdEditor.selectionEnd = pos;
+            }
             mdEditor.focus();
             updatePreview();
             updateWordCount();
         }
 
-        // ================================================================
-        // 列表自动延续（无循环、无递归、不卡死）
-        // ================================================================
+        // 列表自动延续（修复版）
         function handleListContinuation() {
             var value = mdEditor.value;
             var cursorPos = mdEditor.selectionStart;
@@ -1835,7 +1997,13 @@
             if (lineIndex > lines.length - 1) return false;
             var currentLine = lines[lineIndex] || '';
 
-            // 有序列表
+            // 空列表项检测 - 按回车跳出列表
+            var emptyOl = currentLine.match(/^(\s*)(\d+)\.\s*$/);
+            var emptyUl = currentLine.match(/^(\s*)([-*])\s*$/);
+            if (emptyOl || emptyUl) {
+                return false;
+            }
+
             var olMatch = currentLine.match(/^(\s*)(\d+)\.\s+/);
             if (olMatch) {
                 var indent = olMatch[1];
@@ -1852,7 +2020,6 @@
                 return true;
             }
 
-            // 无序列表
             var ulMatch = currentLine.match(/^(\s*)([-*])\s+/);
             if (ulMatch) {
                 var indent = ulMatch[1];
@@ -1872,77 +2039,87 @@
             return false;
         }
 
-        // 工具栏按钮
+        // 工具栏按钮（带容错）
         document.querySelectorAll('#mdToolbar button[data-cmd]').forEach(function(btn) {
             btn.addEventListener('click', function() {
-                var cmd = this.dataset.cmd;
-                var start = mdEditor.selectionStart;
-                var end = mdEditor.selectionEnd;
-                var selected = mdEditor.value.substring(start, end);
+                try {
+                    var cmd = this.dataset.cmd;
+                    var start = mdEditor.selectionStart;
+                    var end = mdEditor.selectionEnd;
+                    var selected = '';
+                    try {
+                        selected = mdEditor.value.substring(start, end) || '';
+                    } catch (e) {
+                        selected = '';
+                    }
 
-                switch (cmd) {
-                    case 'bold':
-                        wrapText('**', '**');
-                        break;
-                    case 'italic':
-                        wrapText('*', '*');
-                        break;
-                    case 'strike':
-                        wrapText('~~', '~~');
-                        break;
-                    case 'h1':
-                        insertText('# ');
-                        break;
-                    case 'h2':
-                        insertText('## ');
-                        break;
-                    case 'h3':
-                        insertText('### ');
-                        break;
-                    case 'h4':
-                        insertText('#### ');
-                        break;
-                    case 'h5':
-                        insertText('##### ');
-                        break;
-                    case 'h6':
-                        insertText('###### ');
-                        break;
-                    case 'link':
-                        if (selected) { wrapText('[', '](url)'); } else { insertText('[](url)'); }
-                        break;
-                    case 'image':
-                        if (selected) { wrapText('![', '](图片url)'); } else { insertText('![](图片url)'); }
-                        break;
-                    case 'code':
-                        wrapText('`', '`');
-                        break;
-                    case 'codeblock':
-                        insertText('\n```\n\n```\n');
-                        var pos = mdEditor.selectionStart;
-                        mdEditor.selectionStart = mdEditor.selectionEnd = pos - 3;
-                        mdEditor.focus();
-                        break;
-                    case 'quote':
-                        insertText('> ');
-                        break;
-                    case 'ul':
-                        insertText('- ');
-                        break;
-                    case 'ol':
-                        insertText('1. ');
-                        break;
-                    case 'table':
-                        insertText('\n| 列1 | 列2 | 列3 |\n|-----|-----|-----|\n| 内容 | 内容 | 内容 |\n');
-                        break;
-                    case 'hr':
-                        insertText('\n---\n');
-                        break;
-                    default:
-                        return;
+                    switch (cmd) {
+                        case 'bold':
+                            wrapText('**', '**');
+                            break;
+                        case 'italic':
+                            wrapText('*', '*');
+                            break;
+                        case 'strike':
+                            wrapText('~~', '~~');
+                            break;
+                        case 'h1':
+                            insertText('# ');
+                            break;
+                        case 'h2':
+                            insertText('## ');
+                            break;
+                        case 'h3':
+                            insertText('### ');
+                            break;
+                        case 'h4':
+                            insertText('#### ');
+                            break;
+                        case 'h5':
+                            insertText('##### ');
+                            break;
+                        case 'h6':
+                            insertText('###### ');
+                            break;
+                        case 'link':
+                            if (selected) { wrapText('[', '](url)'); } else { insertText('[](url)'); }
+                            break;
+                        case 'image':
+                            if (selected) { wrapText('![', '](图片url)'); } else { insertText('![](图片url)'); }
+                            break;
+                        case 'code':
+                            wrapText('`', '`');
+                            break;
+                        case 'codeblock':
+                            insertText('\n```\n\n```\n');
+                            var pos = mdEditor.selectionStart;
+                            mdEditor.selectionStart = mdEditor.selectionEnd = pos - 3;
+                            mdEditor.focus();
+                            break;
+                        case 'quote':
+                            insertText('> ');
+                            break;
+                        case 'ul':
+                            insertText('- ');
+                            break;
+                        case 'ol':
+                            insertText('1. ');
+                            break;
+                        case 'table':
+                            insertText('\n| 列1 | 列2 | 列3 |\n|-----|-----|-----|\n| 内容 | 内容 | 内容 |\n');
+                            break;
+                        case 'hr':
+                            insertText('\n---\n');
+                            break;
+                        default:
+                            return;
+                    }
+                    updatePreview();
+                    updateWordCount();
+                } catch (e) {
+                    console.error('工具栏操作出错:', e);
+                    showToast('操作出错，请重试', true);
                 }
-                updatePreview();
-                updateWordCount();
             });
         });
 
@@ -1956,7 +2133,13 @@
         });
 
         function updatePreview() {
-            previewArea.innerHTML = renderMarkdown(mdEditor.value);
+            try {
+                var rendered = renderMarkdown(mdEditor.value || '');
+                previewArea.innerHTML = rendered || '<span style="color:#8a8ab5;font-size:0.85rem;">预览会显示在这里</span>';
+            } catch (e) {
+                console.error('渲染预览失败:', e);
+                previewArea.innerHTML = '<span style="color:#e53935;font-size:0.85rem;">预览渲染失败，请检查 Markdown 语法</span>';
+            }
         }
         mdEditor.addEventListener('input', function() {
             updatePreview();
@@ -1964,7 +2147,7 @@
         });
 
         // ================================================================
-        // Markdown 渲染器（从 article.html 抠来的完整版）
+        // Markdown 渲染器（完整版）
         // ================================================================
         function renderMarkdown(md) {
             if (!md) return '';
@@ -2088,17 +2271,17 @@
 
                 result += '<div class="code-block-wrapper" id="cbw-' + copyId + '">' +
                     '<div class="code-block-header">' +
-                        '<span class="lang-label">' + escapeHtml(lang) + '</span>' +
-                        '<span class="code-stats">' + statsHtml + '</span>' +
-                        '<span class="header-actions">' +
-                            '<button class="copy-btn" data-copy="' + copyId + '"><i class="fas fa-copy"></i> 复制</button>' +
-                            '<button class="collapse-btn" data-target="cbw-' + copyId + '"><i class="fas fa-chevron-up"></i></button>' +
-                        '</span>' +
+                    '<span class="lang-label">' + escapeHtml(lang) + '</span>' +
+                    '<span class="code-stats">' + statsHtml + '</span>' +
+                    '<span class="header-actions">' +
+                    '<button class="copy-btn" data-copy="' + copyId + '"><i class="fas fa-copy"></i> 复制</button>' +
+                    '<button class="collapse-btn" data-target="cbw-' + copyId + '"><i class="fas fa-chevron-up"></i></button>' +
+                    '</span>' +
                     '</div>' +
                     '<div class="code-block-body-wrapper">' +
-                        '<div class="code-block-body" id="code-body-' + copyId + '">' + codeHtml + '</div>' +
+                    '<div class="code-block-body" id="code-body-' + copyId + '">' + codeHtml + '</div>' +
                     '</div>' +
-                '</div>';
+                    '</div>';
                 codeBlockLines = [];
                 inCodeBlock = false;
                 codeLang = '';
@@ -2388,7 +2571,7 @@
         }
 
         // ================================================================
-        // API 调用（用 Token 不用密码）
+        // API 调用
         // ================================================================
         async function apiCall(endpoint, options) {
             var token = getToken();
@@ -2515,22 +2698,22 @@
 
                 html += '<div class="article-item-admin ' + deletedClass + '">' +
                     '<div class="item-info">' +
-                        '<div class="item-title">' + escapeHtml(article.title || '无标题') + '</div>' +
-                        '<div class="item-meta">' +
-                            (article.date || '') +
-                            tagsHtml +
-                            statusHtml +
-                        '</div>' +
+                    '<div class="item-title">' + escapeHtml(article.title || '无标题') + '</div>' +
+                    '<div class="item-meta">' +
+                    (article.date || '') +
+                    tagsHtml +
+                    statusHtml +
+                    '</div>' +
                     '</div>' +
                     '<div class="item-actions">' +
-                        '<button class="btn-edit" data-idx="' + idx + '">编辑</button>' +
-                        (article.delete ?
-                            '<button class="btn-restore" data-idx="' + idx + '">恢复</button>' :
-                            '<button class="btn-soft-delete" data-idx="' + idx + '">软删除</button>') +
-                        '<button class="btn-hard-delete" data-idx="' + idx + '" data-title="' + escapeHtml(article.title || '无标题') + '">硬删除</button>' +
-                        undoBtn +
+                    '<button class="btn-edit" data-idx="' + idx + '">编辑</button>' +
+                    (article.delete ?
+                        '<button class="btn-restore" data-idx="' + idx + '">恢复</button>' :
+                        '<button class="btn-soft-delete" data-idx="' + idx + '">软删除</button>') +
+                    '<button class="btn-hard-delete" data-idx="' + idx + '" data-title="' + escapeHtml(article.title || '无标题') + '">硬删除</button>' +
+                    undoBtn +
                     '</div>' +
-                '</div>';
+                    '</div>';
             });
             list.innerHTML = html;
 
@@ -2673,7 +2856,7 @@
         }
 
         // ================================================================
-        // 硬删除（输入标题确认）
+        // 硬删除
         // ================================================================
         function showHardDeleteModal(idx, title) {
             hardDeleteTarget = idx;
@@ -2744,17 +2927,17 @@
                 }).join(' ');
                 html += '<div class="draft-item">' +
                     '<div class="draft-info">' +
-                        '<div class="draft-title">' + escapeHtml(draft.title || '无标题') + '</div>' +
-                        '<div class="draft-meta">创建于 ' + (draft.created || '') + (draft.updated && draft.updated !== draft.created ? ' · 更新于 ' + draft.updated : '') + '</div>' +
-                        (tagsHtml ? '<div class="draft-tags">' + tagsHtml + '</div>' : '') +
-                        '<div class="draft-preview">' + escapeHtml(preview) + '</div>' +
+                    '<div class="draft-title">' + escapeHtml(draft.title || '无标题') + '</div>' +
+                    '<div class="draft-meta">创建于 ' + (draft.created || '') + (draft.updated && draft.updated !== draft.created ? ' · 更新于 ' + draft.updated : '') + '</div>' +
+                    (tagsHtml ? '<div class="draft-tags">' + tagsHtml + '</div>' : '') +
+                    '<div class="draft-preview">' + escapeHtml(preview) + '</div>' +
                     '</div>' +
                     '<div class="draft-actions">' +
-                        '<button class="btn-continue" data-id="' + draft.id + '">继续编辑</button>' +
-                        '<button class="btn-publish-draft" data-id="' + draft.id + '">发布</button>' +
-                        '<button class="btn-delete-draft" data-id="' + draft.id + '">删除</button>' +
+                    '<button class="btn-continue" data-id="' + draft.id + '">继续编辑</button>' +
+                    '<button class="btn-publish-draft" data-id="' + draft.id + '">发布</button>' +
+                    '<button class="btn-delete-draft" data-id="' + draft.id + '">删除</button>' +
                     '</div>' +
-                '</div>';
+                    '</div>';
             });
             list.innerHTML = html;
 
