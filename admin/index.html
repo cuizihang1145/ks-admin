@@ -1470,15 +1470,15 @@
         // ================================================================
         // 数学验证码（后端生成）
         // ================================================================
-        let mathQuestionText = '';
+        var mathQuestionText = '';
 
         async function fetchMathQuestion() {
             try {
-                const res = await fetch('/api/auth', {
+                var res = await fetch('/api/auth', {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' }
                 });
-                const data = await res.json();
+                var data = await res.json();
                 if (data.question) {
                     mathQuestionText = data.question;
                     document.getElementById('mathQuestion').textContent = data.question;
@@ -1493,15 +1493,15 @@
         // ================================================================
         // 主程序
         // ================================================================
-        const STORAGE_KEY = 'admin_logged_in';
-        const KEEP_LOGIN_KEY = 'admin_keep_login';
-        const TOKEN_KEY = 'admin_token';
+        var STORAGE_KEY = 'admin_logged_in';
+        var KEEP_LOGIN_KEY = 'admin_keep_login';
+        var TOKEN_KEY = 'admin_token';
 
         // 主题
-        const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = document.getElementById('themeIcon');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        let currentTheme = localStorage.getItem('ks-theme') || (prefersDark ? 'dark' : 'light');
+        var themeToggle = document.getElementById('themeToggle');
+        var themeIcon = document.getElementById('themeIcon');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var currentTheme = localStorage.getItem('ks-theme') || (prefersDark ? 'dark' : 'light');
 
         function setTheme(theme) {
             document.body.classList.toggle('dark', theme === 'dark');
@@ -1515,8 +1515,8 @@
         });
 
         // Toast
-        const toastEl = document.getElementById('toast');
-        let toastTimer = null;
+        var toastEl = document.getElementById('toast');
+        var toastTimer = null;
 
         function showToast(msg, isError) {
             toastEl.textContent = msg;
@@ -1531,16 +1531,16 @@
         }
 
         // Modal
-        const modalOverlay = document.getElementById('modalOverlay');
-        const modalIcon = document.getElementById('modalIcon');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalDesc = document.getElementById('modalDesc');
-        const modalConfirm = document.getElementById('modalConfirm');
-        const modalCancel = document.getElementById('modalCancel');
-        let modalResolve = null;
+        var modalOverlay = document.getElementById('modalOverlay');
+        var modalIcon = document.getElementById('modalIcon');
+        var modalTitle = document.getElementById('modalTitle');
+        var modalDesc = document.getElementById('modalDesc');
+        var modalConfirm = document.getElementById('modalConfirm');
+        var modalCancel = document.getElementById('modalCancel');
+        var modalResolve = null;
 
         function showModal(iconHtml, title, desc, confirmText, confirmClass) {
-            return new Promise((resolve) => {
+            return new Promise(function(resolve) {
                 modalIcon.innerHTML = iconHtml || '<i class="fas fa-exclamation-triangle"></i>';
                 modalTitle.textContent = title || '确认操作';
                 modalDesc.innerHTML = desc || '确定要执行此操作吗？';
@@ -1566,15 +1566,15 @@
         });
 
         // Login
-        const loginScreen = document.getElementById('loginScreen');
-        const mainApp = document.getElementById('mainApp');
-        const passwordInput = document.getElementById('passwordInput');
-        const loginBtn = document.getElementById('loginBtn');
-        const loginError = document.getElementById('loginError');
-        const keepLoginCheck = document.getElementById('keepLogin');
-        const inviteCodeInput = document.getElementById('inviteCode');
-        const mathAnswerInput = document.getElementById('mathAnswer');
-        const refreshMathBtn = document.getElementById('refreshMathBtn');
+        var loginScreen = document.getElementById('loginScreen');
+        var mainApp = document.getElementById('mainApp');
+        var passwordInput = document.getElementById('passwordInput');
+        var loginBtn = document.getElementById('loginBtn');
+        var loginError = document.getElementById('loginError');
+        var keepLoginCheck = document.getElementById('keepLogin');
+        var inviteCodeInput = document.getElementById('inviteCode');
+        var mathAnswerInput = document.getElementById('mathAnswer');
+        var refreshMathBtn = document.getElementById('refreshMathBtn');
 
         refreshMathBtn.addEventListener('click', function() {
             fetchMathQuestion();
@@ -1591,8 +1591,8 @@
             keepLoginCheck.checked = true;
         }
 
-        let loginAttempts = 0;
-        let lockUntil = 0;
+        var loginAttempts = 0;
+        var lockUntil = 0;
 
         function resetLoginForm() {
             inviteCodeInput.value = '';
@@ -1604,7 +1604,7 @@
             fetchMathQuestion();
         }
 
-        // ===== Token 相关 =====
+        // Token 相关
         function getToken() {
             return localStorage.getItem(TOKEN_KEY) || '';
         }
@@ -1615,9 +1615,9 @@
         }
 
         function checkLogin() {
-            const loggedIn = localStorage.getItem(STORAGE_KEY);
-            const token = localStorage.getItem(TOKEN_KEY);
-            const keepLogin = localStorage.getItem(KEEP_LOGIN_KEY) !== 'false';
+            var loggedIn = localStorage.getItem(STORAGE_KEY);
+            var token = localStorage.getItem(TOKEN_KEY);
+            var keepLogin = localStorage.getItem(KEEP_LOGIN_KEY) !== 'false';
 
             if (loggedIn === 'true' && token && keepLogin) {
                 loginScreen.classList.add('hidden');
@@ -1632,9 +1632,9 @@
         }
 
         async function doLogin() {
-            const inviteCode = inviteCodeInput.value.trim();
-            const pwd = passwordInput.value.trim();
-            const userAnswer = parseInt(mathAnswerInput.value.trim());
+            var inviteCode = inviteCodeInput.value.trim();
+            var pwd = passwordInput.value.trim();
+            var userAnswer = parseInt(mathAnswerInput.value.trim());
 
             if (!inviteCode) {
                 loginError.textContent = '请输入邀请码';
@@ -1650,7 +1650,7 @@
             }
 
             if (Date.now() < lockUntil) {
-                const remaining = Math.ceil((lockUntil - Date.now()) / 60000);
+                var remaining = Math.ceil((lockUntil - Date.now()) / 60000);
                 loginError.textContent = '尝试次数过多，请 ' + remaining + ' 分钟后重试';
                 return;
             }
@@ -1658,7 +1658,7 @@
             loginBtn.disabled = true;
             loginError.textContent = '';
             try {
-                const res = await fetch('/api/auth', {
+                var res = await fetch('/api/auth', {
                     method: 'POST',
                     headers: {
                         'X-Invite-Code': inviteCode,
@@ -1668,7 +1668,7 @@
                     },
                     body: JSON.stringify({})
                 });
-                const data = await res.json();
+                var data = await res.json();
 
                 if (data.error && data.error.includes('数学题')) {
                     loginError.textContent = data.error;
@@ -1679,7 +1679,7 @@
 
                 if (data.success) {
                     loginAttempts = 0;
-                    const keepLogin = keepLoginCheck.checked;
+                    var keepLogin = keepLoginCheck.checked;
                     localStorage.setItem(KEEP_LOGIN_KEY, String(keepLogin));
                     localStorage.setItem(TOKEN_KEY, data.token);
                     localStorage.setItem(STORAGE_KEY, 'true');
@@ -1723,14 +1723,14 @@
         });
 
         // Tabs
-        const tabs = document.querySelectorAll('.tab');
-        const tabContents = {
+        var tabs = document.querySelectorAll('.tab');
+        var tabContents = {
             write: document.getElementById('tabWrite'),
             list: document.getElementById('tabList'),
             drafts: document.getElementById('tabDrafts')
         };
 
-        let isDeletingDraft = false;
+        var isDeletingDraft = false;
 
         tabs.forEach(function(tab) {
             tab.addEventListener('click', function() {
@@ -1740,7 +1740,7 @@
                 }
                 tabs.forEach(function(t) { t.classList.remove('active'); });
                 this.classList.add('active');
-                const target = this.dataset.tab;
+                var target = this.dataset.tab;
                 Object.keys(tabContents).forEach(function(key) {
                     tabContents[key].classList.toggle('active', key === target);
                 });
@@ -1817,7 +1817,7 @@
         }
 
         // ================================================================
-        // 列表自动延续（无死循环版本）
+        // 列表自动延续（无循环、无递归、不卡死）
         // ================================================================
         function handleListContinuation() {
             var value = mdEditor.value;
@@ -1835,57 +1835,44 @@
             if (lineIndex > lines.length - 1) return false;
             var currentLine = lines[lineIndex] || '';
 
-            // 检查当前行是否以数字开头（有序列表）
+            // 有序列表
             var olMatch = currentLine.match(/^(\s*)(\d+)\.\s+/);
             if (olMatch) {
                 var indent = olMatch[1];
                 var num = parseInt(olMatch[2]) + 1;
                 var prefix = indent + num + '. ';
-                if (lineIndex + 1 < lines.length) {
-                    var nextLine = lines[lineIndex + 1] || '';
-                    if (nextLine.trim() === '') {
-                        var before = value.substring(0, cursorPos);
-                        var after = value.substring(cursorPos);
-                        mdEditor.value = before + '\n' + prefix + after;
-                        var newPos = cursorPos + 1 + prefix.length;
-                        mdEditor.selectionStart = mdEditor.selectionEnd = newPos;
-                        mdEditor.focus();
-                        updatePreview();
-                        updateWordCount();
-                        return true;
-                    }
-                }
-                return false;
+                var before = value.substring(0, cursorPos);
+                var after = value.substring(cursorPos);
+                mdEditor.value = before + '\n' + prefix + after;
+                var newPos = cursorPos + 1 + prefix.length;
+                mdEditor.selectionStart = mdEditor.selectionEnd = newPos;
+                mdEditor.focus();
+                updatePreview();
+                updateWordCount();
+                return true;
             }
 
-            // 检查当前行是否以 - 或 * 开头（无序列表）
+            // 无序列表
             var ulMatch = currentLine.match(/^(\s*)([-*])\s+/);
             if (ulMatch) {
                 var indent = ulMatch[1];
                 var marker = ulMatch[2];
                 var prefix = indent + marker + ' ';
-                if (lineIndex + 1 < lines.length) {
-                    var nextLine = lines[lineIndex + 1] || '';
-                    if (nextLine.trim() === '') {
-                        var before = value.substring(0, cursorPos);
-                        var after = value.substring(cursorPos);
-                        mdEditor.value = before + '\n' + prefix + after;
-                        var newPos = cursorPos + 1 + prefix.length;
-                        mdEditor.selectionStart = mdEditor.selectionEnd = newPos;
-                        mdEditor.focus();
-                        updatePreview();
-                        updateWordCount();
-                        return true;
-                    }
-                }
-                return false;
+                var before = value.substring(0, cursorPos);
+                var after = value.substring(cursorPos);
+                mdEditor.value = before + '\n' + prefix + after;
+                var newPos = cursorPos + 1 + prefix.length;
+                mdEditor.selectionStart = mdEditor.selectionEnd = newPos;
+                mdEditor.focus();
+                updatePreview();
+                updateWordCount();
+                return true;
             }
+
             return false;
         }
 
-        // ================================================================
         // 工具栏按钮
-        // ================================================================
         document.querySelectorAll('#mdToolbar button[data-cmd]').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 var cmd = this.dataset.cmd;
@@ -2096,28 +2083,22 @@
                 for (var j = 0; j < lines.length; j++) {
                     var lineNum = j + 1;
                     var escapedLine = escapeHtml(lines[j]);
-                    codeHtml += `<span class="code-line"><span class="line-number">${lineNum}</span><span class="hljs">${escapedLine}</span></span>`;
+                    codeHtml += '<span class="code-line"><span class="line-number">' + lineNum + '</span><span class="hljs">' + escapedLine + '</span></span>';
                 }
 
-                result += `
-                            <div class="code-block-wrapper" id="cbw-${copyId}">
-                                <div class="code-block-header">
-                                    <span class="lang-label">${escapeHtml(lang)}</span>
-                                    <span class="code-stats">${statsHtml}</span>
-                                    <span class="header-actions">
-                                        <button class="copy-btn" data-copy="${copyId}"><i class="fas fa-copy"></i> 复制</button>
-                                        <button class="collapse-btn" data-target="cbw-${copyId}">
-                                            <i class="fas fa-chevron-up"></i>
-                                        </button>
-                                    </span>
-                                </div>
-                                <div class="code-block-body-wrapper">
-                                    <div class="code-block-body" id="code-body-${copyId}">
-                                        ${codeHtml}
-                                    </div>
-                                </div>
-                            </div>
-                        `;
+                result += '<div class="code-block-wrapper" id="cbw-' + copyId + '">' +
+                    '<div class="code-block-header">' +
+                        '<span class="lang-label">' + escapeHtml(lang) + '</span>' +
+                        '<span class="code-stats">' + statsHtml + '</span>' +
+                        '<span class="header-actions">' +
+                            '<button class="copy-btn" data-copy="' + copyId + '"><i class="fas fa-copy"></i> 复制</button>' +
+                            '<button class="collapse-btn" data-target="cbw-' + copyId + '"><i class="fas fa-chevron-up"></i></button>' +
+                        '</span>' +
+                    '</div>' +
+                    '<div class="code-block-body-wrapper">' +
+                        '<div class="code-block-body" id="code-body-' + copyId + '">' + codeHtml + '</div>' +
+                    '</div>' +
+                '</div>';
                 codeBlockLines = [];
                 inCodeBlock = false;
                 codeLang = '';
@@ -2532,27 +2513,24 @@
                     '<button class="btn-undo" data-idx="' + idx + '">撤销</button>' :
                     '';
 
-                html += `
-                            <div class="article-item-admin ${deletedClass}">
-                                <div class="item-info">
-                                    <div class="item-title">${escapeHtml(article.title || '无标题')}</div>
-                                    <div class="item-meta">
-                                        ${article.date || ''}
-                                        ${tagsHtml}
-                                        ${statusHtml}
-                                    </div>
-                                </div>
-                                <div class="item-actions">
-                                    <button class="btn-edit" data-idx="${idx}">编辑</button>
-                                    ${article.delete ?
-                                        '<button class="btn-restore" data-idx="' + idx + '">恢复</button>' :
-                                        '<button class="btn-soft-delete" data-idx="' + idx + '">软删除</button>'
-                                    }
-                                    <button class="btn-hard-delete" data-idx="${idx}" data-title="${escapeHtml(article.title || '无标题')}">硬删除</button>
-                                    ${undoBtn}
-                                </div>
-                            </div>
-                        `;
+                html += '<div class="article-item-admin ' + deletedClass + '">' +
+                    '<div class="item-info">' +
+                        '<div class="item-title">' + escapeHtml(article.title || '无标题') + '</div>' +
+                        '<div class="item-meta">' +
+                            (article.date || '') +
+                            tagsHtml +
+                            statusHtml +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="item-actions">' +
+                        '<button class="btn-edit" data-idx="' + idx + '">编辑</button>' +
+                        (article.delete ?
+                            '<button class="btn-restore" data-idx="' + idx + '">恢复</button>' :
+                            '<button class="btn-soft-delete" data-idx="' + idx + '">软删除</button>') +
+                        '<button class="btn-hard-delete" data-idx="' + idx + '" data-title="' + escapeHtml(article.title || '无标题') + '">硬删除</button>' +
+                        undoBtn +
+                    '</div>' +
+                '</div>';
             });
             list.innerHTML = html;
 
@@ -2764,21 +2742,19 @@
                 var tagsHtml = (draft.tags || []).map(function(t) {
                     return '<span class="tag">' + escapeHtml(t) + '</span>';
                 }).join(' ');
-                html += `
-                            <div class="draft-item">
-                                <div class="draft-info">
-                                    <div class="draft-title">${escapeHtml(draft.title || '无标题')}</div>
-                                    <div class="draft-meta">创建于 ${draft.created || ''} ${draft.updated && draft.updated !== draft.created ? ' · 更新于 ' + draft.updated : ''}</div>
-                                    ${tagsHtml ? '<div class="draft-tags">' + tagsHtml + '</div>' : ''}
-                                    <div class="draft-preview">${escapeHtml(preview)}</div>
-                                </div>
-                                <div class="draft-actions">
-                                    <button class="btn-continue" data-id="${draft.id}">继续编辑</button>
-                                    <button class="btn-publish-draft" data-id="${draft.id}">发布</button>
-                                    <button class="btn-delete-draft" data-id="${draft.id}">删除</button>
-                                </div>
-                            </div>
-                        `;
+                html += '<div class="draft-item">' +
+                    '<div class="draft-info">' +
+                        '<div class="draft-title">' + escapeHtml(draft.title || '无标题') + '</div>' +
+                        '<div class="draft-meta">创建于 ' + (draft.created || '') + (draft.updated && draft.updated !== draft.created ? ' · 更新于 ' + draft.updated : '') + '</div>' +
+                        (tagsHtml ? '<div class="draft-tags">' + tagsHtml + '</div>' : '') +
+                        '<div class="draft-preview">' + escapeHtml(preview) + '</div>' +
+                    '</div>' +
+                    '<div class="draft-actions">' +
+                        '<button class="btn-continue" data-id="' + draft.id + '">继续编辑</button>' +
+                        '<button class="btn-publish-draft" data-id="' + draft.id + '">发布</button>' +
+                        '<button class="btn-delete-draft" data-id="' + draft.id + '">删除</button>' +
+                    '</div>' +
+                '</div>';
             });
             list.innerHTML = html;
 
