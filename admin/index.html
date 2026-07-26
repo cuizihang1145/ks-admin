@@ -546,19 +546,6 @@
         body.dark .md-toolbar .sep {
             background: rgba(255, 255, 255, 0.08);
         }
-        .md-toolbar .icon-only {
-            opacity: 0.35;
-            padding: 0 6px;
-            font-size: 0.8rem;
-            color: #6a6a92;
-            display: inline-flex;
-            align-items: center;
-            pointer-events: none;
-            user-select: none;
-        }
-        body.dark .md-toolbar .icon-only {
-            color: #9a96b8;
-        }
 
         .md-editor {
             width: 100%;
@@ -1485,8 +1472,8 @@
                             <button data-cmd="codeblock"><i class="fas fa-code"></i></button>
                             <span class="sep"></span>
                             <button data-cmd="quote"><i class="fas fa-quote-left"></i></button>
-                            <span class="icon-only"><i class="fas fa-list-ul"></i></span>
-                            <span class="icon-only"><i class="fas fa-list-ol"></i></span>
+                            <button data-cmd="ul"><i class="fas fa-list-ul"></i></button>
+                            <button data-cmd="ol"><i class="fas fa-list-ol"></i></button>
                             <span class="sep"></span>
                             <button data-cmd="table"><i class="fas fa-table"></i></button>
                             <button data-cmd="hr"><i class="fas fa-minus"></i></button>
@@ -1893,7 +1880,48 @@
             updateWordCount();
         }
 
-        function handleListContinuation() {
+        // ================================================================
+        // 插入列表标记（工具栏按钮用）
+        // ================================================================
+        function insertListMarker(marker) {
+            var start = mdEditor.selectionStart;
+            var value = mdEditor.value;
+            var lines = value.split('\n');
+            var lineIndex = 0;
+            var charCount = 0;
+            for (var i = 0; i < lines.length; i++) {
+                charCount += lines[i].length + 1;
+                if (start <= charCount) {
+                    lineIndex = i;
+                    break;
+                }
+            }
+            if (lineIndex >= lines.length) return;
+
+            var currentLine = lines[lineIndex];
+            var indent = currentLine.match(/^(\s*)/)[1];
+
+            // 如果当前行已经是列表，不重复插入
+            if (/^(\s*)([-*+]|\d+\.)\s+/.test(currentLine)) {
+                showToast('当前行已是列表', true);
+                return;
+            }
+
+            var prefix = indent + marker;
+            var before = value.substring(0, start - currentLine.length);
+            var after = value.substring(start);
+            mdEditor.value = before + prefix + currentLine.trimStart() + after;
+            var newPos = start + prefix.length;
+            mdEditor.selectionStart = mdEditor.selectionEnd = newPos;
+            mdEditor.focus();
+            updatePreview();
+            updateWordCount();
+        }
+
+        // ================================================================
+        // 回车续行 + 空项退出
+        // ================================================================
+        function handleListEnter() {
             var value = mdEditor.value;
             var cursorPos = mdEditor.selectionStart;
             var lines = value.split('\n');
@@ -1906,20 +1934,30 @@
                     break;
                 }
             }
-            if (lineIndex > lines.length - 1) return false;
-            var currentLine = lines[lineIndex] || '';
+            if (lineIndex >= lines.length) return false;
+            var currentLine = lines[lineIndex];
 
+            // 空列表项 → 退出列表
+            var emptyUl = currentLine.match(/^(\s*)([-*+])\s*$/);
             var emptyOl = currentLine.match(/^(\s*)(\d+)\.\s*$/);
-            var emptyUl = currentLine.match(/^(\s*)([-*])\s*$/);
-            if (emptyOl || emptyUl) {
-                return false;
+            if (emptyUl || emptyOl) {
+                var before = value.substring(0, cursorPos - currentLine.length);
+                var after = value.substring(cursorPos);
+                mdEditor.value = before + after;
+                var newPos = cursorPos - currentLine.length;
+                mdEditor.selectionStart = mdEditor.selectionEnd = newPos;
+                mdEditor.focus();
+                updatePreview();
+                updateWordCount();
+                return true;
             }
 
-            var olMatch = currentLine.match(/^(\s*)(\d+)\.\s+/);
-            if (olMatch) {
-                var indent = olMatch[1];
-                var num = parseInt(olMatch[2]) + 1;
-                var prefix = indent + num + '. ';
+            // 续行：无序列表
+            var ulMatch = currentLine.match(/^(\s*)([-*+])\s+/);
+            if (ulMatch) {
+                var indent = ulMatch[1];
+                var marker = ulMatch[2];
+                var prefix = indent + marker + ' ';
                 var before = value.substring(0, cursorPos);
                 var after = value.substring(cursorPos);
                 mdEditor.value = before + '\n' + prefix + after;
@@ -1931,11 +1969,12 @@
                 return true;
             }
 
-            var ulMatch = currentLine.match(/^(\s*)([-*])\s+/);
-            if (ulMatch) {
-                var indent = ulMatch[1];
-                var marker = ulMatch[2];
-                var prefix = indent + marker + ' ';
+            // 续行：有序列表
+            var olMatch = currentLine.match(/^(\s*)(\d+)\.\s+/);
+            if (olMatch) {
+                var indent = olMatch[1];
+                var num = parseInt(olMatch[2]) + 1;
+                var prefix = indent + num + '. ';
                 var before = value.substring(0, cursorPos);
                 var after = value.substring(cursorPos);
                 mdEditor.value = before + '\n' + prefix + after;
@@ -2009,6 +2048,12 @@
                         case 'quote':
                             insertText('> ');
                             break;
+                        case 'ul':
+                            insertListMarker('- ');
+                            break;
+                        case 'ol':
+                            insertListMarker('1. ');
+                            break;
                         case 'table':
                             insertText('\n| 列1 | 列2 | 列3 |\n|-----|-----|-----|\n| 内容 | 内容 | 内容 |\n');
                             break;
@@ -2029,7 +2074,7 @@
 
         mdEditor.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
-                var handled = handleListContinuation();
+                var handled = handleListEnter();
                 if (handled) {
                     e.preventDefault();
                 }
@@ -2503,7 +2548,6 @@
         var previousVersion = null;
         var hardDeleteTarget = -1;
 
-        // 48小时毫秒数
         var EXPIRE_TIME = 48 * 60 * 60 * 1000;
 
         async function loadAll() {
@@ -2583,7 +2627,6 @@
                 var deletedClass = article.delete ? 'deleted' : '';
                 var statusHtml = article.delete ? '<span class="status-deleted">已删除</span>' : '';
 
-                // 检查撤销按钮：存在且未过期（48小时）
                 var undoBtn = '';
                 if (previousVersion && previousVersion.idx === idx) {
                     var elapsed = Date.now() - previousVersion.savedAt;
@@ -2591,7 +2634,6 @@
                         var remainHours = Math.ceil((EXPIRE_TIME - elapsed) / (60 * 60 * 1000));
                         undoBtn = '<button class="btn-undo" data-idx="' + idx + '" title="还剩 ' + remainHours + ' 小时可撤销">撤销</button>';
                     } else {
-                        // 已过期，清除
                         previousVersion = null;
                     }
                 }
@@ -2718,7 +2760,6 @@
                 showToast('没有可撤销的版本', true);
                 return;
             }
-            // 检查是否过期
             var elapsed = Date.now() - previousVersion.savedAt;
             if (elapsed >= EXPIRE_TIME) {
                 showToast('撤销已过期（超过48小时）', true);
@@ -2936,7 +2977,6 @@
                 return;
             }
 
-            // 检查标题是否重复
             if (editingIdx >= 0) {
                 var existing = allArticles.findIndex(function(a, i) {
                     return i !== editingIdx && a.title === title;
@@ -2952,7 +2992,6 @@
                     if (!confirmed) return;
                 }
 
-                // ★ 每次更新都保存旧版本（带时间戳，48小时有效）★
                 var current = allArticles[editingIdx];
                 previousVersion = {
                     idx: editingIdx,
