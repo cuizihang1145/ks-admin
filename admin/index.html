@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>管理后台 · ks</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <!-- Vditor CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vditor@3.10.8/dist/index.css" />
     <style>
         * {
             margin: 0;
@@ -497,80 +499,60 @@
             margin-bottom: 0;
         }
 
-        .md-toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.2rem;
-            padding: 0.3rem;
-            background: rgba(0, 0, 0, 0.03);
-            border-radius: 8px;
-            margin-bottom: 0.4rem;
-            transition: background 0.3s ease;
+        /* Vditor 自定义样式 - 适配暗色主题 */
+        .vditor {
+            border-radius: 12px !important;
+            border: 1px solid rgba(0, 0, 0, 0.06) !important;
+            background: rgba(255, 255, 255, 0.5) !important;
+            transition: background 0.3s ease, border-color 0.3s ease !important;
         }
-        body.dark .md-toolbar {
-            background: rgba(255, 255, 255, 0.04);
+        body.dark .vditor {
+            background: rgba(255, 255, 255, 0.06) !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
         }
-        .md-toolbar button {
-            min-width: 32px;
-            height: 32px;
-            border: none;
-            border-radius: 4px;
-            background: transparent;
-            color: #6a6a92;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: 0.15s ease;
-            font-family: inherit;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 6px;
-            -webkit-tap-highlight-color: transparent !important;
+        body.dark .vditor .vditor-reset {
+            color: #e8e6f0 !important;
         }
-        body.dark .md-toolbar button {
-            color: #9a96b8;
+        body.dark .vditor .vditor-toolbar {
+            background: rgba(40, 38, 65, 0.6) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
         }
-        .md-toolbar button:hover {
-            background: rgba(107, 90, 207, 0.12);
-            color: #6b5acf;
+        body.dark .vditor .vditor-toolbar .vditor-toolbar__item svg {
+            color: #9a96b8 !important;
         }
-        body.dark .md-toolbar button:hover {
-            background: rgba(136, 204, 255, 0.12);
-            color: #88ccff;
+        body.dark .vditor .vditor-toolbar .vditor-toolbar__item--current svg {
+            color: #88ccff !important;
         }
-        .md-toolbar .sep {
-            width: 1px;
-            background: rgba(0, 0, 0, 0.08);
-            margin: 0 0.2rem;
+        body.dark .vditor .vditor-preview {
+            background: rgba(255, 255, 255, 0.03) !important;
         }
-        body.dark .md-toolbar .sep {
-            background: rgba(255, 255, 255, 0.08);
+        body.dark .vditor .vditor-preview .vditor-reset {
+            color: #d0caf0 !important;
         }
-
-        .md-editor {
-            width: 100%;
-            min-height: 400px;
-            padding: 0.8rem 1rem;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            background: rgba(255, 255, 255, 0.5);
-            font-size: 0.9rem;
-            font-family: 'Courier New', monospace;
-            color: #1a1a2e;
-            resize: vertical;
-            line-height: 1.7;
-            transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-            -webkit-appearance: none;
-            appearance: none;
+        body.dark .vditor .vditor-preview .vditor-reset h1,
+        body.dark .vditor .vditor-preview .vditor-reset h2,
+        body.dark .vditor .vditor-preview .vditor-reset h3,
+        body.dark .vditor .vditor-preview .vditor-reset h4,
+        body.dark .vditor .vditor-preview .vditor-reset h5,
+        body.dark .vditor .vditor-preview .vditor-reset h6 {
+            color: #e8e6f0 !important;
         }
-        body.dark .md-editor {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 255, 255, 0.08);
-            color: #e8e6f0;
+        body.dark .vditor .vditor-preview .vditor-reset code {
+            background: rgba(255, 255, 255, 0.06) !important;
         }
-        .md-editor:focus {
-            border-color: #6b5acf;
-            box-shadow: 0 0 0 3px rgba(107, 90, 207, 0.1);
+        body.dark .vditor .vditor-preview .vditor-reset blockquote {
+            border-left-color: #88ccff !important;
+            color: #a8a4c8 !important;
+        }
+        body.dark .vditor .vditor-preview .vditor-reset a {
+            color: #88ccff !important;
+        }
+        body.dark .vditor .vditor-preview .vditor-reset table th,
+        body.dark .vditor .vditor-preview .vditor-reset table td {
+            border-color: rgba(255, 255, 255, 0.06) !important;
+        }
+        body.dark .vditor .vditor-preview .vditor-reset table th {
+            background: rgba(255, 255, 255, 0.04) !important;
         }
 
         .editor-footer {
@@ -589,217 +571,6 @@
             color: #6b5acf;
         }
         body.dark .editor-footer .word-count {
-            color: #88ccff;
-        }
-
-        .preview-area {
-            min-height: 400px;
-            max-height: 550px;
-            overflow-y: auto;
-            padding: 0.8rem 1rem;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 0, 0, 0.04);
-            background: rgba(255, 255, 255, 0.2);
-            font-size: 0.9rem;
-            line-height: 1.8;
-            color: #2d2d4a;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            transition: background 0.4s ease, border-color 0.3s ease, color 0.3s ease;
-        }
-        body.dark .preview-area {
-            background: rgba(255, 255, 255, 0.03);
-            border-color: rgba(255, 255, 255, 0.05);
-            color: #d0caf0;
-        }
-        .preview-area h1,
-        .preview-area h2,
-        .preview-area h3,
-        .preview-area h4,
-        .preview-area h5,
-        .preview-area h6 {
-            margin: 0.6rem 0 0.3rem 0;
-            font-weight: 700;
-            color: #1a1a2e;
-        }
-        body.dark .preview-area h1,
-        body.dark .preview-area h2,
-        body.dark .preview-area h3,
-        body.dark .preview-area h4,
-        body.dark .preview-area h5,
-        body.dark .preview-area h6 {
-            color: #e8e6f0;
-        }
-        .preview-area p {
-            margin-bottom: 0.5rem;
-        }
-        .preview-area code {
-            font-family: 'Courier New', monospace;
-            font-size: 0.85em;
-            background: rgba(0, 0, 0, 0.06);
-            padding: 0.1rem 0.4rem;
-            border-radius: 4px;
-        }
-        body.dark .preview-area code {
-            background: rgba(255, 255, 255, 0.06);
-        }
-
-        /* ===== 代码块样式（横竖都限制） ===== */
-        .preview-area .code-block-wrapper {
-            background: #0D1117 !important;
-            border-radius: 12px;
-            margin: 0.8rem 0;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            max-height: 460px;
-            display: flex;
-            flex-direction: column;
-        }
-        .preview-area .code-block-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 14px;
-            background: rgba(255, 255, 255, 0.04) !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-            flex-shrink: 0;
-            min-height: 40px;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .preview-area .code-block-header .lang-label {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #8B949E !important;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            font-family: 'Inter', sans-serif;
-        }
-        .preview-area .code-block-header .code-stats {
-            font-size: 0.65rem;
-            color: #484F58 !important;
-            font-family: 'Inter', sans-serif;
-            letter-spacing: 0.3px;
-            flex: 1;
-            text-align: center;
-        }
-        .preview-area .code-block-header .code-stats span {
-            margin: 0 2px;
-        }
-        .preview-area .code-block-body-wrapper {
-            overflow: hidden;
-            flex: 1;
-            min-height: 0;
-        }
-        .preview-area .code-block-body {
-            display: block;
-            overflow: auto;
-            max-height: 400px;
-            min-height: 60px;
-            overflow-x: auto;
-            overflow-y: auto;
-            background: #0D1117 !important;
-            padding: 0.4rem 0;
-            font-size: 0;
-            line-height: 0;
-        }
-        .preview-area .code-block-body .code-line {
-            display: flex;
-            font-size: 0.85rem;
-            line-height: 1.7;
-            font-family: 'JetBrains Mono', 'Courier New', monospace;
-            color: #E6EDF3;
-            white-space: pre;
-            min-height: 1.7em;
-            padding: 0 1.2rem;
-            min-width: max-content;
-        }
-        .preview-area .code-block-body .code-line .line-number {
-            flex-shrink: 0;
-            width: 3.2rem;
-            text-align: right;
-            color: #484F58 !important;
-            user-select: none;
-            padding-right: 0.8rem;
-            border-right: 1px solid rgba(255, 255, 255, 0.06);
-            font-size: 0.85rem;
-            line-height: 1.7;
-            font-family: 'JetBrains Mono', 'Courier New', monospace;
-            margin-right: 1.2rem;
-        }
-        .preview-area .code-block-body .code-line .hljs {
-            background: transparent !important;
-            padding: 0 !important;
-            font-size: 0.85rem;
-            line-height: 1.7;
-            font-family: 'JetBrains Mono', 'Courier New', monospace;
-            flex: 1;
-            white-space: pre;
-        }
-
-        .preview-area blockquote {
-            border-left: 3px solid #6b5acf;
-            padding-left: 0.8rem;
-            margin: 0.4rem 0;
-            color: #6a6a92;
-            font-style: italic;
-        }
-        body.dark .preview-area blockquote {
-            border-left-color: #88ccff;
-            color: #a8a4c8;
-        }
-        .preview-area img {
-            max-width: 100%;
-            border-radius: 6px;
-            margin: 0.4rem 0;
-            display: block;
-        }
-        .preview-area ul,
-        .preview-area ol {
-            padding-left: 1.5rem;
-            margin: 0.3rem 0;
-        }
-        .preview-area ul li,
-        .preview-area ol li {
-            margin-bottom: 0.1rem;
-        }
-        .preview-area table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-            margin: 0.4rem 0;
-        }
-        .preview-area th,
-        .preview-area td {
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            padding: 0.2rem 0.5rem;
-            text-align: left;
-        }
-        body.dark .preview-area th,
-        body.dark .preview-area td {
-            border-color: rgba(255, 255, 255, 0.06);
-        }
-        .preview-area th {
-            background: rgba(0, 0, 0, 0.04);
-            font-weight: 600;
-        }
-        body.dark .preview-area th {
-            background: rgba(255, 255, 255, 0.04);
-        }
-        .preview-area hr {
-            border: none;
-            border-top: 2px solid rgba(0, 0, 0, 0.08);
-            margin: 0.8rem 0;
-        }
-        body.dark .preview-area hr {
-            border-top-color: rgba(255, 255, 255, 0.08);
-        }
-        .preview-area a {
-            color: #6b5acf;
-            text-decoration: underline;
-            word-break: break-all;
-        }
-        body.dark .preview-area a {
             color: #88ccff;
         }
 
@@ -1372,8 +1143,6 @@
             .admin-header .title { font-size: 1.2rem; }
             .login-card { padding: 2rem 1.5rem; }
             .editor-panel { padding: 1rem; }
-            .md-editor { min-height: 250px; }
-            .preview-area { min-height: 250px; max-height: 350px; }
             .article-item-admin { flex-wrap: wrap; padding: 0.8rem 1rem; }
             .article-item-admin .item-actions { width: 100%; justify-content: flex-end; }
             .draft-item { flex-wrap: wrap; padding: 0.8rem 1rem; }
@@ -1392,6 +1161,7 @@
 </head>
 <body>
     <div class="container">
+        <!-- ========== 登录界面（完全保留原样） ========== -->
         <div id="loginScreen">
             <div class="login-card">
                 <h1>管理后台</h1>
@@ -1427,6 +1197,7 @@
             </div>
         </div>
 
+        <!-- ========== 主应用（完全保留原样，除了编辑器区域） ========== -->
         <div id="mainApp">
             <div class="admin-header">
                 <span class="title">管理后台</span>
@@ -1444,8 +1215,10 @@
                 <button class="tab" data-tab="drafts">草稿箱 <span class="badge" id="draftBadge">0</span></button>
             </div>
 
+            <!-- ========== Tab: 写文章（编辑器替换为 Vditor） ========== -->
             <div class="tab-content active" id="tabWrite">
                 <div class="editor-section">
+                    <!-- 左侧：编辑区 -->
                     <div class="editor-panel">
                         <div class="panel-label">编辑</div>
                         <input type="text" id="editTitle" placeholder="文章标题" />
@@ -1453,32 +1226,8 @@
                             <input type="date" id="editDate" />
                             <input type="text" id="editTags" placeholder="标签，用逗号分隔" style="flex:2;" />
                         </div>
-                        <div class="md-toolbar" id="mdToolbar">
-                            <button data-cmd="bold" title="粗体"><b>B</b></button>
-                            <button data-cmd="italic" title="斜体"><i>I</i></button>
-                            <button data-cmd="strike" title="删除线"><s>S</s></button>
-                            <span class="sep"></span>
-                            <button data-cmd="h1">H1</button>
-                            <button data-cmd="h2">H2</button>
-                            <button data-cmd="h3">H3</button>
-                            <button data-cmd="h4">H4</button>
-                            <button data-cmd="h5">H5</button>
-                            <button data-cmd="h6">H6</button>
-                            <span class="sep"></span>
-                            <button data-cmd="link"><i class="fas fa-link"></i></button>
-                            <button data-cmd="image"><i class="fas fa-image"></i></button>
-                            <span class="sep"></span>
-                            <button data-cmd="code">&lt;/&gt;</button>
-                            <button data-cmd="codeblock"><i class="fas fa-code"></i></button>
-                            <span class="sep"></span>
-                            <button data-cmd="quote"><i class="fas fa-quote-left"></i></button>
-                            <button data-cmd="ul"><i class="fas fa-list-ul"></i></button>
-                            <button data-cmd="ol"><i class="fas fa-list-ol"></i></button>
-                            <span class="sep"></span>
-                            <button data-cmd="table"><i class="fas fa-table"></i></button>
-                            <button data-cmd="hr"><i class="fas fa-minus"></i></button>
-                        </div>
-                        <textarea class="md-editor" id="mdEditor" placeholder="用 Markdown 写文章..."></textarea>
+                        <!-- Vditor 容器（替换掉原来的 textarea 和 toolbar） -->
+                        <div id="vditor" style="min-height:400px; border-radius:12px;"></div>
                         <div class="editor-footer">
                             <span>字数：<span class="word-count" id="wordCount">0</span></span>
                         </div>
@@ -1488,15 +1237,18 @@
                             <button class="btn-cancel" id="cancelEditBtn">清空</button>
                         </div>
                     </div>
+
+                    <!-- 右侧：预览区（Vditor 自带分屏预览，这里放一个容器让 Vditor 渲染） -->
                     <div class="editor-panel">
                         <div class="panel-label">预览</div>
-                        <div class="preview-area" id="previewArea">
+                        <div id="vditor-preview" style="min-height:400px; overflow-y:auto; padding:20px; border-radius:12px; background:rgba(255,255,255,0.2);">
                             <span style="color:#8a8ab5;font-size:0.85rem;">预览会显示在这里</span>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- ========== Tab: 文章列表（完全保留原样） ========== -->
             <div class="tab-content" id="tabList">
                 <div class="list-controls">
                     <button class="filter-btn active" data-filter="all">全部</button>
@@ -1509,12 +1261,14 @@
                 <div class="article-list" id="articleList"></div>
             </div>
 
+            <!-- ========== Tab: 草稿箱（完全保留原样） ========== -->
             <div class="tab-content" id="tabDrafts">
                 <div class="article-list" id="draftList"></div>
             </div>
         </div>
     </div>
 
+    <!-- ========== 模态框（完全保留原样） ========== -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-box">
             <span class="modal-icon" id="modalIcon"><i class="fas fa-exclamation-triangle"></i></span>
@@ -1527,9 +1281,18 @@
         </div>
     </div>
 
+    <!-- ========== Toast（完全保留原样） ========== -->
     <div class="toast" id="toast"></div>
 
+    <!-- ========== Vditor JS ========== -->
+    <script src="https://cdn.jsdelivr.net/npm/vditor@3.10.8/dist/index.min.js"></script>
+
     <script>
+        // ================================================================
+        // 以下所有代码完全保留原样，只有编辑器相关逻辑替换为 Vditor API
+        // ================================================================
+
+        // ---------- 登录相关（完全保留） ----------
         var mathQuestionText = '';
 
         async function fetchMathQuestion() {
@@ -1564,6 +1327,10 @@
             themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
             localStorage.setItem('ks-theme', theme);
             currentTheme = theme;
+            // 切换 Vditor 主题
+            if (window.vditorInstance) {
+                vditorInstance.setTheme(theme === 'dark' ? 'dark' : 'classic');
+            }
         }
         setTheme(currentTheme);
         themeToggle.addEventListener('click', function() {
@@ -1772,8 +1539,14 @@
             resetLoginForm();
             passwordInput.value = '';
             loginError.textContent = '';
+            // 清空编辑器
+            if (window.vditorInstance) {
+                vditorInstance.setValue('');
+                updateWordCount();
+            }
         });
 
+        // ---------- Tab 切换（完全保留） ----------
         var tabs = document.querySelectorAll('.tab');
         var tabContents = {
             write: document.getElementById('tabWrite'),
@@ -1797,35 +1570,99 @@
                 });
                 if (target === 'list') renderArticleList();
                 if (target === 'drafts') renderDraftList();
+                // 切换到写文章时刷新 Vditor 布局
+                if (target === 'write' && window.vditorInstance) {
+                    setTimeout(function() {
+                        vditorInstance.reRender();
+                    }, 100);
+                }
             });
         });
 
-        function countWords(text) {
-            if (!text) return 0;
-            var clean = text
-                .replace(/```[\s\S]*?```/g, '')
-                .replace(/`[^`]+`/g, '')
-                .replace(/\*\*(.*?)\*\*/g, '$1')
-                .replace(/\*([^*]+)\*/g, '$1')
-                .replace(/~~(.*?)~~/g, '$1')
-                .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
-                .replace(/!\[([^\]]*)\]\([^)]*\)/g, '')
-                .replace(/^#{1,6}\s+/gm, '')
-                .replace(/^-\s+/gm, '')
-                .replace(/^\d+\.\s+/gm, '')
-                .replace(/^>\s+/gm, '')
-                .replace(/^---$/gm, '')
-                .replace(/\s+/g, ' ')
-                .trim();
-            return clean.length;
-        }
+        // ---------- Vditor 初始化（替换掉原来的编辑器逻辑） ----------
+        var vditorInstance = null;
+        var wordCountEl = document.getElementById('wordCount');
 
         function updateWordCount() {
-            var text = mdEditor.value;
-            var count = countWords(text);
-            document.getElementById('wordCount').textContent = count;
+            if (vditorInstance) {
+                var text = vditorInstance.getValue();
+                // 简单字数统计（去除 Markdown 标记）
+                var clean = text
+                    .replace(/```[\s\S]*?```/g, '')
+                    .replace(/`[^`]+`/g, '')
+                    .replace(/\*\*(.*?)\*\*/g, '$1')
+                    .replace(/\*([^*]+)\*/g, '$1')
+                    .replace(/~~(.*?)~~/g, '$1')
+                    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+                    .replace(/!\[([^\]]*)\]\([^)]*\)/g, '')
+                    .replace(/^#{1,6}\s+/gm, '')
+                    .replace(/^-\s+/gm, '')
+                    .replace(/^\d+\.\s+/gm, '')
+                    .replace(/^>\s+/gm, '')
+                    .replace(/^---$/gm, '')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                wordCountEl.textContent = clean.length;
+            }
         }
 
+        function initVditor() {
+            if (document.getElementById('vditor')) {
+                vditorInstance = new Vditor('vditor', {
+                    height: 400,
+                    mode: 'both', // 分屏模式：左编辑右预览
+                    preview: {
+                        markdown: {
+                            toc: true,
+                            markdown: true
+                        }
+                    },
+                    toolbar: [
+                        'bold', 'italic', 'strike', '|',
+                        'heading', '|',
+                        'list-ul', 'list-ol', '|',
+                        'code', 'code-block', '|',
+                        'link', 'image', '|',
+                        'table', 'quote', '|',
+                        'undo', 'redo', '|',
+                        'preview', 'fullscreen'
+                    ],
+                    toolbarConfig: {
+                        pin: true
+                    },
+                    cache: {
+                        enable: false
+                    },
+                    theme: currentTheme === 'dark' ? 'dark' : 'classic',
+                    after: function() {
+                        // 编辑器加载完成后的回调
+                        updateWordCount();
+                        // 监听内容变化
+                        vditorInstance.on('input', function() {
+                            updateWordCount();
+                        });
+                    }
+                });
+                // 暴露全局供其他地方使用
+                window.vditorInstance = vditorInstance;
+            }
+        }
+
+        // ---------- 清空编辑器 ----------
+        function clearEditor() {
+            document.getElementById('editTitle').value = '';
+            document.getElementById('editDate').value = '';
+            document.getElementById('editTags').value = '';
+            if (vditorInstance) {
+                vditorInstance.setValue('');
+                updateWordCount();
+            }
+            editingIdx = -1;
+            publishBtn.textContent = '发布文章';
+            setDefaultDate();
+        }
+
+        // ---------- 设置默认日期 ----------
         var editDateInput = document.getElementById('editDate');
 
         function setDefaultDate() {
@@ -1836,700 +1673,7 @@
         }
         setDefaultDate();
 
-        var mdEditor = document.getElementById('mdEditor');
-        var previewArea = document.getElementById('previewArea');
-        var publishBtn = document.getElementById('publishBtn');
-
-        function insertText(text) {
-            var start = mdEditor.selectionStart;
-            var end = mdEditor.selectionEnd;
-            var value = mdEditor.value;
-            if (typeof start !== 'number' || typeof end !== 'number') {
-                start = 0;
-                end = 0;
-            }
-            mdEditor.value = value.substring(0, start) + text + value.substring(end);
-            var pos = start + text.length;
-            mdEditor.selectionStart = mdEditor.selectionEnd = pos;
-            mdEditor.focus();
-            updatePreview();
-            updateWordCount();
-        }
-
-        function wrapText(before, after) {
-            var start = mdEditor.selectionStart;
-            var end = mdEditor.selectionEnd;
-            var value = mdEditor.value;
-            var selected = '';
-            try {
-                selected = value.substring(start, end) || '';
-            } catch (e) {
-                selected = '';
-            }
-            var newValue = value.substring(0, start) + before + selected + after + value.substring(end);
-            mdEditor.value = newValue;
-            var pos = start + before.length;
-            if (selected.length > 0) {
-                mdEditor.selectionStart = pos;
-                mdEditor.selectionEnd = pos + selected.length;
-            } else {
-                mdEditor.selectionStart = mdEditor.selectionEnd = pos;
-            }
-            mdEditor.focus();
-            updatePreview();
-            updateWordCount();
-        }
-
-        function insertListMarker(marker) {
-            var start = mdEditor.selectionStart;
-            var value = mdEditor.value;
-            var lines = value.split('\n');
-            var lineIndex = 0;
-            var charCount = 0;
-            for (var i = 0; i < lines.length; i++) {
-                charCount += lines[i].length + 1;
-                if (start <= charCount) {
-                    lineIndex = i;
-                    break;
-                }
-            }
-            if (lineIndex >= lines.length) return;
-
-            var currentLine = lines[lineIndex];
-            var indent = currentLine.match(/^(\s*)/)[1];
-
-            if (/^(\s*)([-*+]|\d+\.)\s+/.test(currentLine)) {
-                showToast('当前行已是列表', true);
-                return;
-            }
-
-            var prefix = indent + marker;
-            var before = value.substring(0, start - currentLine.length);
-            var after = value.substring(start);
-            mdEditor.value = before + prefix + currentLine.trimStart() + after;
-            var newPos = start + prefix.length;
-            mdEditor.selectionStart = mdEditor.selectionEnd = newPos;
-            mdEditor.focus();
-            updatePreview();
-            updateWordCount();
-        }
-
-        function handleListEnter() {
-            var value = mdEditor.value;
-            var cursorPos = mdEditor.selectionStart;
-            var lines = value.split('\n');
-            var lineIndex = 0;
-            var charCount = 0;
-            for (var i = 0; i < lines.length; i++) {
-                charCount += lines[i].length + 1;
-                if (cursorPos <= charCount) {
-                    lineIndex = i;
-                    break;
-                }
-            }
-            if (lineIndex >= lines.length) return false;
-            var currentLine = lines[lineIndex];
-
-            var emptyUl = currentLine.match(/^(\s*)([-*+])\s*$/);
-            var emptyOl = currentLine.match(/^(\s*)(\d+)\.\s*$/);
-            if (emptyUl || emptyOl) {
-                var before = value.substring(0, cursorPos - currentLine.length);
-                var after = value.substring(cursorPos);
-                mdEditor.value = before + after;
-                var newPos = cursorPos - currentLine.length;
-                mdEditor.selectionStart = mdEditor.selectionEnd = newPos;
-                mdEditor.focus();
-                updatePreview();
-                updateWordCount();
-                return true;
-            }
-
-            var ulMatch = currentLine.match(/^(\s*)([-*+])\s+/);
-            if (ulMatch) {
-                var indent = ulMatch[1];
-                var marker = ulMatch[2];
-                var prefix = indent + marker + ' ';
-                var before = value.substring(0, cursorPos);
-                var after = value.substring(cursorPos);
-                mdEditor.value = before + '\n' + prefix + after;
-                var newPos = cursorPos + 1 + prefix.length;
-                mdEditor.selectionStart = mdEditor.selectionEnd = newPos;
-                mdEditor.focus();
-                updatePreview();
-                updateWordCount();
-                return true;
-            }
-
-            var olMatch = currentLine.match(/^(\s*)(\d+)\.\s+/);
-            if (olMatch) {
-                var indent = olMatch[1];
-                var num = parseInt(olMatch[2]) + 1;
-                var prefix = indent + num + '. ';
-                var before = value.substring(0, cursorPos);
-                var after = value.substring(cursorPos);
-                mdEditor.value = before + '\n' + prefix + after;
-                var newPos = cursorPos + 1 + prefix.length;
-                mdEditor.selectionStart = mdEditor.selectionEnd = newPos;
-                mdEditor.focus();
-                updatePreview();
-                updateWordCount();
-                return true;
-            }
-
-            return false;
-        }
-
-        document.querySelectorAll('#mdToolbar button[data-cmd]').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                try {
-                    var cmd = this.dataset.cmd;
-                    var start = mdEditor.selectionStart;
-                    var end = mdEditor.selectionEnd;
-                    var selected = '';
-                    try {
-                        selected = mdEditor.value.substring(start, end) || '';
-                    } catch (e) {
-                        selected = '';
-                    }
-
-                    switch (cmd) {
-                        case 'bold':
-                            wrapText('**', '**');
-                            break;
-                        case 'italic':
-                            wrapText('*', '*');
-                            break;
-                        case 'strike':
-                            wrapText('~~', '~~');
-                            break;
-                        case 'h1':
-                            insertText('# ');
-                            break;
-                        case 'h2':
-                            insertText('## ');
-                            break;
-                        case 'h3':
-                            insertText('### ');
-                            break;
-                        case 'h4':
-                            insertText('#### ');
-                            break;
-                        case 'h5':
-                            insertText('##### ');
-                            break;
-                        case 'h6':
-                            insertText('###### ');
-                            break;
-                        case 'link':
-                            if (selected) { wrapText('[', '](url)'); } else { insertText('[](url)'); }
-                            break;
-                        case 'image':
-                            if (selected) { wrapText('![', '](图片url)'); } else { insertText('![](图片url)'); }
-                            break;
-                        case 'code':
-                            wrapText('`', '`');
-                            break;
-                        case 'codeblock':
-                            insertText('\n```\n\n```\n');
-                            var pos = mdEditor.selectionStart;
-                            mdEditor.selectionStart = mdEditor.selectionEnd = pos - 3;
-                            mdEditor.focus();
-                            break;
-                        case 'quote':
-                            insertText('> ');
-                            break;
-                        case 'ul':
-                            insertListMarker('- ');
-                            break;
-                        case 'ol':
-                            insertListMarker('1. ');
-                            break;
-                        case 'table':
-                            insertText('\n| 列1 | 列2 | 列3 |\n|-----|-----|-----|\n| 内容 | 内容 | 内容 |\n');
-                            break;
-                        case 'hr':
-                            insertText('\n---\n');
-                            break;
-                        default:
-                            return;
-                    }
-                    updatePreview();
-                    updateWordCount();
-                } catch (e) {
-                    console.error('工具栏操作出错:', e);
-                    showToast('操作出错，请重试', true);
-                }
-            });
-        });
-
-        mdEditor.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                var handled = handleListEnter();
-                if (handled) {
-                    e.preventDefault();
-                }
-            }
-        });
-
-        function updatePreview() {
-            try {
-                var rendered = renderMarkdown(mdEditor.value || '');
-                previewArea.innerHTML = rendered || '<span style="color:#8a8ab5;font-size:0.85rem;">预览会显示在这里</span>';
-            } catch (e) {
-                console.error('渲染预览失败:', e);
-                previewArea.innerHTML = '<span style="color:#e53935;font-size:0.85rem;">预览渲染失败，请检查 Markdown 语法</span>';
-            }
-        }
-        mdEditor.addEventListener('input', function() {
-            updatePreview();
-            updateWordCount();
-        });
-
-        function renderMarkdown(md) {
-            if (!md) return '';
-
-            var escMap = {};
-            var escCounter = 0;
-            md = md.replace(/\\([\\`*_{}\[\]()#+\-.!|$])/g, function(match, char) {
-                var key = '\uE000' + (escCounter++) + '\uE001';
-                escMap[key] = char;
-                return key;
-            });
-
-            var lines = md.split('\n');
-            var result = '';
-            var inCodeBlock = false;
-            var codeBlockLines = [];
-            var codeLang = '';
-            var codeBlockCounter = 0;
-            var inTable = false;
-            var tableRows = [];
-            var tableAligns = [];
-            var footnotes = {};
-            var footnoteKeys = [];
-
-            function restoreEscapes(text) {
-                var r = text;
-                for (var key in escMap) {
-                    if (escMap.hasOwnProperty(key)) {
-                        r = r.replace(new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), escMap[key]);
-                    }
-                }
-                return r;
-            }
-
-            function escapeHtml(text) {
-                if (!text) return '';
-                var div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
-            }
-
-            function renderInline(text) {
-                var html = escapeHtml(text);
-                html = html.replace(/&lt;(https?:\/\/[^\s<>]+)&gt;/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
-                html = html.replace(/&lt;([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})&gt;/g, '<a href="mailto:$1">$1</a>');
-                html = html.replace(/(?<!\]\()https?:\/\/[^\s<>]+/g, '<a href="$&" target="_blank" rel="noopener">$&</a>');
-                html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-                html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-                html = html.replace(/~~(.*?)~~/g, '<del>$1</del>');
-                html = html.replace(/!\[([^\]]*)\]\(([^)]*?)(?:\s+=\s*(\d*)(?:x(\d+))?)?\)/g, function(match, alt, src, w, h) {
-                    var style = '';
-                    if (w && h) style = ' style="width:' + w + 'px; height:' + h + 'px;"';
-                    else if (w) style = ' style="width:' + w + 'px; height:auto;"';
-                    else if (h) style = ' style="height:' + h + 'px; width:auto;"';
-                    return '<img src="' + src + '" alt="' + alt + '" loading="lazy"' + style + ' />';
-                });
-                html = html.replace(/\[([^\]]*)\]\(([^)]*)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-                html = html.replace(/\[\^([^\]]+)\]/g, function(match, key) {
-                    if (!footnoteKeys.includes(key)) footnoteKeys.push(key);
-                    return '<sup class="footnote-ref"><a href="#fn-' + key + '" id="fnref-' + key + '">' + key + '</a></sup>';
-                });
-                html = restoreEscapes(html);
-                return html;
-            }
-
-            function flushTable() {
-                if (tableRows.length === 0) return;
-                var html = '<table>';
-                for (var i = 0; i < tableRows.length; i++) {
-                    var cells = tableRows[i];
-                    var isHeader = i === 0;
-                    html += '<tr>';
-                    for (var j = 0; j < cells.length; j++) {
-                        var tag = isHeader ? 'th' : 'td';
-                        var align = (i === 1 && tableAligns[j]) ? ' style="text-align:' + tableAligns[j] + ';"' : '';
-                        var cellContent = cells[j].replace(/\\n/g, '\n').replace(/\n/g, '<br>');
-                        html += '<' + tag + align + '>' + renderInline(cellContent) + '</' + tag + '>';
-                    }
-                    html += '</tr>';
-                }
-                html += '</table>';
-                result += html;
-                tableRows = [];
-                tableAligns = [];
-                inTable = false;
-            }
-
-            function flushCodeBlock() {
-                if (codeBlockLines.length === 0) {
-                    inCodeBlock = false;
-                    codeLang = '';
-                    return;
-                }
-                var code = codeBlockLines.join('\n');
-                code = code.replace(/^\s*\n/, '').replace(/\n\s*$/, '');
-
-                var langParts = codeLang.split(/\s+/);
-                var lang = langParts[0] || 'text';
-                var copyId = 'code-' + Date.now() + '-' + (codeBlockCounter++);
-
-                var lines = code.split('\n');
-                var lineCount = lines.length;
-                var maxLineLength = 0;
-                var totalChars = 0;
-                for (var j = 0; j < lines.length; j++) {
-                    var lineLen = lines[j].length;
-                    if (lineLen > maxLineLength) maxLineLength = lineLen;
-                    totalChars += lineLen;
-                }
-                totalChars += lineCount > 0 ? lineCount - 1 : 0;
-
-                var statsHtml = '<span>' + lineCount + ' 行</span> · <span>' + maxLineLength + ' 列</span> · <span>' + totalChars + ' 字符</span>';
-
-                var codeHtml = '';
-                for (var j = 0; j < lines.length; j++) {
-                    var lineNum = j + 1;
-                    var escapedLine = escapeHtml(lines[j]);
-                    codeHtml += '<span class="code-line"><span class="line-number">' + lineNum + '</span><span class="hljs">' + escapedLine + '</span></span>';
-                }
-
-                result += '<div class="code-block-wrapper" id="cbw-' + copyId + '">' +
-                    '<div class="code-block-header">' +
-                    '<span class="lang-label">' + escapeHtml(lang) + '</span>' +
-                    '<span class="code-stats">' + statsHtml + '</span>' +
-                    '</div>' +
-                    '<div class="code-block-body-wrapper">' +
-                    '<div class="code-block-body" id="code-body-' + copyId + '">' + codeHtml + '</div>' +
-                    '</div>' +
-                    '</div>';
-                codeBlockLines = [];
-                inCodeBlock = false;
-                codeLang = '';
-            }
-
-            // ================================================================
-            // 修复 parseList 函数 - 防止无限递归
-            // ================================================================
-            function parseList(startIdx, parentIndent) {
-                var html = '';
-                var idx = startIdx;
-                var currentListType = null;
-                var items = [];
-                var olStartNumber = null;
-                var olValues = [];
-                var maxDepth = 50;
-                var depth = 0;
-
-                while (idx < lines.length && depth < maxDepth) {
-                    var l = lines[idx];
-                    var t = l.trim();
-                    if (t === '') {
-                        var nextIdx = idx + 1;
-                        while (nextIdx < lines.length && lines[nextIdx].trim() === '') nextIdx++;
-                        if (nextIdx < lines.length) {
-                            var nextLine = lines[nextIdx];
-                            var nextUl = nextLine.match(/^(\s*)[-*+]\s+/);
-                            var nextOl = nextLine.match(/^(\s*)(\d+)\.\s+/);
-                            var nextTask = nextLine.match(/^(\s*)[-*+]\s+\[[ x]\]\s+/);
-                            if (nextUl || nextOl || nextTask) {
-                                var nextIndent = parseInt((nextUl || nextOl || nextTask)[1].length);
-                                if (nextIndent <= parentIndent) {
-                                    break;
-                                }
-                            } else {
-                                break;
-                            }
-                        } else {
-                            break;
-                        }
-                        idx++;
-                        continue;
-                    }
-
-                    var ulMatch = l.match(/^(\s*)[-*+]\s+(.+)/);
-                    var olMatch = l.match(/^(\s*)(\d+)\.\s+(.+)/);
-                    var taskMatch = l.match(/^(\s*)[-*+]\s+\[([ x])\]\s+(.+)/);
-
-                    var match = null;
-                    var type = null;
-                    var content = '';
-                    var indent = 0;
-                    var olNumber = 0;
-
-                    if (taskMatch) {
-                        indent = taskMatch[1].length;
-                        if (indent < parentIndent) break;
-                        type = 'task';
-                        var checked = taskMatch[2] === 'x';
-                        content = '<input type="checkbox"' + (checked ? ' checked' : '') + ' disabled> ' + taskMatch[3];
-                    } else if (ulMatch) {
-                        indent = ulMatch[1].length;
-                        if (indent < parentIndent) break;
-                        type = 'ul';
-                        content = ulMatch[2];
-                    } else if (olMatch) {
-                        indent = olMatch[1].length;
-                        if (indent < parentIndent) break;
-                        type = 'ol';
-                        olNumber = parseInt(olMatch[2]);
-                        content = olMatch[3];
-                        if (olStartNumber === null) {
-                            olStartNumber = olNumber;
-                        }
-                        olValues.push(olNumber);
-                    } else {
-                        break;
-                    }
-
-                    var childHtml = '';
-                    var childIdx = idx + 1;
-                    while (childIdx < lines.length && lines[childIdx].trim() === '') childIdx++;
-                    if (childIdx < lines.length) {
-                        var nextLine = lines[childIdx];
-                        var nextUl = nextLine.match(/^(\s*)[-*+]\s+/);
-                        var nextOl = nextLine.match(/^(\s*)(\d+)\.\s+/);
-                        var nextTask = nextLine.match(/^(\s*)[-*+]\s+\[[ x]\]\s+/);
-                        if (nextUl || nextOl || nextTask) {
-                            var nextIndent = parseInt((nextUl || nextOl || nextTask)[1].length);
-                            if (nextIndent > indent) {
-                                depth++;
-                                var childResult = parseList(childIdx, indent);
-                                childHtml = childResult[0];
-                                idx += childResult[1];
-                                depth--;
-                            }
-                        }
-                    }
-
-                    if (!currentListType) {
-                        currentListType = type === 'ol' ? 'ol' : 'ul';
-                    }
-
-                    var isTask = type === 'task';
-                    var liClass = isTask ? ' class="task-list-item"' : '';
-                    var renderedContent = renderInline(content);
-
-                    var liTag = '<li' + liClass;
-                    if (type === 'ol') {
-                        liTag += ' value="' + olNumber + '"';
-                    }
-                    liTag += '>' + renderedContent + childHtml + '</li>';
-
-                    items.push({
-                        type: type,
-                        olNumber: olNumber,
-                        html: liTag
-                    });
-
-                    idx++;
-                }
-
-                if (items.length === 0) {
-                    return ['', 0];
-                }
-
-                var listTag = currentListType === 'ol' ? 'ol' : 'ul';
-                var listClass = currentListType === 'ol' ? '' : ' class="task-list"';
-                var startAttr = '';
-                if (currentListType === 'ol' && olStartNumber !== null && olStartNumber !== 1) {
-                    startAttr = ' start="' + olStartNumber + '"';
-                }
-                var itemsHtml = items.map(function(item) { return item.html; }).join('\n');
-                html = '<' + listTag + listClass + startAttr + '>\n' + itemsHtml + '\n</' + listTag + '>';
-                return [html, idx - startIdx];
-            }
-
-            var i = 0;
-            while (i < lines.length) {
-                var line = lines[i];
-                var trimmed = line.trim();
-
-                var codeBlockStart = line.match(/^(```|~~~)(\w*)/);
-                if (codeBlockStart) {
-                    if (!inCodeBlock) {
-                        flushTable();
-                        inCodeBlock = true;
-                        codeLang = codeBlockStart[2] || 'text';
-                        i++;
-                        continue;
-                    } else {
-                        flushCodeBlock();
-                        i++;
-                        continue;
-                    }
-                }
-                if (inCodeBlock) {
-                    codeBlockLines.push(line);
-                    i++;
-                    continue;
-                }
-
-                if (trimmed === '') {
-                    flushTable();
-                    i++;
-                    continue;
-                }
-
-                var fnMatch = line.match(/^\[\^([^\]]+)\]:\s*(.+)/);
-                if (fnMatch) {
-                    flushTable();
-                    var key = fnMatch[1];
-                    var content = fnMatch[2];
-                    footnotes[key] = renderInline(content);
-                    if (!footnoteKeys.includes(key)) footnoteKeys.push(key);
-                    i++;
-                    continue;
-                }
-
-                if (line.includes('|') && trimmed.startsWith('|') && trimmed.endsWith('|')) {
-                    if (!inTable) {
-                        flushTable();
-                        inTable = true;
-                        tableRows = [];
-                        tableAligns = [];
-                    }
-                    var cells = trimmed.slice(1, -1).split('|').map(function(s) { return s.trim(); });
-                    if (cells.every(function(c) { return /^:?-+:?$/.test(c); })) {
-                        tableAligns = cells.map(function(c) {
-                            if (c.startsWith(':') && c.endsWith(':')) return 'center';
-                            if (c.endsWith(':')) return 'right';
-                            if (c.startsWith(':')) return 'left';
-                            return '';
-                        });
-                        i++;
-                        continue;
-                    }
-                    tableRows.push(cells);
-                    i++;
-                    continue;
-                }
-                if (inTable) {
-                    flushTable();
-                    continue;
-                }
-
-                var headingMatch = line.match(/^(#{1,6})\s+(.+)/);
-                if (headingMatch) {
-                    flushTable();
-                    var level = headingMatch[1].length;
-                    var text = headingMatch[2];
-                    result += '<h' + level + '>' + renderInline(text) + '</h' + level + '>';
-                    i++;
-                    continue;
-                }
-
-                if (/^---$/.test(trimmed) || /^\*\*\*$/.test(trimmed) || /^___$/.test(trimmed)) {
-                    flushTable();
-                    result += '<hr />';
-                    i++;
-                    continue;
-                }
-
-                if (i + 1 < lines.length && lines[i + 1].match(/^:\s+/)) {
-                    flushTable();
-                    var term = renderInline(trimmed);
-                    var defs = [];
-                    i++;
-                    while (i < lines.length && lines[i].match(/^:\s+/)) {
-                        defs.push(renderInline(lines[i].replace(/^:\s+/, '')));
-                        i++;
-                    }
-                    while (i < lines.length && lines[i].trim() === '') i++;
-                    var ddHtml = defs.map(function(d) { return '<dd>' + d + '</dd>'; }).join('');
-                    result += '<dl><dt>' + term + '</dt>' + ddHtml + '</dl>';
-                    continue;
-                }
-
-                var listCheck = line.match(/^(\s*)[-*+]\s+/);
-                var taskCheck = line.match(/^(\s*)[-*+]\s+\[[ x]\]\s+/);
-                var olCheck = line.match(/^(\s*)(\d+)\.\s+/);
-
-                if (taskCheck || listCheck || olCheck) {
-                    flushTable();
-                    var listResult = parseList(i, 0);
-                    result += listResult[0];
-                    i += listResult[1];
-                    continue;
-                }
-
-                if (line.startsWith('>')) {
-                    flushTable();
-                    var level = 0;
-                    var temp = line;
-                    while (temp.startsWith('>')) {
-                        level++;
-                        temp = temp.substring(1);
-                        if (temp.startsWith(' ')) temp = temp.substring(1);
-                    }
-                    var content = temp.trim();
-                    var quoteLines = [content];
-                    var j = i + 1;
-                    while (j < lines.length) {
-                        var nextLine = lines[j];
-                        if (nextLine.startsWith('>')) {
-                            var lv = 0;
-                            var tmp = nextLine;
-                            while (tmp.startsWith('>')) {
-                                lv++;
-                                tmp = tmp.substring(1);
-                                if (tmp.startsWith(' ')) tmp = tmp.substring(1);
-                            }
-                            quoteLines.push(tmp.trim());
-                            j++;
-                        } else if (nextLine.trim() === '') {
-                            quoteLines.push('');
-                            j++;
-                        } else {
-                            break;
-                        }
-                    }
-                    var innerHtml = renderInline(quoteLines.join('\n'));
-                    for (var lv = 0; lv < level; lv++) {
-                        innerHtml = '<blockquote>' + innerHtml + '</blockquote>';
-                    }
-                    result += innerHtml;
-                    i = j;
-                    continue;
-                }
-
-                flushTable();
-                result += '<p>' + renderInline(line) + '</p>';
-                i++;
-            }
-
-            flushCodeBlock();
-            flushTable();
-
-            if (footnoteKeys.length > 0) {
-                result += '<div class="footnotes">\n';
-                for (var keyIndex = 0; keyIndex < footnoteKeys.length; keyIndex++) {
-                    var key = footnoteKeys[keyIndex];
-                    if (footnotes[key]) {
-                        result += '<div class="footnote-def" id="fn-' + key + '">';
-                        result += '<a href="#fnref-' + key + '" class="footnote-back">↩</a> ';
-                        result += footnotes[key];
-                        result += '</div>\n';
-                    }
-                }
-                result += '</div>\n';
-            }
-
-            result = restoreEscapes(result);
-            return result;
-        }
-
+        // ---------- API 调用（完全保留） ----------
         async function apiCall(endpoint, options) {
             var token = getToken();
             var defaultOptions = {
@@ -2558,6 +1702,7 @@
             return res;
         }
 
+        // ---------- 数据（完全保留） ----------
         var allArticles = [];
         var currentFilter = 'all';
         var currentSort = 'desc';
@@ -2565,9 +1710,10 @@
         var editingIdx = -1;
         var previousVersion = null;
         var hardDeleteTarget = -1;
-
         var EXPIRE_TIME = 48 * 60 * 60 * 1000;
+        var publishBtn = document.getElementById('publishBtn');
 
+        // ---------- 加载数据（完全保留） ----------
         async function loadAll() {
             await loadArticles();
             renderArticleList();
@@ -2597,6 +1743,14 @@
             }
         }
 
+        // ---------- 工具函数（完全保留） ----------
+        function escapeHtml(text) {
+            if (!text) return '';
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         function getFilteredArticles(filter) {
             var result = allArticles.slice();
             if (filter === 'published') {
@@ -2612,13 +1766,7 @@
             return result;
         }
 
-        function escapeHtml(text) {
-            if (!text) return '';
-            var div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
+        // ---------- 渲染文章列表（完全保留） ----------
         function renderArticleList() {
             var list = document.getElementById('articleList');
             var search = document.getElementById('listSearch').value.trim().toLowerCase();
@@ -2710,6 +1858,7 @@
             });
         }
 
+        // ---------- 文章操作（完全保留，只修改了编辑器取值/赋值） ----------
         function editArticle(idx) {
             var article = allArticles[idx];
             if (!article) return;
@@ -2717,9 +1866,10 @@
             document.getElementById('editTitle').value = article.title || '';
             document.getElementById('editDate').value = article.date || '';
             document.getElementById('editTags').value = (article.tags || []).join('，');
-            mdEditor.value = article.content || '';
-            updatePreview();
-            updateWordCount();
+            if (vditorInstance) {
+                vditorInstance.setValue(article.content || '');
+                updateWordCount();
+            }
             publishBtn.textContent = '更新文章';
             document.querySelector('.tab[data-tab="write"]').click();
             showToast('已加载文章，修改后点更新');
@@ -2871,6 +2021,7 @@
             }
         }
 
+        // ---------- 草稿（完全保留，只修改了编辑器取值/赋值） ----------
         function renderDraftList() {
             var list = document.getElementById('draftList');
             if (allDrafts.length === 0) {
@@ -2907,9 +2058,10 @@
                         document.getElementById('editTitle').value = draft.title || '';
                         document.getElementById('editDate').value = draft.date || '';
                         document.getElementById('editTags').value = (draft.tags || []).join('，');
-                        mdEditor.value = draft.content || '';
-                        updatePreview();
-                        updateWordCount();
+                        if (vditorInstance) {
+                            vditorInstance.setValue(draft.content || '');
+                            updateWordCount();
+                        }
                         editingIdx = -1;
                         publishBtn.textContent = '发布文章';
                         document.querySelector('.tab[data-tab="write"]').click();
@@ -2926,9 +2078,10 @@
                         document.getElementById('editTitle').value = draft.title || '';
                         document.getElementById('editDate').value = draft.date || '';
                         document.getElementById('editTags').value = (draft.tags || []).join('，');
-                        mdEditor.value = draft.content || '';
-                        updatePreview();
-                        updateWordCount();
+                        if (vditorInstance) {
+                            vditorInstance.setValue(draft.content || '');
+                            updateWordCount();
+                        }
                         editingIdx = -1;
                         publishBtn.textContent = '发布文章';
                         deleteDraft(id);
@@ -2979,9 +2132,10 @@
             }
         }
 
+        // ---------- 发布/更新（完全保留，只修改了编辑器取值） ----------
         document.getElementById('publishBtn').addEventListener('click', async function() {
             var title = document.getElementById('editTitle').value.trim();
-            var content = mdEditor.value.trim();
+            var content = vditorInstance ? vditorInstance.getValue().trim() : '';
             var tagsRaw = document.getElementById('editTags').value.trim();
             var date = document.getElementById('editDate').value;
             var tags = tagsRaw ? tagsRaw.split(/[，,、\s]+/).filter(Boolean) : [];
@@ -3074,20 +2228,9 @@
             this.disabled = false;
         });
 
-        function clearEditor() {
-            document.getElementById('editTitle').value = '';
-            document.getElementById('editDate').value = '';
-            document.getElementById('editTags').value = '';
-            mdEditor.value = '';
-            updatePreview();
-            updateWordCount();
-            editingIdx = -1;
-            publishBtn.textContent = '发布文章';
-            setDefaultDate();
-        }
-
+        // ---------- 清空按钮（完全保留） ----------
         document.getElementById('cancelEditBtn').addEventListener('click', function() {
-            if (editingIdx >= 0 || mdEditor.value || document.getElementById('editTitle').value) {
+            if (editingIdx >= 0 || (vditorInstance && vditorInstance.getValue()) || document.getElementById('editTitle').value) {
                 showModal(
                     '<i class="fas fa-trash-alt"></i>',
                     '清空内容',
@@ -3103,9 +2246,10 @@
             }
         });
 
+        // ---------- 保存草稿（完全保留，只修改了编辑器取值） ----------
         document.getElementById('saveDraftBtn').addEventListener('click', async function() {
             var title = document.getElementById('editTitle').value.trim() || '无标题';
-            var content = mdEditor.value;
+            var content = vditorInstance ? vditorInstance.getValue() : '';
             var tagsRaw = document.getElementById('editTags').value.trim();
             var tags = tagsRaw ? tagsRaw.split(/[，,、\s]+/).filter(Boolean) : [];
             var date = document.getElementById('editDate').value || '';
@@ -3134,6 +2278,7 @@
             this.disabled = false;
         });
 
+        // ---------- 列表筛选/排序/搜索（完全保留） ----------
         document.querySelectorAll('#tabList .filter-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('#tabList .filter-btn').forEach(function(b) { b.classList.remove('active'); });
@@ -3159,22 +2304,29 @@
             renderArticleList();
         });
 
+        // ---------- 更新角标（完全保留） ----------
         function updateBadges() {
             document.getElementById('listBadge').textContent = allArticles.length;
             document.getElementById('draftBadge').textContent = allDrafts.length;
         }
 
+        // ---------- 初始化 ----------
         fetchMathQuestion();
+
+        // 先初始化 Vditor
+        initVditor();
 
         if (!checkLogin()) {
             loginScreen.classList.remove('hidden');
             mainApp.classList.remove('active');
         }
 
+        // 延迟更新字数
         setTimeout(function() {
             updateWordCount();
-        }, 100);
+        }, 500);
 
+        // 页面关闭前清理
         window.addEventListener('beforeunload', function() {
             if (localStorage.getItem(KEEP_LOGIN_KEY) === 'false') {
                 clearToken();
