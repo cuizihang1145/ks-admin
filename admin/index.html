@@ -497,7 +497,6 @@
             margin-bottom: 0;
         }
 
-        /* ===== 编辑器样式 ===== */
         .editor-split {
             display: flex;
             height: 420px;
@@ -1340,7 +1339,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- ========== 登录界面 ========== -->
         <div id="loginScreen">
             <div class="login-card">
                 <h1>管理后台</h1>
@@ -1376,7 +1374,6 @@
             </div>
         </div>
 
-        <!-- ========== 主应用 ========== -->
         <div id="mainApp">
             <div class="admin-header">
                 <span class="title">管理后台</span>
@@ -1394,7 +1391,6 @@
                 <button class="tab" data-tab="drafts">草稿箱 <span class="badge" id="draftBadge">0</span></button>
             </div>
 
-            <!-- ========== Tab: 写文章 ========== -->
             <div class="tab-content active" id="tabWrite">
                 <div class="editor-section">
                     <div class="editor-panel">
@@ -1405,7 +1401,6 @@
                             <input type="text" id="editTags" placeholder="标签，用逗号分隔" style="flex:2;" />
                         </div>
 
-                        <!-- 自定义工具栏 -->
                         <div class="custom-toolbar" id="customToolbar">
                             <button data-cmd="bold" title="加粗"><b>B</b></button>
                             <button data-cmd="italic" title="斜体"><i>I</i></button>
@@ -1432,7 +1427,6 @@
                             <button data-cmd="hr" title="分割线"><i class="fas fa-minus"></i></button>
                         </div>
 
-                        <!-- 编辑器分屏 -->
                         <div class="editor-split" id="editorSplit">
                             <textarea id="mdEditor" placeholder="用 Markdown 写文章..."></textarea>
                             <div class="preview" id="previewArea">
@@ -1453,7 +1447,6 @@
                 </div>
             </div>
 
-            <!-- ========== Tab: 文章列表 ========== -->
             <div class="tab-content" id="tabList">
                 <div class="list-controls">
                     <button class="filter-btn active" data-filter="all">全部</button>
@@ -1466,14 +1459,12 @@
                 <div class="article-list" id="articleList"></div>
             </div>
 
-            <!-- ========== Tab: 草稿箱 ========== -->
             <div class="tab-content" id="tabDrafts">
                 <div class="article-list" id="draftList"></div>
             </div>
         </div>
     </div>
 
-    <!-- ========== 模态框 ========== -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-box">
             <span class="modal-icon" id="modalIcon"><i class="fas fa-exclamation-triangle"></i></span>
@@ -1486,17 +1477,12 @@
         </div>
     </div>
 
-    <!-- ========== Toast ========== -->
     <div class="toast" id="toast"></div>
 
-    <!-- ========== 依赖（本地文件） ========== -->
     <script src="/libs/marked.min.js"></script>
     <script src="/libs/DOMPurify.min.js"></script>
 
     <script>
-        // ================================================================
-        // 登录相关
-        // ================================================================
         var mathQuestionText = '';
 
         async function fetchMathQuestion() {
@@ -1611,8 +1597,8 @@
             keepLoginCheck.checked = true;
         }
 
-        var loginAttempts = 0;
-        var lockUntil = 0;
+        var loginAttempts = parseInt(localStorage.getItem('login_attempts')) || 0;
+        var lockUntil = parseInt(localStorage.getItem('lock_until')) || 0;
 
         function resetLoginForm() {
             inviteCodeInput.value = '';
@@ -1621,6 +1607,8 @@
             loginError.textContent = '';
             loginAttempts = 0;
             lockUntil = 0;
+            localStorage.removeItem('login_attempts');
+            localStorage.removeItem('lock_until');
             fetchMathQuestion();
         }
 
@@ -1668,10 +1656,20 @@
                 return;
             }
 
-            if (Date.now() < lockUntil) {
-                var remaining = Math.ceil((lockUntil - Date.now()) / 60000);
+            var attempts = parseInt(localStorage.getItem('login_attempts')) || 0;
+            var lockedUntil = parseInt(localStorage.getItem('lock_until')) || 0;
+
+            if (Date.now() < lockedUntil) {
+                var remaining = Math.ceil((lockedUntil - Date.now()) / 60000);
                 loginError.textContent = '尝试次数过多，请 ' + remaining + ' 分钟后重试';
                 return;
+            }
+
+            if (lockedUntil > 0 && Date.now() >= lockedUntil) {
+                localStorage.removeItem('login_attempts');
+                localStorage.removeItem('lock_until');
+                attempts = 0;
+                lockedUntil = 0;
             }
 
             loginBtn.disabled = true;
@@ -1697,7 +1695,8 @@
                 }
 
                 if (data.success) {
-                    loginAttempts = 0;
+                    localStorage.removeItem('login_attempts');
+                    localStorage.removeItem('lock_until');
                     var keepLogin = keepLoginCheck.checked;
                     localStorage.setItem(KEEP_LOGIN_KEY, String(keepLogin));
                     localStorage.setItem(TOKEN_KEY, data.token);
@@ -1706,12 +1705,14 @@
                     mainApp.classList.add('active');
                     loadAll();
                 } else {
-                    loginAttempts++;
-                    if (loginAttempts >= 5) {
-                        lockUntil = Date.now() + 15 * 60 * 1000;
+                    attempts++;
+                    localStorage.setItem('login_attempts', String(attempts));
+                    if (attempts >= 5) {
+                        var lockTime = Date.now() + 15 * 60 * 1000;
+                        localStorage.setItem('lock_until', String(lockTime));
                         loginError.textContent = '尝试次数过多，请 15 分钟后重试';
                     } else {
-                        loginError.textContent = '验证失败（' + loginAttempts + '/5）';
+                        loginError.textContent = '验证失败（' + attempts + '/5）';
                     }
                     fetchMathQuestion();
                 }
@@ -1729,11 +1730,7 @@
             if (e.key === 'Enter') doLogin();
         });
 
-        // ================================================================
-        // 退出登录（带 Font Awesome 图标的二级确认弹窗）
-        // ================================================================
         document.getElementById('logoutBtn').addEventListener('click', async function() {
-            // 第一级确认
             var confirmed = await showModal(
                 '<i class="fas fa-sign-out-alt"></i>',
                 '确认退出',
@@ -1743,7 +1740,6 @@
             );
             if (!confirmed) return;
 
-            // 第二级确认
             var doubleConfirmed = await showModal(
                 '<i class="fas fa-shield-alt"></i>',
                 '二次确认',
@@ -1753,7 +1749,6 @@
             );
             if (!doubleConfirmed) return;
 
-            // 执行退出
             clearToken();
             if (localStorage.getItem(KEEP_LOGIN_KEY) === 'false') {
                 clearToken();
@@ -1771,7 +1766,6 @@
             showToast('已安全退出');
         });
 
-        // ---------- Tab 切换 ----------
         var tabs = document.querySelectorAll('.tab');
         var tabContents = {
             write: document.getElementById('tabWrite'),
@@ -1797,10 +1791,6 @@
                 if (target === 'drafts') renderDraftList();
             });
         });
-
-        // ================================================================
-        // 编辑器逻辑
-        // ================================================================
 
         var editor = document.getElementById('mdEditor');
         var previewArea = document.getElementById('previewArea');
@@ -1841,9 +1831,6 @@
             wordCountEl.textContent = countWords(text);
         }
 
-        // ================================================================
-        // 核心渲染函数（带语言标签的代码块）
-        // ================================================================
         function updatePreview() {
             try {
                 var raw = editor.value || '';
@@ -1854,7 +1841,6 @@
                 var clean = DOMPurify.sanitize(html);
                 previewArea.innerHTML = clean;
 
-                // 给代码块加语言标签（只显示语言名，不要行数）
                 previewArea.querySelectorAll('pre').forEach(function(pre) {
                     var code = pre.querySelector('code');
                     if (!code) return;
@@ -1874,7 +1860,6 @@
             }
         }
 
-        // ---------- 编辑器输入事件 ----------
         if (editor) {
             editor.addEventListener('input', function() {
                 updatePreview();
@@ -1882,7 +1867,6 @@
             });
         }
 
-        // ---------- 插入/包裹文本 ----------
         function insertText(text) {
             if (!editor) return;
             var start = editor.selectionStart;
@@ -1925,7 +1909,6 @@
             updateWordCount();
         }
 
-        // ---------- 插入列表标记 ----------
         function insertListMarker(marker) {
             if (!editor) return;
             var start = editor.selectionStart;
@@ -1961,7 +1944,6 @@
             updateWordCount();
         }
 
-        // ---------- 回车续行 ----------
         function handleListEnter() {
             if (!editor) return false;
             var value = editor.value;
@@ -2028,7 +2010,6 @@
             return false;
         }
 
-        // ---------- 键盘事件 ----------
         if (editor) {
             editor.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') {
@@ -2040,9 +2021,6 @@
             });
         }
 
-        // ================================================================
-        // 工具栏按钮
-        // ================================================================
         document.querySelectorAll('#customToolbar button[data-cmd]').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 try {
@@ -2126,7 +2104,6 @@
             });
         });
 
-        // ---------- 清空编辑器 ----------
         function clearEditor() {
             document.getElementById('editTitle').value = '';
             document.getElementById('editDate').value = '';
@@ -2141,9 +2118,6 @@
             setDefaultDate();
         }
 
-        // ================================================================
-        // API 调用
-        // ================================================================
         async function apiCall(endpoint, options) {
             var token = getToken();
             var defaultOptions = {
@@ -2172,9 +2146,6 @@
             return res;
         }
 
-        // ================================================================
-        // 数据
-        // ================================================================
         var allArticles = [];
         var currentFilter = 'all';
         var currentSort = 'desc';
@@ -2235,9 +2206,6 @@
             return result;
         }
 
-        // ================================================================
-        // 渲染文章列表
-        // ================================================================
         function renderArticleList() {
             var list = document.getElementById('articleList');
             var search = document.getElementById('listSearch').value.trim().toLowerCase();
@@ -2329,9 +2297,6 @@
             });
         }
 
-        // ================================================================
-        // 文章操作
-        // ================================================================
         function editArticle(idx) {
             var article = allArticles[idx];
             if (!article) return;
@@ -2495,9 +2460,6 @@
             }
         }
 
-        // ================================================================
-        // 草稿
-        // ================================================================
         function renderDraftList() {
             var list = document.getElementById('draftList');
             if (allDrafts.length === 0) {
@@ -2610,9 +2572,6 @@
             }
         }
 
-        // ================================================================
-        // 发布
-        // ================================================================
         document.getElementById('publishBtn').addEventListener('click', async function() {
             var title = document.getElementById('editTitle').value.trim();
             var content = editor ? editor.value.trim() : '';
@@ -2708,9 +2667,6 @@
             this.disabled = false;
         });
 
-        // ================================================================
-        // 清空
-        // ================================================================
         document.getElementById('cancelEditBtn').addEventListener('click', function() {
             if (editingIdx >= 0 || (editor && editor.value) || document.getElementById('editTitle').value) {
                 showModal(
@@ -2728,9 +2684,6 @@
             }
         });
 
-        // ================================================================
-        // 保存草稿
-        // ================================================================
         document.getElementById('saveDraftBtn').addEventListener('click', async function() {
             var title = document.getElementById('editTitle').value.trim() || '无标题';
             var content = editor ? editor.value : '';
@@ -2762,9 +2715,6 @@
             this.disabled = false;
         });
 
-        // ================================================================
-        // 筛选/排序/搜索
-        // ================================================================
         document.querySelectorAll('#tabList .filter-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('#tabList .filter-btn').forEach(function(b) { b.classList.remove('active'); });
@@ -2795,9 +2745,6 @@
             document.getElementById('draftBadge').textContent = allDrafts.length;
         }
 
-        // ================================================================
-        // 启动
-        // ================================================================
         fetchMathQuestion();
 
         if (editor) {
