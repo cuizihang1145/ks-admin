@@ -546,6 +546,19 @@
         body.dark .md-toolbar .sep {
             background: rgba(255, 255, 255, 0.08);
         }
+        .md-toolbar .icon-only {
+            opacity: 0.35;
+            padding: 0 6px;
+            font-size: 0.8rem;
+            color: #6a6a92;
+            display: inline-flex;
+            align-items: center;
+            pointer-events: none;
+            user-select: none;
+        }
+        body.dark .md-toolbar .icon-only {
+            color: #9a96b8;
+        }
 
         .md-editor {
             width: 100%;
@@ -643,37 +656,94 @@
         body.dark .preview-area code {
             background: rgba(255, 255, 255, 0.06);
         }
-        .preview-area pre {
-            background: #0d1117;
-            padding: 0;
-            border-radius: 8px;
-            overflow: auto;
-            margin: 0.5rem 0;
+
+        /* ===== 代码块样式（纯展示） ===== */
+        .preview-area .code-block-wrapper {
+            background: #0D1117 !important;
+            border-radius: 12px;
+            margin: 0.8rem 0;
+            overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.06);
         }
-        .preview-area pre .code-lang {
-            display: block;
-            background: rgba(255, 255, 255, 0.06);
-            color: #8b949e;
-            font-size: 0.65rem;
-            font-weight: 600;
-            padding: 0.15rem 0.8rem;
-            border-radius: 4px 4px 0 0;
-            font-family: monospace;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .preview-area .code-block-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 14px;
+            background: rgba(255, 255, 255, 0.04) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+            flex-shrink: 0;
+            min-height: 40px;
+            gap: 10px;
+            flex-wrap: wrap;
         }
-        .preview-area pre code {
+        .preview-area .code-block-header .lang-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #8B949E !important;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-family: 'Inter', sans-serif;
+        }
+        .preview-area .code-block-header .code-stats {
+            font-size: 0.65rem;
+            color: #484F58 !important;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.3px;
+            flex: 1;
+            text-align: center;
+        }
+        .preview-area .code-block-header .code-stats span {
+            margin: 0 2px;
+        }
+        .preview-area .code-block-body-wrapper {
+            overflow: hidden;
+            max-height: 3000px;
+            opacity: 1;
+        }
+        .preview-area .code-block-body {
             display: block;
-            background: transparent;
-            padding: 0.6rem 0.8rem;
-            color: #e6edf3;
-            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            overflow: auto;
+            max-height: 500px;
+            background: #0D1117 !important;
+            border-radius: 0 0 12px 12px;
+            padding: 0.4rem 0;
+            font-size: 0;
+            line-height: 0;
+        }
+        .preview-area .code-block-body .code-line {
+            display: flex;
             font-size: 0.85rem;
             line-height: 1.7;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            color: #E6EDF3;
             white-space: pre;
-            overflow-x: auto;
+            min-height: 1.7em;
+            padding: 0 1.2rem;
         }
+        .preview-area .code-block-body .code-line .line-number {
+            flex-shrink: 0;
+            width: 3.2rem;
+            text-align: right;
+            color: #484F58 !important;
+            user-select: none;
+            padding-right: 0.8rem;
+            border-right: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 0.85rem;
+            line-height: 1.7;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            margin-right: 1.2rem;
+        }
+        .preview-area .code-block-body .code-line .hljs {
+            background: transparent !important;
+            padding: 0 !important;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            flex: 1;
+            white-space: pre;
+        }
+
         .preview-area blockquote {
             border-left: 3px solid #6b5acf;
             padding-left: 0.8rem;
@@ -738,155 +808,6 @@
         }
         body.dark .preview-area a {
             color: #88ccff;
-        }
-
-        /* ===== 预览区代码块样式（完整版） ===== */
-        .preview-area .code-block-wrapper {
-            background: #0D1117 !important;
-            border-radius: 12px;
-            margin: 0.8rem 0;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-        }
-        .preview-area .code-block-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 14px;
-            background: rgba(255, 255, 255, 0.04) !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-            flex-shrink: 0;
-            min-height: 40px;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .preview-area .code-block-header .lang-label {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #8B949E !important;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            font-family: 'Inter', sans-serif;
-        }
-        .preview-area .code-block-header .code-stats {
-            font-size: 0.65rem;
-            color: #484F58 !important;
-            font-family: 'Inter', sans-serif;
-            letter-spacing: 0.3px;
-            flex: 1;
-            text-align: center;
-        }
-        .preview-area .code-block-header .code-stats span {
-            margin: 0 2px;
-        }
-        .preview-area .code-block-header .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            flex-shrink: 0;
-        }
-        .preview-area .code-block-header .copy-btn {
-            background: rgba(255, 255, 255, 0.08) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            border-radius: 6px;
-            padding: 2px 10px;
-            font-size: 0.65rem;
-            font-weight: 500;
-            color: #8B949E !important;
-            cursor: pointer;
-            transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-            font-family: 'Inter', sans-serif;
-            line-height: 1.8;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .preview-area .code-block-header .copy-btn:hover {
-            background: rgba(255, 255, 255, 0.15) !important;
-            color: #E8E6F0 !important;
-        }
-        .preview-area .code-block-header .copy-btn.copied {
-            background: rgba(46, 204, 113, 0.2) !important;
-            color: #2ecc71 !important;
-            border-color: rgba(46, 204, 113, 0.2) !important;
-        }
-        .preview-area .code-block-header .copy-btn i {
-            font-size: 0.7rem;
-        }
-        .preview-area .code-block-header .collapse-btn {
-            width: 28px;
-            height: 28px;
-            border: none;
-            border-radius: 50%;
-            background: transparent;
-            color: #8B949E;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            transition: background 0.2s ease, color 0.2s ease;
-            font-family: 'Inter', sans-serif;
-            padding: 0;
-            flex-shrink: 0;
-            user-select: none;
-        }
-        .preview-area .code-block-header .collapse-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #E8E6F0;
-        }
-        .preview-area .code-block-body-wrapper {
-            overflow: hidden;
-            transition: max-height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
-            max-height: 3000px;
-            opacity: 1;
-        }
-        .preview-area .code-block-wrapper.collapsed .code-block-body-wrapper {
-            max-height: 0 !important;
-            opacity: 0;
-            padding: 0;
-        }
-        .preview-area .code-block-body {
-            display: block;
-            overflow: auto;
-            max-height: 500px;
-            background: #0D1117 !important;
-            border-radius: 0 0 12px 12px;
-            padding: 0.4rem 0;
-            font-size: 0;
-            line-height: 0;
-        }
-        .preview-area .code-block-body .code-line {
-            display: flex;
-            font-size: 0.85rem;
-            line-height: 1.7;
-            font-family: 'JetBrains Mono', 'Courier New', monospace;
-            color: #E6EDF3;
-            white-space: pre;
-            min-height: 1.7em;
-            padding: 0 1.2rem;
-        }
-        .preview-area .code-block-body .code-line .line-number {
-            flex-shrink: 0;
-            width: 3.2rem;
-            text-align: right;
-            color: #484F58 !important;
-            user-select: none;
-            padding-right: 0.8rem;
-            border-right: 1px solid rgba(255, 255, 255, 0.06);
-            font-size: 0.85rem;
-            line-height: 1.7;
-            font-family: 'JetBrains Mono', 'Courier New', monospace;
-            margin-right: 1.2rem;
-        }
-        .preview-area .code-block-body .code-line .hljs {
-            background: transparent !important;
-            padding: 0 !important;
-            font-size: 0.85rem;
-            line-height: 1.7;
-            font-family: 'JetBrains Mono', 'Courier New', monospace;
-            flex: 1;
-            white-space: pre;
         }
 
         .editor-actions {
@@ -1558,8 +1479,8 @@
                             <button data-cmd="codeblock"><i class="fas fa-code"></i></button>
                             <span class="sep"></span>
                             <button data-cmd="quote"><i class="fas fa-quote-left"></i></button>
-                            <button data-cmd="ul"><i class="fas fa-list-ul"></i></button>
-                            <button data-cmd="ol"><i class="fas fa-list-ol"></i></button>
+                            <span class="icon-only"><i class="fas fa-list-ul"></i></span>
+                            <span class="icon-only"><i class="fas fa-list-ol"></i></span>
                             <span class="sep"></span>
                             <button data-cmd="table"><i class="fas fa-table"></i></button>
                             <button data-cmd="hr"><i class="fas fa-minus"></i></button>
@@ -1616,9 +1537,6 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // ================================================================
-        // 数学验证码（后端生成）
-        // ================================================================
         var mathQuestionText = '';
 
         async function fetchMathQuestion() {
@@ -1639,14 +1557,10 @@
             }
         }
 
-        // ================================================================
-        // 主程序
-        // ================================================================
         var STORAGE_KEY = 'admin_logged_in';
         var KEEP_LOGIN_KEY = 'admin_keep_login';
         var TOKEN_KEY = 'admin_token';
 
-        // 主题
         var themeToggle = document.getElementById('themeToggle');
         var themeIcon = document.getElementById('themeIcon');
         var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -1663,7 +1577,6 @@
             setTheme(currentTheme === 'dark' ? 'light' : 'dark');
         });
 
-        // Toast
         var toastEl = document.getElementById('toast');
         var toastTimer = null;
 
@@ -1679,7 +1592,6 @@
             }, 3000);
         }
 
-        // Modal
         var modalOverlay = document.getElementById('modalOverlay');
         var modalIcon = document.getElementById('modalIcon');
         var modalTitle = document.getElementById('modalTitle');
@@ -1714,7 +1626,6 @@
             if (e.target === this) closeModal(false);
         });
 
-        // Login
         var loginScreen = document.getElementById('loginScreen');
         var mainApp = document.getElementById('mainApp');
         var passwordInput = document.getElementById('passwordInput');
@@ -1753,7 +1664,6 @@
             fetchMathQuestion();
         }
 
-        // Token 相关
         function getToken() {
             return localStorage.getItem(TOKEN_KEY) || '';
         }
@@ -1871,7 +1781,6 @@
             loginError.textContent = '';
         });
 
-        // Tabs
         var tabs = document.querySelectorAll('.tab');
         var tabContents = {
             write: document.getElementById('tabWrite'),
@@ -1898,7 +1807,6 @@
             });
         });
 
-        // 字数统计
         function countWords(text) {
             if (!text) return 0;
             var clean = text
@@ -1935,7 +1843,6 @@
         }
         setDefaultDate();
 
-        // Markdown 编辑器
         var mdEditor = document.getElementById('mdEditor');
         var previewArea = document.getElementById('previewArea');
         var publishBtn = document.getElementById('publishBtn');
@@ -1980,7 +1887,6 @@
             updateWordCount();
         }
 
-        // 列表自动延续（修复版）
         function handleListContinuation() {
             var value = mdEditor.value;
             var cursorPos = mdEditor.selectionStart;
@@ -1997,7 +1903,6 @@
             if (lineIndex > lines.length - 1) return false;
             var currentLine = lines[lineIndex] || '';
 
-            // 空列表项检测 - 按回车跳出列表
             var emptyOl = currentLine.match(/^(\s*)(\d+)\.\s*$/);
             var emptyUl = currentLine.match(/^(\s*)([-*])\s*$/);
             if (emptyOl || emptyUl) {
@@ -2039,7 +1944,6 @@
             return false;
         }
 
-        // 工具栏按钮（带容错）
         document.querySelectorAll('#mdToolbar button[data-cmd]').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 try {
@@ -2099,12 +2003,6 @@
                         case 'quote':
                             insertText('> ');
                             break;
-                        case 'ul':
-                            insertText('- ');
-                            break;
-                        case 'ol':
-                            insertText('1. ');
-                            break;
                         case 'table':
                             insertText('\n| 列1 | 列2 | 列3 |\n|-----|-----|-----|\n| 内容 | 内容 | 内容 |\n');
                             break;
@@ -2146,9 +2044,6 @@
             updateWordCount();
         });
 
-        // ================================================================
-        // Markdown 渲染器（完整版）
-        // ================================================================
         function renderMarkdown(md) {
             if (!md) return '';
 
@@ -2269,14 +2164,11 @@
                     codeHtml += '<span class="code-line"><span class="line-number">' + lineNum + '</span><span class="hljs">' + escapedLine + '</span></span>';
                 }
 
+                // 代码块：只有语言标签和统计，没有复制和折叠按钮
                 result += '<div class="code-block-wrapper" id="cbw-' + copyId + '">' +
                     '<div class="code-block-header">' +
                     '<span class="lang-label">' + escapeHtml(lang) + '</span>' +
                     '<span class="code-stats">' + statsHtml + '</span>' +
-                    '<span class="header-actions">' +
-                    '<button class="copy-btn" data-copy="' + copyId + '"><i class="fas fa-copy"></i> 复制</button>' +
-                    '<button class="collapse-btn" data-target="cbw-' + copyId + '"><i class="fas fa-chevron-up"></i></button>' +
-                    '</span>' +
                     '</div>' +
                     '<div class="code-block-body-wrapper">' +
                     '<div class="code-block-body" id="code-body-' + copyId + '">' + codeHtml + '</div>' +
@@ -2570,9 +2462,6 @@
             return result;
         }
 
-        // ================================================================
-        // API 调用
-        // ================================================================
         async function apiCall(endpoint, options) {
             var token = getToken();
             var defaultOptions = {
@@ -2601,9 +2490,6 @@
             return res;
         }
 
-        // ================================================================
-        // 数据
-        // ================================================================
         var allArticles = [];
         var currentFilter = 'all';
         var currentSort = 'desc';
@@ -2663,9 +2549,6 @@
             return div.innerHTML;
         }
 
-        // ================================================================
-        // 文章列表渲染
-        // ================================================================
         function renderArticleList() {
             var list = document.getElementById('articleList');
             var search = document.getElementById('listSearch').value.trim().toLowerCase();
@@ -2750,9 +2633,6 @@
             });
         }
 
-        // ================================================================
-        // 文章操作
-        // ================================================================
         function editArticle(idx) {
             var article = allArticles[idx];
             if (!article) return;
@@ -2855,9 +2735,6 @@
             }
         }
 
-        // ================================================================
-        // 硬删除
-        // ================================================================
         function showHardDeleteModal(idx, title) {
             hardDeleteTarget = idx;
             var descHtml = '你正在执行<strong>硬删除</strong>操作，该文章将从数据中<strong>彻底移除</strong>，无法恢复。<br /><br />输入文章标题 <strong style="color:#e53935;">' + escapeHtml(title) + '</strong> 确认删除：<br /><br /><input type="text" id="hardDeleteConfirmInput" placeholder="输入文章标题..." style="width:100%;padding:0.6rem 1rem;border-radius:60px;border:2px solid #e53935;font-size:0.9rem;font-family:inherit;background:rgba(255,255,255,0.5);color:#1a1a2e;text-align:center;outline:none;" />';
@@ -2910,9 +2787,6 @@
             }
         }
 
-        // ================================================================
-        // 草稿箱
-        // ================================================================
         function renderDraftList() {
             var list = document.getElementById('draftList');
             if (allDrafts.length === 0) {
@@ -3021,9 +2895,6 @@
             }
         }
 
-        // ================================================================
-        // 发布 / 更新
-        // ================================================================
         document.getElementById('publishBtn').addEventListener('click', async function() {
             var title = document.getElementById('editTitle').value.trim();
             var content = mdEditor.value.trim();
@@ -3177,9 +3048,6 @@
             this.disabled = false;
         });
 
-        // ================================================================
-        // 筛选 / 搜索 / 排序
-        // ================================================================
         document.querySelectorAll('#tabList .filter-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('#tabList .filter-btn').forEach(function(b) { b.classList.remove('active'); });
@@ -3210,9 +3078,6 @@
             document.getElementById('draftBadge').textContent = allDrafts.length;
         }
 
-        // ================================================================
-        // 启动
-        // ================================================================
         fetchMathQuestion();
 
         if (!checkLogin()) {
