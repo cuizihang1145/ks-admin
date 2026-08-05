@@ -1530,7 +1530,7 @@
     <script src="/libs/marked.min.js"></script>
     <script src="/libs/DOMPurify.min.js"></script>
     <script>
-        // ========== 登录相关（完全恢复你原来的逻辑） ==========
+        // ========== 登录（原始版本，完全未改） ==========
         var mathQuestionText = '';
 
         async function fetchMathQuestion() {
@@ -1812,7 +1812,7 @@
             showToast('已安全退出');
         });
 
-        // ========== 文章+说说双模式（完全保留，未改动） ==========
+        // ========== 文章+说说双模式（完整功能） ==========
         var currentMode = 'article';
         var editingIdx = -1;
         var previousVersion = null;
@@ -2094,10 +2094,6 @@
             updateWordCount();
         }
 
-        function getToken() {
-            return localStorage.getItem(TOKEN_KEY) || '';
-        }
-
         async function apiCall(endpoint, options) {
             var token = getToken();
             var defaultOptions = {
@@ -2201,7 +2197,7 @@
                     var l = (a.location || '').toLowerCase();
                     var tg = (a.tags || []).join(' ').toLowerCase();
                     return c.indexOf(search) !== -1 || t.indexOf(search) !== -1 || l.indexOf(search) !== -1 || tg.indexOf(
-                    search) !== -1;
+                        search) !== -1;
                 });
             }
 
@@ -2282,10 +2278,34 @@
             });
         }
 
+        // ===== 编辑时自动切换模式 =====
         function loadToEditor(idx) {
             var data = getCurrentData();
             var item = data[idx];
             if (!item) return;
+
+            // 根据当前模式切换 UI
+            var targetMode = currentMode;
+            document.querySelectorAll('.mode-btn').forEach(function(b) {
+                if (b.dataset.mode === targetMode) {
+                    b.classList.add('active');
+                    b.style.background = 'rgba(255,255,255,.6)';
+                    b.style.color = '#3d2d8a';
+                } else {
+                    b.classList.remove('active');
+                    b.style.background = 'transparent';
+                    b.style.color = '#6a6a92';
+                }
+            });
+
+            // 显示/隐藏对应字段
+            document.querySelectorAll('.article-only').forEach(function(el) {
+                el.style.display = targetMode === 'article' ? '' : 'none';
+            });
+            document.querySelectorAll('.shuoshuo-only').forEach(function(el) {
+                el.style.display = targetMode === 'shuoshuo' ? '' : 'none';
+            });
+
             editingIdx = idx;
             if (currentMode === 'article') {
                 editTitle.value = item.title || '';
@@ -2306,6 +2326,7 @@
             showToast('已加载');
         }
 
+        // ===== 软删除 + 刷新 =====
         async function softDeleteItem(idx) {
             var result = await showModal(
                 '<i class="fas fa-trash-alt"></i>',
@@ -2334,6 +2355,7 @@
             }
         }
 
+        // ===== 恢复 =====
         async function restoreItem(idx) {
             try {
                 var res = await apiCall(getCurrentEndpoint(), {
@@ -2354,6 +2376,7 @@
             }
         }
 
+        // ===== 撤销 =====
         async function undoItem(idx) {
             if (!previousVersion || previousVersion.idx !== idx) {
                 showToast('没有可撤销的版本', true);
@@ -2400,10 +2423,13 @@
             }
         }
 
+        // ===== 硬删除：固定确认语 + 二次确认 =====
         function showHardDeleteModal(idx, title) {
             hardDeleteTarget = idx;
-            var descHtml = '你正在执行<strong>硬删除</strong>操作，该内容将从数据中<strong>彻底移除</strong>，无法恢复。<br /><br />输入内容标题 <strong style="color:#e53935;">' +
-                escapeHtml(title) + '</strong> 确认删除：<br /><br /><input type="text" id="hardDeleteConfirmInput" placeholder="输入标题..." style="width:100%;padding:.6rem 1rem;border-radius:60px;border:2px solid #e53935;font-size:.9rem;font-family:inherit;background:rgba(255,255,255,.5);color:#1a1a2e;text-align:center;outline:none;">';
+            var typeLabel = currentMode === 'article' ? '文章' : '说说';
+            var expected = currentMode === 'article' ? '我确定删除这篇文章' : '我确定删除这篇说说';
+            var descHtml = '你正在执行<strong>硬删除</strong>操作，该内容将从数据中<strong>彻底移除</strong>，无法恢复。<br /><br />输入 <strong style="color:#e53935;">' +
+                expected + '</strong> 确认删除：<br /><br /><input type="text" id="hardDeleteConfirmInput" placeholder="输入确认语..." style="width:100%;padding:.6rem 1rem;border-radius:60px;border:2px solid #e53935;font-size:.9rem;font-family:inherit;background:rgba(255,255,255,.5);color:#1a1a2e;text-align:center;outline:none;">';
             showModal(
                 '<i class="fas fa-exclamation-triangle"></i>',
                 '危险操作',
@@ -2413,10 +2439,20 @@
             ).then(async function(confirmed) {
                 if (confirmed) {
                     var confirmInput = document.getElementById('hardDeleteConfirmInput');
-                    if (confirmInput && confirmInput.value.trim() === title) {
-                        await confirmHardDelete();
+                    if (confirmInput && confirmInput.value.trim() === expected) {
+                        // 二次确认
+                        var secondConfirm = await showModal(
+                            '<i class="fas fa-exclamation-circle"></i>',
+                            '二次确认',
+                            '你真的确定要彻底删除吗？删除后无法恢复！',
+                            '确定删除',
+                            'btn-confirm'
+                        );
+                        if (secondConfirm) {
+                            await confirmHardDelete();
+                        }
                     } else {
-                        showToast('标题输入不正确，取消删除', true);
+                        showToast('确认语输入不正确，取消删除', true);
                     }
                 }
                 hardDeleteTarget = -1;
@@ -2446,6 +2482,7 @@
             }
         }
 
+        // ===== 草稿箱：区分类型，自动切换模式 =====
         function renderDraftList() {
             var list = document.getElementById('draftList');
             if (allDrafts.length === 0) {
@@ -2459,7 +2496,8 @@
                 var tagsHtml = (draft.tags || []).map(function(t) {
                     return '<span class="tag">' + escapeHtml(t) + '</span>';
                 }).join(' ');
-                var typeLabel = draft.type === 'shuoshuo' ? '<i class="fas fa-comment"></i> 说说草稿' :
+                var typeLabel = draft.type === 'shuoshuo' ?
+                    '<i class="fas fa-comment"></i> 说说草稿' :
                     '<i class="fas fa-file-alt"></i> 文章草稿';
                 html += '<div class="draft-item">' +
                     '<div class="draft-info">' +
@@ -2486,11 +2524,13 @@
                     var id = this.dataset.id;
                     var draft = allDrafts.find(function(d) { return d.id === id; });
                     if (draft) {
+                        // 根据草稿类型切换模式
                         if (draft.type === 'shuoshuo') {
                             document.querySelector('.mode-btn[data-mode="shuoshuo"]').click();
                         } else {
                             document.querySelector('.mode-btn[data-mode="article"]').click();
                         }
+                        // 填充内容
                         editTitle.value = draft.title || '';
                         editLocation.value = draft.location || '';
                         editDateInput.value = draft.date || '';
@@ -2575,6 +2615,7 @@
             }
         }
 
+        // ===== 加载全部 & 刷新徽章 =====
         async function loadAll() {
             await loadArticles();
             await loadShuoshuo();
@@ -2590,6 +2631,7 @@
             document.getElementById('draftBadge').textContent = allDrafts.length;
         }
 
+        // ===== 模式切换 =====
         document.querySelectorAll('.mode-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.mode-btn').forEach(function(b) {
@@ -2614,6 +2656,7 @@
             });
         });
 
+        // ===== 发布/更新 =====
         document.getElementById('publishBtn').addEventListener('click', async function() {
             var content = editor ? editor.value.trim() : '';
             if (!content) {
@@ -2660,6 +2703,7 @@
             this.disabled = false;
         });
 
+        // ===== 保存草稿（带 location 和 type） =====
         document.getElementById('saveDraftBtn').addEventListener('click', async function() {
             var content = editor ? editor.value : '';
             if (!content) {
@@ -2674,8 +2718,14 @@
             try {
                 var res = await apiCall('drafts', {
                     method: 'POST',
-                    body: JSON.stringify({ title: title, content: content, tags: tags, date: date, location: location,
-                        type: currentMode })
+                    body: JSON.stringify({
+                        title: title,
+                        content: content,
+                        tags: tags,
+                        date: date,
+                        location: location,
+                        type: currentMode
+                    })
                 });
                 var data = await res.json();
                 if (data.success) {
@@ -2709,10 +2759,11 @@
             }
         });
 
+        // ===== 列表筛选和排序 =====
         document.querySelectorAll('#tabList .filter-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('#tabList .filter-btn').forEach(function(b) { b.classList.remove(
-                    'active'); });
+                        'active'); });
                 this.classList.add('active');
                 currentFilter = this.dataset.filter;
                 renderUnifiedList();
@@ -2735,6 +2786,7 @@
             renderUnifiedList();
         });
 
+        // ===== Tab 切换 =====
         var tabs = document.querySelectorAll('.tab');
         var tabContents = {
             write: document.getElementById('tabWrite'),
@@ -2758,6 +2810,7 @@
             });
         });
 
+        // ===== 初始化 =====
         setDefaultDate();
         if (editor) {
             updatePreview();
