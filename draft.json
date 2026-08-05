@@ -10,6 +10,17 @@
       "date": "2026-08-05",
       "created": "2026-08-05T12:50:26.726Z",
       "updated": "2026-08-05T12:50:26.726Z"
+    },
+    {
+      "id": "msg3575z6d8r",
+      "title": "测试",
+      "content": "!video[`<u>***~~视频~~***</u>`](https://www.bilibili.com/video/BV1GJ411x7h7)\n---\n!video[🤔](https://www.bilibili.com/video/BV1xx411c79H)",
+      "tags": [
+        "测试"
+      ],
+      "date": "2026-07-29",
+      "created": "2026-08-05T12:50:55.751Z",
+      "updated": "2026-08-05T12:50:55.751Z"
     }
   ]
 }
