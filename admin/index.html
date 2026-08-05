@@ -1684,6 +1684,7 @@
             return false;
         }
 
+        // ===== 修复后的 doLogin（使用 headers） =====
         async function doLogin() {
             var inviteCode = inviteCodeInput.value.trim();
             var pwd = passwordInput.value.trim();
@@ -1725,14 +1726,14 @@
                 var res = await fetch('/api/auth', {
                     method: 'POST',
                     headers: {
+                        'X-Invite-Code': inviteCode,
+                        'X-Admin-Password': pwd,
+                        'X-Math-Answer': String(userAnswer),
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        inviteCode: inviteCode,
-                        password: pwd,
-                        mathAnswer: userAnswer
-                    })
+                    body: JSON.stringify({})
                 });
+
                 var data = await res.json();
 
                 if (data.error && data.error.includes('数学题')) {
