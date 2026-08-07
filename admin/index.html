@@ -1700,9 +1700,9 @@
     });
     var currentMode = 'article';
     var editingIdx = -1;
-    var previousVersion = null;
     var hardDeleteTarget = -1;
     var EXPIRE_TIME = 48 * 60 * 60 * 1000;
+    var UNDO_PREFIX = 'undo_backup_';
     var allArticles = [];
     var allShuoshuo = [];
     var allDrafts = [];
@@ -1957,6 +1957,25 @@
     function getCurrentEndpoint() {
       return currentMode === 'article' ? 'posts' : 'shuoshuo';
     }
+    function getUndoKey(mode, idx) {
+      return UNDO_PREFIX + mode + '_' + idx;
+    }
+    function getUndoBackup(mode, idx) {
+      var key = getUndoKey(mode, idx);
+      var raw = localStorage.getItem(key);
+      if (!raw) return null;
+      try {
+        var backup = JSON.parse(raw);
+        if (Date.now() - backup.savedAt >= EXPIRE_TIME) {
+          localStorage.removeItem(key);
+          return null;
+        }
+        return backup;
+      } catch (e) {
+        localStorage.removeItem(key);
+        return null;
+      }
+    }
     function setDefaultDate() {
       if (!editDateText.value) {
         var today = new Date().toISOString().slice(0, 10);
@@ -2043,16 +2062,19 @@
         var metaParts = [item.date || ''];
         if (currentMode === 'shuoshuo' && item.location) metaParts.push('<i class="fas fa-map-marker-alt"></i> ' + escapeHtml(item.location));
         var metaHtml = metaParts.join(' · ') + ' ' + tagsHtml + ' ' + statusHtml;
+        var actionsHtml = '<button class="btn-edit" data-idx="' + idx + '">编辑</button>' +
+          (item.delete ? '<button class="btn-restore" data-idx="' + idx + '">恢复</button>' : '<button class="btn-soft-delete" data-idx="' + idx + '">删除</button>') +
+          '<button class="btn-hard-delete" data-idx="' + idx + '" data-title="' + (currentMode === 'article' ? escapeHtml(item.title || '无标题') : escapeHtml((item.content || '').slice(0, 30))) + '">硬删</button>';
+        var undoBackup = getUndoBackup(currentMode, idx);
+        if (undoBackup) {
+          actionsHtml += '<button class="btn-undo" data-idx="' + idx + '">撤销修改</button>';
+        }
         html += '<div class="article-item-admin ' + deletedClass + '">' +
           '<div class="item-info">' +
           '<div class="item-title">' + displayTitle + '</div>' +
           '<div class="item-meta">' + metaHtml + '</div>' +
           '</div>' +
-          '<div class="item-actions">' +
-          '<button class="btn-edit" data-idx="' + idx + '">编辑</button>' +
-          (item.delete ? '<button class="btn-restore" data-idx="' + idx + '">恢复</button>' : '<button class="btn-soft-delete" data-idx="' + idx + '">删除</button>') +
-          '<button class="btn-hard-delete" data-idx="' + idx + '" data-title="' + (currentMode === 'article' ? escapeHtml(item.title || '无标题') : escapeHtml((item.content || '').slice(0, 30))) + '">硬删</button>' +
-          '</div>' +
+          '<div class="item-actions">' + actionsHtml + '</div>' +
           '</div>';
       });
       list.innerHTML = html;
@@ -2182,40 +2204,39 @@
       }
     }
     async function undoItem(idx) {
-      if (!previousVersion || previousVersion.idx !== idx) {
+      var backup = getUndoBackup(currentMode, idx);
+      if (!backup) {
         showToast('没有可撤销的版本', true);
         return;
       }
-      var elapsed = Date.now() - previousVersion.savedAt;
-      if (elapsed >= EXPIRE_TIME) {
-        showToast('撤销已过期（超过48小时）', true);
-        previousVersion = null;
-        renderUnifiedList();
-        return;
-      }
+      var displayTitle = currentMode === 'article' ? (backup.title || '无标题') : (backup.content || '').slice(0, 50);
       var result = await showModal(
         '<i class="fas fa-undo-alt"></i>',
         '撤销修改',
-        '确定要撤销对 <strong>' + escapeHtml(previousVersion.title) + '</strong> 的修改吗？<br />将恢复到修改前的版本。',
+        '确定要撤销对 <strong>' + escapeHtml(displayTitle) + '</strong> 的修改吗？<br />将恢复到修改前的版本。',
         '确认撤销',
         'btn-confirm-warning'
       );
       if (!result) return;
       try {
+        var body = {
+          id: idx,
+          title: backup.title || '',
+          content: backup.content || '',
+          tags: backup.tags || [],
+          date: backup.date || ''
+        };
+        if (currentMode === 'shuoshuo' && backup.location) {
+          body.location = backup.location;
+        }
         var res = await apiCall(getCurrentEndpoint(), {
           method: 'PUT',
-          body: JSON.stringify({
-            id: idx,
-            title: previousVersion.title,
-            content: previousVersion.content,
-            tags: previousVersion.tags,
-            date: previousVersion.date
-          })
+          body: JSON.stringify(body)
         });
         var data = await res.json();
         if (data.success) {
           showToast('已撤销');
-          previousVersion = null;
+          localStorage.removeItem(getUndoKey(currentMode, idx));
           await loadAll();
           renderUnifiedList();
           updateBadges();
@@ -2260,6 +2281,7 @@
     async function confirmHardDelete() {
       if (hardDeleteTarget === -1) return;
       try {
+        localStorage.removeItem(getUndoKey(currentMode, hardDeleteTarget));
         var data = getCurrentData();
         data.splice(hardDeleteTarget, 1);
         var res = await apiCall(getCurrentEndpoint(), {
@@ -2480,7 +2502,21 @@
         var location = editLocation.value.trim();
         if (location) body.location = location;
       }
-      if (editingIdx >= 0) body.id = editingIdx;
+      if (editingIdx >= 0) {
+        body.id = editingIdx;
+        var oldItem = getCurrentData()[editingIdx];
+        if (oldItem) {
+          var backup = {
+            title: oldItem.title || '',
+            content: oldItem.content || '',
+            tags: oldItem.tags || [],
+            date: oldItem.date || '',
+            location: oldItem.location || '',
+            savedAt: Date.now()
+          };
+          localStorage.setItem(getUndoKey(currentMode, editingIdx), JSON.stringify(backup));
+        }
+      }
       this.disabled = true;
       try {
         var res = await apiCall(getCurrentEndpoint(), {
@@ -2643,5 +2679,6 @@
     });
   </script>
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"91fbf2e723a14893b836d95ba4694dbf","r":1}' crossorigin="anonymous"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"91fbf2e723a14893b836d95ba4694dbf","r":1}' crossorigin="anonymous"></script>
 </body>
 </html>
