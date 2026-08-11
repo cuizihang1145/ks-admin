@@ -46,7 +46,7 @@ export default async function handler(req, res) {
         delete: false,
         content: content.trim()
       };
-      shuoshuo.unshift(newItem); // 最新在前
+      shuoshuo.push(newItem); // ？傻逼ai 在最前面id不都自动变成0然后窜评论了吗 气死我了
       await writeFile(MAIN_REPO, 'shuoshuo.json', shuoshuo, sha, `发布说说：${content.trim().slice(0, 20)}...`);
       return res.status(200).json({ success: true, message: '发布成功', id: 0 });
     }
