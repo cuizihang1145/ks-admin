@@ -314,6 +314,7 @@ var allArticles = [];
 var allShuoshuo = [];
 var allDrafts = [];
 var allFriends = [];
+var allDeletedFriends = [];
 var currentFilter = 'all';
 var currentSort = 'desc';
 var EXPIRE_TIME = 48 * 60 * 60 * 1000;
@@ -620,29 +621,34 @@ function clearEditor() {
   setDefaultDate();
 }
 
-function loadFriendList() {
-  return apiCall('friends', { method: 'GET' })
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-      allFriends = data || [];
-      renderUnifiedList();
-      updateBadges();
-    })
-    .catch(function() {
-      allFriends = [];
-      renderUnifiedList();
-      updateBadges();
-    });
-}
-
-function getDeletedFriendIds() {
+function getDeletedFriends() {
   return getState('deleted_friends').then(function(data) {
     return data || [];
   });
 }
 
-function setDeletedFriendIds(ids) {
-  return setState('deleted_friends', ids);
+function setDeletedFriends(data) {
+  return setState('deleted_friends', data);
+}
+
+function loadFriendList() {
+  return apiCall('friends', { method: 'GET' })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      allFriends = data || [];
+      return getDeletedFriends();
+    })
+    .then(function(deleted) {
+      allDeletedFriends = deleted || [];
+      renderUnifiedList();
+      updateBadges();
+    })
+    .catch(function() {
+      allFriends = [];
+      allDeletedFriends = [];
+      renderUnifiedList();
+      updateBadges();
+    });
 }
 
 function renderUnifiedList() {
@@ -650,38 +656,64 @@ function renderUnifiedList() {
   var search = document.getElementById('listSearch').value.trim().toLowerCase();
 
   if (currentMode === 'friend') {
-    getDeletedFriendIds().then(function(deletedIds) {
-      var filtered = allFriends.slice();
-      if (search) {
-        filtered = filtered.filter(function(f) {
-          var name = (f.name || '').toLowerCase();
-          var url = (f.url || '').toLowerCase();
-          return name.indexOf(search) !== -1 || url.indexOf(search) !== -1;
-        });
-      }
-      document.getElementById('listCount').textContent = filtered.length + ' 项';
-      if (filtered.length === 0) {
-        list.innerHTML = '<div class="empty">没有友链</div>';
-        return;
-      }
-      var html = '';
-      filtered.forEach(function(friend) {
-        var originalIdx = allFriends.indexOf(friend);
-        var isDeleted = deletedIds.indexOf(originalIdx) !== -1;
-        var deletedClass = isDeleted ? 'deleted' : '';
-        var actionsHtml = '';
-        if (isDeleted) {
-          actionsHtml += '<button class="btn-restore-friend" data-idx="' + originalIdx + '">恢复</button>';
-          actionsHtml += '<button class="btn-delete-record" data-idx="' + originalIdx + '">删除记录</button>';
-        } else {
-          actionsHtml += '<button class="btn-edit-friend" data-idx="' + originalIdx + '">编辑</button>';
-          actionsHtml += '<button class="btn-delete-friend" data-idx="' + originalIdx + '" data-name="' + escapeHtml(friend.name) + '">删除</button>';
-        }
-        html += '<div class="article-item-admin ' + deletedClass + '"><div class="item-info"><div class="item-title">' + escapeHtml(friend.name) + '</div><div class="item-meta"><span>' + escapeHtml(friend.url) + '</span></div></div><div class="item-actions">' + actionsHtml + '</div></div>';
-      });
-      list.innerHTML = html;
-      bindFriendEvents(list);
+    var allItems = [];
+    var deletedKeys = {};
+
+    allDeletedFriends.forEach(function(f) {
+      var key = f.name + '|' + f.url;
+      deletedKeys[key] = true;
     });
+
+    allFriends.forEach(function(f) {
+      var key = f.name + '|' + f.url;
+      if (!deletedKeys[key]) {
+        allItems.push({ data: f, deleted: false });
+      }
+    });
+
+    allDeletedFriends.forEach(function(f) {
+      var key = f.name + '|' + f.url;
+      var exists = allFriends.some(function(af) { return (af.name + '|' + af.url) === key; });
+      if (exists) {
+        allItems.push({ data: f, deleted: true });
+      } else {
+        allItems.push({ data: f, deleted: true });
+      }
+    });
+
+    var filtered = allItems;
+    if (search) {
+      filtered = filtered.filter(function(item) {
+        var name = (item.data.name || '').toLowerCase();
+        var url = (item.data.url || '').toLowerCase();
+        return name.indexOf(search) !== -1 || url.indexOf(search) !== -1;
+      });
+    }
+
+    document.getElementById('listCount').textContent = filtered.length + ' 项';
+    if (filtered.length === 0) {
+      list.innerHTML = '<div class="empty">没有友链</div>';
+      return;
+    }
+
+    var html = '';
+    filtered.forEach(function(item) {
+      var friend = item.data;
+      var isDeleted = item.deleted;
+      var deletedClass = isDeleted ? 'deleted' : '';
+      var actionsHtml = '';
+      if (isDeleted) {
+        actionsHtml += '<button class="btn-restore-friend" data-name="' + escapeHtml(friend.name) + '" data-url="' + escapeHtml(friend.url) + '" data-desc="' + escapeHtml(friend.desc || '') + '" data-logo="' + escapeHtml(friend.logo || '') + '" data-feed="' + escapeHtml(friend.feed || '') + '">恢复</button>';
+        actionsHtml += '<button class="btn-delete-record" data-name="' + escapeHtml(friend.name) + '" data-url="' + escapeHtml(friend.url) + '">删除记录</button>';
+      } else {
+        var idx = allFriends.indexOf(friend);
+        actionsHtml += '<button class="btn-edit-friend" data-idx="' + idx + '">编辑</button>';
+        actionsHtml += '<button class="btn-delete-friend" data-idx="' + idx + '" data-name="' + escapeHtml(friend.name) + '" data-url="' + escapeHtml(friend.url) + '" data-desc="' + escapeHtml(friend.desc || '') + '" data-logo="' + escapeHtml(friend.logo || '') + '" data-feed="' + escapeHtml(friend.feed || '') + '">删除</button>';
+      }
+      html += '<div class="article-item-admin ' + deletedClass + '"><div class="item-info"><div class="item-title">' + escapeHtml(friend.name) + '</div><div class="item-meta"><span>' + escapeHtml(friend.url) + '</span></div></div><div class="item-actions">' + actionsHtml + '</div></div>';
+    });
+    list.innerHTML = html;
+    bindFriendEvents(list);
     return;
   }
 
@@ -740,23 +772,35 @@ function bindFriendEvents(list) {
       editFriend(idx);
     });
   });
+
   list.querySelectorAll('.btn-delete-friend').forEach(function(btn) {
     btn.addEventListener('click', function() {
       var idx = parseInt(this.dataset.idx);
       var name = this.dataset.name;
-      deleteFriendWithConfirm(idx, name);
+      var url = this.dataset.url;
+      var desc = this.dataset.desc;
+      var logo = this.dataset.logo;
+      var feed = this.dataset.feed;
+      deleteFriendWithConfirm(idx, name, url, desc, logo, feed);
     });
   });
+
   list.querySelectorAll('.btn-restore-friend').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      var idx = parseInt(this.dataset.idx);
-      restoreFriend(idx);
+      var name = this.dataset.name;
+      var url = this.dataset.url;
+      var desc = this.dataset.desc;
+      var logo = this.dataset.logo;
+      var feed = this.dataset.feed;
+      restoreFriend(name, url, desc, logo, feed);
     });
   });
+
   list.querySelectorAll('.btn-delete-record').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      var idx = parseInt(this.dataset.idx);
-      deleteFriendRecord(idx);
+      var name = this.dataset.name;
+      var url = this.dataset.url;
+      deleteFriendRecord(name, url);
     });
   });
 }
@@ -777,86 +821,103 @@ function editFriend(idx) {
   showToast('已加载友链，修改后点击更新');
 }
 
-function deleteFriendWithConfirm(idx, name) {
-  getDeletedFriendIds().then(function(deletedIds) {
-    if (deletedIds.indexOf(idx) !== -1) {
-      showToast('这条友链已删除', true);
-      return;
-    }
-    var confirmText = '我确定删除这条友链';
-    var descHtml = '输入 <strong style="color:#e53935;">' + confirmText + '</strong> 确认删除：<br><br><input type="text" id="deleteConfirmInput" placeholder="输入确认语..." style="width:100%;padding:.6rem 1rem;border-radius:60px;border:2px solid #e53935;font-size:.9rem;font-family:inherit;background:rgba(255,255,255,.5);color:#1a1a2e;text-align:center;outline:none;">';
-    showModal(
-      '<i class="fas fa-exclamation-triangle"></i>',
-      '删除友链',
-      descHtml,
-      '确认删除',
-      'btn-confirm'
-    ).then(function(confirmed) {
-      if (!confirmed) return;
-      var input = document.getElementById('deleteConfirmInput');
-      if (!input || input.value.trim() !== confirmText) {
-        showToast('确认语输入不正确', true);
-        return;
-      }
-      showModal(
-        '<i class="fas fa-exclamation-circle"></i>',
-        '二次确认',
-        '你真的确定要删除友链 <strong>' + escapeHtml(name) + '</strong> 吗？',
-        '确定删除',
-        'btn-confirm'
-      ).then(function(secondConfirmed) {
-        if (!secondConfirmed) return;
-        apiCall('friends', {
-          method: 'DELETE',
-          body: JSON.stringify({ id: idx })
-        })
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-          if (data.success) {
-            getDeletedFriendIds().then(function(ids) {
-              if (ids.indexOf(idx) === -1) {
-                ids.push(idx);
-                setDeletedFriendIds(ids).then(function() {
-                  showToast('已删除');
-                  loadFriendList();
-                });
-              } else {
-                showToast('已删除');
-                loadFriendList();
-              }
-            });
-          } else {
-            showToast(data.error || '删除失败', true);
-          }
-        })
-        .catch(function() { showToast('删除失败', true); });
-      });
-    });
-  });
-}
-
-function restoreFriend(idx) {
-  getDeletedFriendIds().then(function(deletedIds) {
-    var newIds = deletedIds.filter(function(id) { return id !== idx; });
-    setDeletedFriendIds(newIds).then(function() {
-      showToast('已恢复');
-      loadFriendList();
-    });
-  });
-}
-
-function deleteFriendRecord(idx) {
+function deleteFriendWithConfirm(idx, name, url, desc, logo, feed) {
+  var confirmText = '我确定删除这条友链';
+  var descHtml = '输入 <strong style="color:#e53935;">' + confirmText + '</strong> 确认删除：<br><br><input type="text" id="deleteConfirmInput" placeholder="输入确认语..." style="width:100%;padding:.6rem 1rem;border-radius:60px;border:2px solid #e53935;font-size:.9rem;font-family:inherit;background:rgba(255,255,255,.5);color:#1a1a2e;text-align:center;outline:none;">';
   showModal(
-    '<i class="fas fa-trash-alt"></i>',
-    '删除记录',
-    '确定要删除友链的恢复记录吗？<br>删除后该友链将无法通过"恢复"按钮找回。',
+    '<i class="fas fa-exclamation-triangle"></i>',
+    '删除友链',
+    descHtml,
     '确认删除',
     'btn-confirm'
   ).then(function(confirmed) {
     if (!confirmed) return;
-    getDeletedFriendIds().then(function(deletedIds) {
-      var newIds = deletedIds.filter(function(id) { return id !== idx; });
-      setDeletedFriendIds(newIds).then(function() {
+    var input = document.getElementById('deleteConfirmInput');
+    if (!input || input.value.trim() !== confirmText) {
+      showToast('确认语输入不正确', true);
+      return;
+    }
+    showModal(
+      '<i class="fas fa-exclamation-circle"></i>',
+      '二次确认',
+      '你真的确定要删除友链 <strong>' + escapeHtml(name) + '</strong> 吗？',
+      '确定删除',
+      'btn-confirm'
+    ).then(function(secondConfirmed) {
+      if (!secondConfirmed) return;
+      apiCall('friends', {
+        method: 'DELETE',
+        body: JSON.stringify({ id: idx })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data.success) {
+          var backup = { name: name, url: url, desc: desc, logo: logo, feed: feed };
+          getDeletedFriends().then(function(list) {
+            var exists = list.some(function(f) { return f.name === name && f.url === url; });
+            if (!exists) {
+              list.push(backup);
+              setDeletedFriends(list).then(function() {
+                showToast('已删除');
+                loadFriendList();
+              });
+            } else {
+              showToast('已删除');
+              loadFriendList();
+            }
+          });
+        } else {
+          showToast(data.error || '删除失败', true);
+        }
+      })
+      .catch(function() { showToast('删除失败', true); });
+    });
+  });
+}
+
+function restoreFriend(name, url, desc, logo, feed) {
+  showModal(
+    '<i class="fas fa-undo-alt"></i>',
+    '恢复友链',
+    '确定要恢复友链 <strong>' + escapeHtml(name) + '</strong> 吗？',
+    '确认恢复',
+    'btn-confirm-primary'
+  ).then(function(confirmed) {
+    if (!confirmed) return;
+    apiCall('friends', {
+      method: 'POST',
+      body: JSON.stringify({ name: name, url: url, desc: desc, logo: logo, feed: feed })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      if (data.success) {
+        getDeletedFriends().then(function(list) {
+          var newList = list.filter(function(f) { return !(f.name === name && f.url === url); });
+          setDeletedFriends(newList).then(function() {
+            showToast('已恢复');
+            loadFriendList();
+          });
+        });
+      } else {
+        showToast(data.error || '恢复失败', true);
+      }
+    })
+    .catch(function() { showToast('恢复失败', true); });
+  });
+}
+
+function deleteFriendRecord(name, url) {
+  showModal(
+    '<i class="fas fa-trash-alt"></i>',
+    '删除恢复记录',
+    '确定要删除友链 <strong>' + escapeHtml(name) + '</strong> 的恢复记录吗？<br>删除后将无法通过"恢复"按钮找回。',
+    '确认删除',
+    'btn-confirm'
+  ).then(function(confirmed) {
+    if (!confirmed) return;
+    getDeletedFriends().then(function(list) {
+      var newList = list.filter(function(f) { return !(f.name === name && f.url === url); });
+      setDeletedFriends(newList).then(function() {
         showToast('记录已删除');
         loadFriendList();
       });
@@ -1565,7 +1626,7 @@ function updateBadges() {
   var total;
   if (currentMode === 'article') total = allArticles.length;
   else if (currentMode === 'shuoshuo') total = allShuoshuo.length;
-  else total = allFriends.length;
+  else total = allFriends.length + allDeletedFriends.length;
   document.getElementById('listBadge').textContent = total;
   document.getElementById('draftBadge').textContent = allDrafts.length;
 }
