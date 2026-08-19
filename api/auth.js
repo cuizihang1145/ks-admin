@@ -1,8 +1,14 @@
 // api/auth.js
 const crypto = require('crypto');
+
+// 存储失败尝试记录（内存缓存，重启丢失）
 const failedAttempts = {};
+// 存储数学题会话（内存缓存）
 const mathSessions = {};
 
+/**
+ * 生成一道数学题（结果在 10~99 之间）
+ */
 function generateMathQuestion() {
   let a, b, answer, op, question;
   const operators = ['+', '-'];
@@ -21,7 +27,7 @@ function generateMathQuestion() {
       question = a + ' + ' + b + ' = ?';
     } else {
       if (a < b) {
-        var temp = a;
+        const temp = a;
         a = b;
         b = temp;
       }
@@ -38,6 +44,9 @@ function generateMathQuestion() {
   return { question, answer };
 }
 
+/**
+ * 生成带签名的 Token（HMAC-SHA256）
+ */
 function generateToken(payload) {
   const secret = process.env.TOKEN_SECRET || 'ks-admin-secret-key-change-me';
   const payloadBase64 = Buffer.from(JSON.stringify(payload)).toString('base64');
@@ -45,34 +54,56 @@ function generateToken(payload) {
   return payloadBase64 + '.' + signature;
 }
 
+/**
+ * 验证 Token 是否有效（可选中间件用）
+ */
+function verifyToken(token) {
+  const secret = process.env.TOKEN_SECRET || 'ks-admin-secret-key-change-me';
+  const parts = token.split('.');
+  if (parts.length !== 2) return null;
+  const [payloadBase64, signature] = parts;
+  const expectedSignature = crypto.createHmac('sha256', secret).update(payloadBase64).digest('hex');
+  if (signature !== expectedSignature) return null;
+  try {
+    const payload = JSON.parse(Buffer.from(payloadBase64, 'base64').toString('utf-8'));
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
+// ==================== 主处理函数 ====================
+
 export default async function handler(req, res) {
-  // GET：获取数学题
+  // ---------- GET：获取数学题 ----------
   if (req.method === 'GET') {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
     const { question, answer } = generateMathQuestion();
     mathSessions[ip] = {
       answer: answer,
-      expires: Date.now() + 5 * 60 * 1000
+      expires: Date.now() + 5 * 60 * 1000 // 5分钟有效期
     };
-    return res.status(200).json({ question: question });
+    return res.status(200).json({ question });
   }
 
+  // 仅允许 POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: '方法不允许' });
   }
 
+  // ---------- 获取客户端信息 ----------
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
   const now = Date.now();
 
-  // 后端限流
+  // ---------- 后端限流（15分钟锁） ----------
   if (failedAttempts[ip] && failedAttempts[ip].lockedUntil > now) {
     const remaining = Math.ceil((failedAttempts[ip].lockedUntil - now) / 60000);
     return res.status(429).json({
-      error: '尝试次数过多，请 ' + remaining + ' 分钟后重试'
+      error: `尝试次数过多，请 ${remaining} 分钟后重试`
     });
   }
 
-  // CSRF 防护
+  // ---------- CSRF 防护（检查 Referer） ----------
   const referer = req.headers.referer || '';
   const allowedDomains = ['admin.cuizi.top', 'cuizi.top', 'localhost'];
   let isAllowed = false;
@@ -86,25 +117,30 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: '请求来源不合法' });
   }
 
+  // ---------- 获取请求头中的凭证 ----------
   const inviteCode = req.headers['x-invite-code'] || '';
   const password = req.headers['x-admin-password'] || '';
   const userAnswer = parseInt(req.headers['x-math-answer']) || 0;
 
+  // ---------- 验证数学题 ----------
   const mathSession = mathSessions[ip];
   let validMath = false;
   if (mathSession && mathSession.expires > Date.now()) {
     validMath = userAnswer === mathSession.answer;
   }
+  // 用完即销毁
   delete mathSessions[ip];
 
   if (!validMath) {
     return res.status(400).json({ error: '数学题答错了或已过期，请刷新重试' });
   }
 
+  // ---------- 验证邀请码和密码 ----------
   const validInvite = inviteCode === (process.env.INVITE_CODE || '').trim();
   const validPassword = password === (process.env.ADMIN_PASSWORD || '').trim();
 
   if (!validInvite || !validPassword) {
+    // 记录失败次数
     if (!failedAttempts[ip]) {
       failedAttempts[ip] = { count: 0, lockedUntil: 0 };
     }
@@ -118,13 +154,20 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: '验证失败' });
   }
 
+  // 验证成功，清除失败记录
   delete failedAttempts[ip];
 
-  // 生成带签名的 Token
+  // ---------- 生成 Token（有效期 30 天） ----------
   const token = generateToken({
     authenticated: true,
-    exp: Date.now() + 24 * 60 * 60 * 1000
+    exp: Date.now() + 30 * 24 * 60 * 60 * 1000 // 30 天
   });
 
-  return res.status(200).json({ success: true, token: token });
-            }
+  return res.status(200).json({
+    success: true,
+    token: token
+  });
+}
+
+// 导出验证函数供其他中间件使用
+export { verifyToken };
