@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>管理后台 · 登录</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent !important;
+      -webkit-touch-callout: none !important;
+      outline: none !important;
+    }
+    *:focus, *:active, *:visited {
+      outline: none !important;
+      -webkit-tap-highlight-color: transparent !important;
+    }
+    a:focus, a:active, button:focus, button:active, input:focus, input:active, textarea:focus, textarea:active {
+      outline: none !important;
+      -webkit-tap-highlight-color: transparent !important;
+    }
+    body {
+      font-family: 'Inter', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: #f5f3ff;
+      color: #1a1a2e;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      transition: background 0.4s ease, color 0.3s ease;
+      margin: 0;
+    }
+    body.dark {
+      background: #12101e;
+      color: #e8e6f0;
+    }
+    .bg-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      background: radial-gradient(circle at 30% 30%, #f6f2ff, #ffffff);
+      transition: background 0.5s ease;
+    }
+    body.dark .bg-glow {
+      background: radial-gradient(circle at 30% 30%, #28253d, #0e0d18);
+    }
+    .glow-orb {
+      position: fixed;
+      width: 60vw;
+      height: 60vw;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(160, 130, 230, 0.18), rgba(210, 190, 255, 0) 70%);
+      top: -20vh;
+      right: -15vw;
+      z-index: -1;
+      filter: blur(80px);
+      animation: floatOrb 22s infinite alternate ease-in-out;
+      transition: background 0.5s ease;
+    }
+    body.dark .glow-orb {
+      background: radial-gradient(circle, rgba(120, 100, 200, 0.20), rgba(60, 40, 120, 0) 70%);
+    }
+    .glow-orb-2 {
+      position: fixed;
+      width: 50vw;
+      height: 50vw;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(200, 180, 255, 0.10), rgba(255, 240, 255, 0) 70%);
+      bottom: -15vh;
+      left: -10vw;
+      z-index: -1;
+      filter: blur(70px);
+      animation: floatOrb2 26s infinite alternate ease-in-out;
+      transition: background 0.5s ease;
+    }
+    body.dark .glow-orb-2 {
+      background: radial-gradient(circle, rgba(90, 70, 160, 0.15), rgba(30, 20, 60, 0) 70%);
+    }
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+      100% { transform: translate(4%, 8%) scale(1.2); opacity: 0.8; }
+    }
+    @keyframes floatOrb2 {
+      0% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+      100% { transform: translate(-6%, -5%) scale(1.3); opacity: 0.6; }
+    }
+
+    .login-card {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 2rem;
+      padding: 2.8rem 2.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      transition: background 0.4s ease, border-color 0.3s ease;
+      box-shadow: 0 20px 60px rgba(80, 60, 160, 0.08);
+      position: relative;
+      z-index: 10;
+    }
+    body.dark .login-card {
+      background: rgba(30, 28, 50, 0.6);
+      border-color: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    }
+    .login-card h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #201d3a, #5b4daf);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.1rem;
+    }
+    body.dark .login-card h1 {
+      background: linear-gradient(135deg, #c8c0f0, #8f7be0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .login-card .sub {
+      color: #8a8ab5;
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
+    body.dark .login-card .sub {
+      color: #9a96b8;
+    }
+    .login-card .input-group {
+      position: relative;
+      margin-bottom: 0.6rem;
+    }
+    .login-card .input-group input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      padding-left: 2.6rem;
+      border-radius: 60px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      background: rgba(255, 255, 255, 0.5);
+      font-size: 0.95rem;
+      color: #1a1a2e;
+      transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    body.dark .login-card .input-group input {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.08);
+      color: #e8e6f0;
+    }
+    .login-card .input-group input:focus {
+      border-color: #6b5acf;
+      box-shadow: 0 0 0 3px rgba(107, 90, 207, 0.12);
+    }
+    .login-card .input-group input::placeholder {
+      color: #aaaac0;
+    }
+    body.dark .login-card .input-group input::placeholder {
+      color: #6a6a8a;
+    }
+    .login-card .input-group .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #8a8ab5;
+      font-size: 0.9rem;
+      pointer-events: none;
+    }
+    body.dark .login-card .input-group .input-icon {
+      color: #6a6a8a;
+    }
+    .login-card .math-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 0.6rem;
+    }
+    .login-card .math-row .math-question {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #6b5acf;
+      white-space: nowrap;
+      flex-shrink: 0;
+      background: rgba(107, 90, 207, 0.08);
+      padding: 0.4rem 0.7rem;
+      border-radius: 40px;
+    }
+    body.dark .login-card .math-row .math-question {
+      color: #88ccff;
+      background: rgba(136, 204, 255, 0.08);
+    }
+    .login-card .math-row input {
+      flex: 1;
+      min-width: 60px;
+      max-width: 130px;
+      margin-bottom: 0;
+      padding: 0.65rem 0.8rem;
+      border-radius: 60px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      background: rgba(255, 255, 255, 0.5);
+      font-size: 0.9rem;
+      color: #1a1a2e;
+      transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    body.dark .login-card .math-row input {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.08);
+      color: #e8e6f0;
+    }
+    .login-card .math-row input:focus {
+      border-color: #6b5acf;
+      box-shadow: 0 0 0 3px rgba(107, 90, 207, 0.12);
+    }
+    .login-card .math-row .refresh-btn {
+      background: rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      color: #6a6a92;
+      cursor: pointer;
+      transition: 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    body.dark .login-card .math-row .refresh-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.08);
+      color: #9a96b8;
+    }
+    .login-card .math-row .refresh-btn:hover {
+      background: rgba(107, 90, 207, 0.12);
+      color: #6b5acf;
+    }
+    body.dark .login-card .math-row .refresh-btn:hover {
+      background: rgba(136, 204, 255, 0.12);
+      color: #88ccff;
+    }
+    .login-card .login-options {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+      color: #8a8ab5;
+    }
+    body.dark .login-card .login-options {
+      color: #7a7aa0;
+    }
+    .login-card .login-options label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      user-select: none;
+    }
+    .login-card .login-options input[type="checkbox"] {
+      accent-color: #6b5acf;
+      cursor: pointer;
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+    .login-card .btn-login {
+      width: 100%;
+      padding: 0.9rem;
+      border: none;
+      border-radius: 60px;
+      background: linear-gradient(145deg, #7a6bcf, #624ed0);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      box-shadow: 0 8px 24px rgba(90, 70, 170, 0.25);
+    }
+    body.dark .login-card .btn-login {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+    .login-card .btn-login:hover {
+      transform: translateY(-2px);
+    }
+    .login-card .btn-login:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+    .login-card .error-msg {
+      color: #e57373;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      min-height: 1.5rem;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 24px;
+      z-index: 50;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 60px;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: #4f4f78;
+      cursor: pointer;
+      transition: 0.3s ease;
+      box-shadow: 0 6px 20px rgba(80, 60, 160, 0.10);
+      user-select: none;
+    }
+    body.dark .theme-toggle {
+      background: rgba(30, 28, 50, 0.7);
+      border-color: rgba(255, 255, 255, 0.08);
+      color: #d0caf0;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+    .theme-toggle:hover {
+      transform: scale(1.05) rotate(8deg);
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 10px 28px rgba(80, 60, 160, 0.18);
+    }
+    body.dark .theme-toggle:hover {
+      background: rgba(50, 45, 80, 0.8);
+    }
+
+    .footer-note {
+      position: fixed;
+      bottom: 24px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 0.7rem;
+      color: #8a8ab5;
+      letter-spacing: 0.3px;
+      z-index: 50;
+      transition: color 0.3s ease;
+    }
+    body.dark .footer-note {
+      color: #6a6a8a;
+    }
+
+    @media (max-width: 480px) {
+      .login-card { padding: 2rem 1.5rem; }
+      .theme-toggle { top: 14px; right: 16px; width: 38px; height: 38px; font-size: 1rem; }
+      .footer-note { bottom: 16px; font-size: 0.6rem; }
+    }
+    @media (max-width: 380px) {
+      .login-card { padding: 1.6rem 1.2rem; }
+      .login-card .math-row { flex-wrap: wrap; justify-content: center; }
+      .login-card .math-row input { max-width: 100%; flex: 1 1 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+  <div class="glow-orb"></div>
+  <div class="glow-orb-2"></div>
+
+  <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
+    <i class="fas fa-moon" id="themeIcon"></i>
+  </button>
+
+  <div class="login-card">
+    <h1>管理后台</h1>
+    <p class="sub">ks · 内容管理</p>
+    <div class="input-group">
+      <span class="input-icon"><i class="fas fa-key"></i></span>
+      <input type="password" id="inviteCode" placeholder="邀请码" autocomplete="off" />
+    </div>
+    <div class="input-group">
+      <span class="input-icon"><i class="fas fa-lock"></i></span>
+      <input type="password" id="passwordInput" placeholder="请输入密码" autocomplete="current-password" />
+    </div>
+    <div class="math-row">
+      <span class="math-question" id="mathQuestion">加载题目中...</span>
+      <input type="text" id="mathAnswer" placeholder="答案" autocomplete="off" />
+      <button type="button" class="refresh-btn" id="refreshMathBtn" aria-label="刷新题目">
+        <i class="fas fa-rotate-right"></i>
+      </button>
+    </div>
+    <div class="login-options">
+      <label>
+        <input type="checkbox" id="keepLogin" checked /> 保持登录
+      </label>
+    </div>
+    <button class="btn-login" id="loginBtn">登录</button>
+    <div class="error-msg" id="loginError"></div>
+  </div>
+
+  <div class="footer-note">ks · admin</div>
+
+  <script>
+    (function() {
+      var mathQuestionText = '';
+      var loginBtn = document.getElementById('loginBtn');
+      var passwordInput = document.getElementById('passwordInput');
+      var inviteCodeInput = document.getElementById('inviteCode');
+      var mathAnswerInput = document.getElementById('mathAnswer');
+      var loginError = document.getElementById('loginError');
+      var keepLoginCheck = document.getElementById('keepLogin');
+      var refreshMathBtn = document.getElementById('refreshMathBtn');
+
+      var STORAGE_KEY = 'admin_logged_in';
+      var KEEP_LOGIN_KEY = 'admin_keep_login';
+      var TOKEN_KEY = 'admin_token';
+
+      // —— 主题切换 ——
+      var themeToggle = document.getElementById('themeToggle');
+      var themeIcon = document.getElementById('themeIcon');
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var currentTheme = localStorage.getItem('ks-theme') || (prefersDark ? 'dark' : 'light');
+      function setTheme(theme) {
+        document.body.classList.toggle('dark', theme === 'dark');
+        themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        localStorage.setItem('ks-theme', theme);
+        currentTheme = theme;
+      }
+      setTheme(currentTheme);
+      themeToggle.addEventListener('click', function() {
+        setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+      });
+
+      // —— 保持登录状态 ——
+      if (localStorage.getItem(KEEP_LOGIN_KEY) === 'false') {
+        keepLoginCheck.checked = false;
+      } else {
+        keepLoginCheck.checked = true;
+      }
+
+      // —— 获取数学题 ——
+      function fetchMathQuestion() {
+        fetch('/api/auth', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.question) {
+            mathQuestionText = data.question;
+            document.getElementById('mathQuestion').textContent = data.question;
+            mathAnswerInput.value = '';
+            mathAnswerInput.focus();
+          }
+        })
+        .catch(function() {
+          document.getElementById('mathQuestion').textContent = '加载题目失败，请刷新';
+        });
+      }
+
+      // —— 登录逻辑 ——
+      function doLogin() {
+        var inviteCode = inviteCodeInput.value.trim();
+        var pwd = passwordInput.value.trim();
+        var userAnswer = parseInt(mathAnswerInput.value.trim());
+
+        if (!inviteCode) {
+          loginError.textContent = '请输入邀请码';
+          return;
+        }
+        if (!pwd) {
+          loginError.textContent = '请输入密码';
+          return;
+        }
+        if (isNaN(userAnswer)) {
+          loginError.textContent = '请输入数学题答案';
+          return;
+        }
+
+        var attempts = parseInt(localStorage.getItem('login_attempts')) || 0;
+        var lockedUntil = parseInt(localStorage.getItem('lock_until')) || 0;
+        if (Date.now() < lockedUntil) {
+          var remaining = Math.ceil((lockedUntil - Date.now()) / 60000);
+          loginError.textContent = '尝试次数过多，请 ' + remaining + ' 分钟后重试';
+          return;
+        }
+        if (lockedUntil > 0 && Date.now() >= lockedUntil) {
+          localStorage.removeItem('login_attempts');
+          localStorage.removeItem('lock_until');
+          attempts = 0;
+        }
+
+        loginBtn.disabled = true;
+        loginError.textContent = '';
+
+        fetch('/api/auth', {
+          method: 'POST',
+          headers: {
+            'X-Invite-Code': inviteCode,
+            'X-Admin-Password': pwd,
+            'X-Math-Answer': String(userAnswer),
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({})
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.error && data.error.includes('数学题')) {
+            loginError.textContent = data.error;
+            fetchMathQuestion();
+            loginBtn.disabled = false;
+            return;
+          }
+          if (data.success) {
+            localStorage.removeItem('login_attempts');
+            localStorage.removeItem('lock_until');
+            var keep = keepLoginCheck.checked;
+            localStorage.setItem(KEEP_LOGIN_KEY, String(keep));
+            localStorage.setItem(TOKEN_KEY, data.token);
+            localStorage.setItem(STORAGE_KEY, 'true');
+            // 登录成功，跳转到主界面
+            window.location.href = './index.html';
+          } else {
+            attempts++;
+            localStorage.setItem('login_attempts', String(attempts));
+            if (attempts >= 5) {
+              var lockTime = Date.now() + 15 * 60 * 1000;
+              localStorage.setItem('lock_until', String(lockTime));
+              loginError.textContent = '尝试次数过多，请 15 分钟后重试';
+            } else {
+              loginError.textContent = '验证失败（' + attempts + '/5）';
+            }
+            fetchMathQuestion();
+          }
+        })
+        .catch(function() {
+          loginError.textContent = '网络错误，请重试';
+        })
+        .finally(function() {
+          loginBtn.disabled = false;
+        });
+      }
+
+      // —— 事件绑定 ——
+      loginBtn.addEventListener('click', doLogin);
+      passwordInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') doLogin();
+      });
+      inviteCodeInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') doLogin();
+      });
+      mathAnswerInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') doLogin();
+      });
+      refreshMathBtn.addEventListener('click', function() {
+        fetchMathQuestion();
+        mathAnswerInput.focus();
+      });
+
+      // —— 检查是否已登录（如果已登录则直接跳转） ——
+      function checkLogin() {
+        var loggedIn = localStorage.getItem(STORAGE_KEY);
+        var token = localStorage.getItem(TOKEN_KEY);
+        var keep = localStorage.getItem(KEEP_LOGIN_KEY) !== 'false';
+        if (loggedIn === 'true' && token && keep) {
+          window.location.href = './index.html';
+        }
+        if (!keep) {
+          localStorage.removeItem(TOKEN_KEY);
+          localStorage.removeItem(STORAGE_KEY);
+        }
+      }
+      checkLogin();
+
+      // —— 加载数学题 ——
+      fetchMathQuestion();
+
+      // —— 点击输入框自动选中 ——
+      document.querySelectorAll('.input-group input, .math-row input').forEach(function(el) {
+        el.addEventListener('focus', function() { this.select(); });
+      });
+    })();
+  </script>
+</body>
+</html>
