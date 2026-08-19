@@ -26,7 +26,7 @@
   </div>
 </div>
 <div class="tabs" id="tabs">
-  <button class="tab active" data-tab="write">写内容 <span class="badge" id="writeBadge">0</span></button>
+  <button class="tab active" data-tab="write">写内容</button>
   <button class="tab" data-tab="list">内容列表 <span class="badge" id="listBadge">0</span></button>
   <button class="tab" data-tab="drafts">草稿箱 <span class="badge" id="draftBadge">0</span></button>
 </div>
@@ -635,56 +635,63 @@ function loadFriendList() {
     });
 }
 
+function getDeletedFriendIds() {
+  return getState('deleted_friends').then(function(data) {
+    return data || [];
+  });
+}
+
+function setDeletedFriendIds(ids) {
+  return setState('deleted_friends', ids);
+}
+
 function renderUnifiedList() {
   var list = document.getElementById('articleList');
   var search = document.getElementById('listSearch').value.trim().toLowerCase();
 
   if (currentMode === 'friend') {
-    var filtered = allFriends.slice();
-    if (search) {
-      filtered = filtered.filter(function(f) {
-        var name = (f.name || '').toLowerCase();
-        var desc = (f.desc || '').toLowerCase();
-        var url = (f.url || '').toLowerCase();
-        return name.indexOf(search) !== -1 || desc.indexOf(search) !== -1 || url.indexOf(search) !== -1;
+    getDeletedFriendIds().then(function(deletedIds) {
+      var filtered = allFriends.slice();
+      if (search) {
+        filtered = filtered.filter(function(f) {
+          var name = (f.name || '').toLowerCase();
+          var desc = (f.desc || '').toLowerCase();
+          var url = (f.url || '').toLowerCase();
+          return name.indexOf(search) !== -1 || desc.indexOf(search) !== -1 || url.indexOf(search) !== -1;
+        });
+      }
+      document.getElementById('listCount').textContent = filtered.length + ' 项';
+      if (filtered.length === 0) {
+        list.innerHTML = '<div class="empty">没有友链</div>';
+        return;
+      }
+      var html = '';
+      filtered.forEach(function(friend, idx) {
+        var originalIdx = allFriends.indexOf(friend);
+        var isDeleted = deletedIds.indexOf(originalIdx) !== -1;
+        var deletedClass = isDeleted ? 'deleted' : '';
+        var actionsHtml = '<button class="btn-edit-friend" data-idx="' + originalIdx + '">编辑</button>';
+        if (isDeleted) {
+          actionsHtml += '<button class="btn-restore-friend" data-idx="' + originalIdx + '">恢复</button>';
+          actionsHtml += '<button class="btn-delete-record" data-idx="' + originalIdx + '">删除记录</button>';
+        } else {
+          actionsHtml += '<button class="btn-delete-friend" data-idx="' + originalIdx + '" data-name="' + escapeHtml(friend.name) + '">删除</button>';
+        }
+        html += '<div class="article-item-admin ' + deletedClass + '">' +
+          '<div class="item-info">' +
+          '<div class="item-title">' + escapeHtml(friend.name) + '</div>' +
+          '<div class="item-meta">' +
+          '<span>' + escapeHtml(friend.url) + '</span>' +
+          (friend.desc ? ' · <span>' + escapeHtml(friend.desc) + '</span>' : '') +
+          (friend.logo ? ' · <span>Logo: ' + escapeHtml(friend.logo) + '</span>' : '') +
+          (friend.feed ? ' · <span>Feed: ' + escapeHtml(friend.feed) + '</span>' : '') +
+          '</div>' +
+          '</div>' +
+          '<div class="item-actions">' + actionsHtml + '</div>' +
+          '</div>';
       });
-    }
-    document.getElementById('listCount').textContent = filtered.length + ' 项';
-    if (filtered.length === 0) {
-      list.innerHTML = '<div class="empty">没有友链</div>';
-      return;
-    }
-    var html = '';
-    filtered.forEach(function(friend, idx) {
-      var originalIdx = allFriends.indexOf(friend);
-      html += '<div class="article-item-admin">' +
-        '<div class="item-info">' +
-        '<div class="item-title">' + escapeHtml(friend.name) + '</div>' +
-        '<div class="item-meta">' +
-        '<span>' + escapeHtml(friend.url) + '</span>' +
-        (friend.desc ? ' · <span>' + escapeHtml(friend.desc) + '</span>' : '') +
-        (friend.logo ? ' · <span>Logo: ' + escapeHtml(friend.logo) + '</span>' : '') +
-        (friend.feed ? ' · <span>Feed: ' + escapeHtml(friend.feed) + '</span>' : '') +
-        '</div>' +
-        '</div>' +
-        '<div class="item-actions">' +
-        '<button class="btn-edit-friend" data-idx="' + originalIdx + '">编辑</button>' +
-        '<button class="btn-soft-delete friend-delete" data-idx="' + originalIdx + '" data-name="' + escapeHtml(friend.name) + '">删除</button>' +
-        '</div>' +
-        '</div>';
-    });
-    list.innerHTML = html;
-    list.querySelectorAll('.btn-edit-friend').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var idx = parseInt(this.dataset.idx);
-        editFriend(idx);
-      });
-    });
-    list.querySelectorAll('.friend-delete').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var idx = parseInt(this.dataset.idx);
-        deleteFriend(idx);
-      });
+      list.innerHTML = html;
+      bindFriendEvents(list);
     });
     return;
   }
@@ -743,6 +750,146 @@ function renderUnifiedList() {
   bindListEvents(list);
 }
 
+function bindFriendEvents(list) {
+  list.querySelectorAll('.btn-edit-friend').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var idx = parseInt(this.dataset.idx);
+      editFriend(idx);
+    });
+  });
+
+  list.querySelectorAll('.btn-delete-friend').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var idx = parseInt(this.dataset.idx);
+      var name = this.dataset.name;
+      deleteFriendWithConfirm(idx, name);
+    });
+  });
+
+  list.querySelectorAll('.btn-restore-friend').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var idx = parseInt(this.dataset.idx);
+      restoreFriend(idx);
+    });
+  });
+
+  list.querySelectorAll('.btn-delete-record').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var idx = parseInt(this.dataset.idx);
+      deleteFriendRecord(idx);
+    });
+  });
+}
+
+function editFriend(idx) {
+  var friend = allFriends[idx];
+  if (!friend) return;
+  var targetBtn = document.querySelector('.mode-switch-btn[data-mode="friend"]');
+  if (targetBtn) targetBtn.click();
+  friendName.value = friend.name || '';
+  friendUrl.value = friend.url || '';
+  friendDesc.value = friend.desc || '';
+  friendLogo.value = friend.logo || '';
+  friendFeed.value = friend.feed || '';
+  editingFriendIdx = idx;
+  publishBtn.textContent = '更新友链';
+  document.querySelector('.tab[data-tab="write"]').click();
+  showToast('已加载友链，修改后点击更新');
+}
+
+function deleteFriendWithConfirm(idx, name) {
+  getDeletedFriendIds().then(function(deletedIds) {
+    if (deletedIds.indexOf(idx) !== -1) {
+      showToast('这条友链已删除', true);
+      return;
+    }
+
+    // 弹窗1：输入确认语
+    var confirmText = '我确定删除这条友链';
+    var descHtml = '输入 <strong style="color:#e53935;">' + confirmText + '</strong> 确认删除：<br /><br /><input type="text" id="deleteConfirmInput" placeholder="输入确认语..." style="width:100%;padding:.6rem 1rem;border-radius:60px;border:2px solid #e53935;font-size:.9rem;font-family:inherit;background:rgba(255,255,255,.5);color:#1a1a2e;text-align:center;outline:none;">';
+    showModal(
+      '<i class="fas fa-exclamation-triangle"></i>',
+      '删除友链',
+      descHtml,
+      '确认删除',
+      'btn-confirm'
+    ).then(function(confirmed) {
+      if (!confirmed) return;
+      var input = document.getElementById('deleteConfirmInput');
+      if (!input || input.value.trim() !== confirmText) {
+        showToast('确认语输入不正确', true);
+        return;
+      }
+
+      // 弹窗2：再次确认
+      showModal(
+        '<i class="fas fa-exclamation-circle"></i>',
+        '二次确认',
+        '你真的确定要删除友链 <strong>' + escapeHtml(name) + '</strong> 吗？<br />删除后可通过"恢复"按钮找回，但彻底删除记录后无法恢复。',
+        '确定删除',
+        'btn-confirm'
+      ).then(function(secondConfirmed) {
+        if (!secondConfirmed) return;
+        // 调用API删除
+        apiCall('friends', {
+          method: 'DELETE',
+          body: JSON.stringify({ id: idx })
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.success) {
+            // 存入IndexedDB标记删除
+            getDeletedFriendIds().then(function(ids) {
+              if (ids.indexOf(idx) === -1) {
+                ids.push(idx);
+                setDeletedFriendIds(ids).then(function() {
+                  showToast('已删除');
+                  loadFriendList();
+                });
+              } else {
+                showToast('已删除');
+                loadFriendList();
+              }
+            });
+          } else {
+            showToast(data.error || '删除失败', true);
+          }
+        })
+        .catch(function() { showToast('删除失败', true); });
+      });
+    });
+  });
+}
+
+function restoreFriend(idx) {
+  getDeletedFriendIds().then(function(deletedIds) {
+    var newIds = deletedIds.filter(function(id) { return id !== idx; });
+    setDeletedFriendIds(newIds).then(function() {
+      showToast('已恢复');
+      loadFriendList();
+    });
+  });
+}
+
+function deleteFriendRecord(idx) {
+  showModal(
+    '<i class="fas fa-trash-alt"></i>',
+    '删除记录',
+    '确定要删除友链的恢复记录吗？<br />删除后该友链将无法通过"恢复"按钮找回。',
+    '确认删除',
+    'btn-confirm'
+  ).then(function(confirmed) {
+    if (!confirmed) return;
+    getDeletedFriendIds().then(function(deletedIds) {
+      var newIds = deletedIds.filter(function(id) { return id !== idx; });
+      setDeletedFriendIds(newIds).then(function() {
+        showToast('记录已删除');
+        loadFriendList();
+      });
+    });
+  });
+}
+
 function bindListEvents(list) {
   list.querySelectorAll('.btn-edit').forEach(function(btn) {
     btn.addEventListener('click', function() {
@@ -777,39 +924,8 @@ function bindListEvents(list) {
   });
 }
 
-function editFriend(idx) {
-  var friend = allFriends[idx];
-  if (!friend) return;
-  var targetBtn = document.querySelector('.mode-switch-btn[data-mode="friend"]');
-  if (targetBtn) targetBtn.click();
-  friendName.value = friend.name || '';
-  friendUrl.value = friend.url || '';
-  friendDesc.value = friend.desc || '';
-  friendLogo.value = friend.logo || '';
-  friendFeed.value = friend.feed || '';
-  editingFriendIdx = idx;
-  publishBtn.textContent = '更新友链';
-  document.querySelector('.tab[data-tab="write"]').click();
-  showToast('已加载友链，修改后点击更新');
-}
-
-function deleteFriend(idx) {
-  var friend = allFriends[idx];
-  if (!friend) return;
-  apiCall('friends', {
-    method: 'DELETE',
-    body: JSON.stringify({ id: idx })
-  })
-  .then(function(res) { return res.json(); })
-  .then(function(data) {
-    if (data.success) {
-      showToast('已删除');
-      loadFriendList();
-    } else {
-      showToast(data.error || '删除失败', true);
-    }
-  })
-  .catch(function() { showToast('删除失败', true); });
+function getCurrentData() {
+  return currentMode === 'article' ? allArticles : allShuoshuo;
 }
 
 function getUndoKey(mode, idx) {
@@ -934,7 +1050,7 @@ document.getElementById('publishBtn').addEventListener('click', function() {
 
   if (editingIdx >= 0) {
     body.id = editingIdx;
-    var oldItem = loadCurrentData()[editingIdx];
+    var oldItem = getCurrentData()[editingIdx];
     if (oldItem) {
       var backup = {
         title: oldItem.title || '',
@@ -1132,7 +1248,7 @@ function getUndoBackup(mode, idx) {
 }
 
 function loadToEditor(idx) {
-  var data = loadCurrentData();
+  var data = getCurrentData();
   var item = data[idx];
   if (!item) return;
   editingIdx = idx;
@@ -1282,7 +1398,7 @@ function showHardDeleteModal(idx, title) {
       ).then(function(secondConfirmed) {
         if (secondConfirmed) {
           localStorage.removeItem(getUndoKey(currentMode, idx));
-          var data = loadCurrentData();
+          var data = getCurrentData();
           data.splice(idx, 1);
           apiCall(currentMode === 'article' ? 'posts' : 'shuoshuo', {
             method: 'PUT',
@@ -1506,7 +1622,6 @@ function updateBadges() {
   if (currentMode === 'article') total = allArticles.length;
   else if (currentMode === 'shuoshuo') total = allShuoshuo.length;
   else total = allFriends.length;
-  document.getElementById('writeBadge').textContent = total;
   document.getElementById('listBadge').textContent = total;
   document.getElementById('draftBadge').textContent = allDrafts.length;
 }
