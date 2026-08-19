@@ -26,10 +26,12 @@ export default async function handler(req, res) {
     const posts = result.data;
     const sha = result.sha;
 
+    // ===== GET =====
     if (req.method === 'GET') {
       return res.status(200).json(posts);
     }
 
+    // ===== POST（新建） =====
     if (req.method === 'POST') {
       const { title, content, tags, date } = req.body;
       if (!title || !content) {
@@ -47,18 +49,26 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: '发布成功', id: posts.announcements.length - 1 });
     }
 
+    // ===== PUT（编辑 / 硬删除） =====
     if (req.method === 'PUT') {
-      const { id, title, content, tags, date, hardDelete, articles } = req.body;
+      // ✅ 关键修复：同时兼容前端的 items 和 articles
+      const { id, title, content, tags, date, hardDelete, articles, items } = req.body;
       
-      if (hardDelete && articles) {
-        await writeFile(MAIN_REPO, 'wenzhang.json', { announcements: articles }, sha, '硬删除文章');
+      // 统一成 targetItems
+      const targetItems = articles || items;
+
+      // 1️⃣ 如果是硬删除（直接替换整个数组，根本不检查 id）
+      if (hardDelete && targetItems) {
+        await writeFile(MAIN_REPO, 'wenzhang.json', { announcements: targetItems }, sha, '硬删除文章');
         return res.status(200).json({ success: true, message: '已硬删除' });
       }
-      
+
+      // 2️⃣ 如果不是硬删除，走编辑或软删除（这时才需要检查 id）
       const idx = parseInt(id);
       if (isNaN(idx) || idx < 0 || idx >= posts.announcements.length) {
         return res.status(400).json({ error: '文章不存在' });
       }
+      
       const article = posts.announcements[idx];
       if (title !== undefined) article.title = title.trim();
       if (content !== undefined) article.content = content;
@@ -68,6 +78,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: '保存成功' });
     }
 
+    // ===== DELETE（软删除 / 恢复） =====
     if (req.method === 'DELETE') {
       const { id, restore } = req.body;
       const idx = parseInt(id);
@@ -85,4 +96,4 @@ export default async function handler(req, res) {
     console.error('Error:', error.message);
     return res.status(500).json({ error: error.message });
   }
-    }
+}
