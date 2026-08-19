@@ -6,6 +6,7 @@
   <title>管理后台 · ks</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <style>
+    /* ========== 基础重置 & 全局 ========== */
     * {
       margin: 0;
       padding: 0;
@@ -38,231 +39,28 @@
       margin: 0 auto;
       padding: 2rem 1.5rem;
     }
-    #loginScreen {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 80vh;
-    }
-    #loginScreen.hidden {
-      display: none;
-    }
-    .login-card {
-      background: rgba(255, 255, 255, 0.6);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-radius: 2rem;
-      padding: 2.8rem 2.5rem;
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      width: 100%;
-      max-width: 380px;
-      text-align: center;
-      transition: background 0.4s ease, border-color 0.3s ease;
-      box-shadow: 0 20px 60px rgba(80, 60, 160, 0.08);
-    }
-    body.dark .login-card {
-      background: rgba(30, 28, 50, 0.6);
-      border-color: rgba(255, 255, 255, 0.08);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-    }
-    .login-card h1 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #201D3A, #5B4DAF);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 0.1rem;
-    }
-    body.dark .login-card h1 {
-      background: linear-gradient(135deg, #c8c0f0, #8f7be0);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .login-card .sub {
-      color: #8a8ab5;
-      font-size: 0.85rem;
-      margin-bottom: 1.5rem;
-    }
-    body.dark .login-card .sub {
-      color: #9a96b8;
-    }
-    .login-card .input-group {
-      position: relative;
-      margin-bottom: 0.6rem;
-    }
-    .login-card .input-group input {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      padding-left: 2.6rem;
-      border-radius: 60px;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      background: rgba(255, 255, 255, 0.5);
-      font-size: 0.95rem;
-      color: #1a1a2e;
-      transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-    body.dark .login-card .input-group input {
-      background: rgba(255, 255, 255, 0.06);
-      border-color: rgba(255, 255, 255, 0.08);
-      color: #e8e6f0;
-    }
-    .login-card .input-group input:focus {
-      border-color: #6b5acf;
-      box-shadow: 0 0 0 3px rgba(107, 90, 207, 0.12);
-    }
-    .login-card .input-group input::placeholder {
-      color: #aaaac0;
-    }
-    body.dark .login-card .input-group input::placeholder {
-      color: #6a6a8a;
-    }
-    .login-card .input-group .input-icon {
-      position: absolute;
-      left: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #8a8ab5;
-      font-size: 0.9rem;
-      pointer-events: none;
-    }
-    body.dark .login-card .input-group .input-icon {
-      color: #6a6a8a;
-    }
-    .login-card .math-row {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-      margin-bottom: 0.6rem;
-    }
-    .login-card .math-row .math-question {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: #6b5acf;
-      white-space: nowrap;
-      flex-shrink: 0;
-      background: rgba(107, 90, 207, 0.08);
-      padding: 0.4rem 0.7rem;
-      border-radius: 40px;
-    }
-    body.dark .login-card .math-row .math-question {
-      color: #88ccff;
-      background: rgba(136, 204, 255, 0.08);
-    }
-    .login-card .math-row input {
-      flex: 1;
-      min-width: 60px;
-      max-width: 130px;
-      margin-bottom: 0;
-      padding: 0.65rem 0.8rem;
-      border-radius: 60px;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      background: rgba(255, 255, 255, 0.5);
-      font-size: 0.9rem;
-      color: #1a1a2e;
-      transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-    body.dark .login-card .math-row input {
-      background: rgba(255, 255, 255, 0.06);
-      border-color: rgba(255, 255, 255, 0.08);
-      color: #e8e6f0;
-    }
-    .login-card .math-row input:focus {
-      border-color: #6b5acf;
-      box-shadow: 0 0 0 3px rgba(107, 90, 207, 0.12);
-    }
-    .login-card .math-row .refresh-btn {
-      background: rgba(255, 255, 255, 0.3);
-      border: 1px solid rgba(0, 0, 0, 0.06);
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      color: #6a6a92;
-      cursor: pointer;
-      transition: 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      flex-shrink: 0;
-    }
-    body.dark .login-card .math-row .refresh-btn {
-      background: rgba(255, 255, 255, 0.06);
-      border-color: rgba(255, 255, 255, 0.08);
-      color: #9a96b8;
-    }
-    .login-card .math-row .refresh-btn:hover {
-      background: rgba(107, 90, 207, 0.12);
-      color: #6b5acf;
-    }
-    body.dark .login-card .math-row .refresh-btn:hover {
-      background: rgba(136, 204, 255, 0.12);
-      color: #88ccff;
-    }
-    .login-card .login-options {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1rem;
-      font-size: 0.85rem;
-      color: #8a8ab5;
-    }
-    body.dark .login-card .login-options {
-      color: #7a7aa0;
-    }
-    .login-card .login-options label {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      cursor: pointer;
-      user-select: none;
-    }
-    .login-card .login-options input[type="checkbox"] {
-      accent-color: #6b5acf;
-      cursor: pointer;
-      width: 16px;
-      height: 16px;
-      flex-shrink: 0;
-    }
-    .login-card .btn-login {
-      width: 100%;
-      padding: 0.9rem;
-      border: none;
-      border-radius: 60px;
-      background: linear-gradient(145deg, #7a6bcf, #624ed0);
-      color: #fff;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-      box-shadow: 0 8px 24px rgba(90, 70, 170, 0.25);
-    }
-    body.dark .login-card .btn-login {
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    }
-    .login-card .btn-login:hover {
-      transform: translateY(-2px);
-    }
-    .login-card .btn-login:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none !important;
-    }
-    .login-card .error-msg {
-      color: #e57373;
-      font-size: 0.85rem;
-      margin-top: 0.5rem;
-      min-height: 1.5rem;
-    }
+
+    /* ========== 页面验证（门禁） ========== */
+    <script>
+      (function() {
+        var STORAGE_KEY = 'admin_logged_in';
+        var TOKEN_KEY = 'admin_token';
+        var KEEP_LOGIN_KEY = 'admin_keep_login';
+        var loggedIn = localStorage.getItem(STORAGE_KEY);
+        var token = localStorage.getItem(TOKEN_KEY);
+        var keep = localStorage.getItem(KEEP_LOGIN_KEY) !== 'false';
+        if (!(loggedIn === 'true' && token && keep)) {
+          // 清除残留数据
+          localStorage.removeItem(STORAGE_KEY);
+          localStorage.removeItem(TOKEN_KEY);
+          window.location.href = './index.html';
+        }
+      })();
+    </script>
+
+    /* ========== 主界面样式 ========== */
     #mainApp {
-      display: none;
       animation: fadeIn 0.4s ease;
-    }
-    #mainApp.active {
-      display: block;
     }
     @keyframes fadeIn {
       0% { opacity: 0; transform: translateY(12px); }
@@ -272,6 +70,7 @@
       0% { opacity: 0; transform: translateY(-10px); }
       100% { opacity: 1; transform: translateY(0); }
     }
+
     .admin-header {
       display: flex;
       align-items: center;
@@ -347,6 +146,7 @@
     body.dark .admin-header .btn-logout:hover {
       background: rgba(255, 255, 255, 0.15);
     }
+
     .tabs {
       display: flex;
       gap: 0.3rem;
@@ -410,6 +210,7 @@
       background: rgba(136, 204, 255, 0.12);
       color: #88ccff;
     }
+
     .tab-content {
       display: none;
       animation: slideDown 0.3s ease;
@@ -417,6 +218,7 @@
     .tab-content.active {
       display: block;
     }
+
     .editor-section {
       display: grid;
       grid-template-columns: 1fr;
@@ -427,6 +229,7 @@
         grid-template-columns: 1fr;
       }
     }
+
     .editor-panel {
       background: rgba(255, 255, 255, 0.4);
       backdrop-filter: blur(8px);
@@ -495,6 +298,7 @@
       flex: 1;
       min-width: 100px;
     }
+
     .editor-split {
       display: flex;
       height: 420px;
@@ -663,6 +467,7 @@
     .editor-split .preview .task-list-item input[type="checkbox"] {
       margin-right: 0.3rem;
     }
+
     .custom-toolbar {
       display: flex;
       flex-wrap: wrap;
@@ -712,6 +517,7 @@
     body.dark .custom-toolbar .sep {
       background: rgba(255, 255, 255, 0.08);
     }
+
     .editor-footer {
       display: flex;
       justify-content: flex-end;
@@ -730,6 +536,7 @@
     body.dark .editor-footer .word-count {
       color: #88ccff;
     }
+
     .editor-actions {
       display: flex;
       gap: 0.8rem;
@@ -785,6 +592,7 @@
     body.dark .editor-actions .btn-cancel:hover {
       color: #d0caf0;
     }
+
     .list-controls {
       display: flex;
       gap: 0.8rem;
@@ -871,6 +679,7 @@
     body.dark .list-controls .count-badge {
       color: #7a7aa0;
     }
+
     .article-list {
       display: flex;
       flex-direction: column;
@@ -1009,6 +818,7 @@
     .article-item-admin .item-actions .btn-undo:hover {
       background: rgba(255, 152, 0, 0.22);
     }
+
     .draft-item {
       background: rgba(255, 255, 255, 0.35);
       backdrop-filter: blur(8px);
@@ -1126,6 +936,7 @@
     .draft-item .draft-actions .btn-delete-draft:hover {
       background: rgba(229, 115, 115, 0.22);
     }
+
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -1252,6 +1063,7 @@
     .modal-box .modal-actions .btn-confirm-warning:hover {
       transform: scale(1.02);
     }
+
     .toast {
       position: fixed;
       bottom: 30px;
@@ -1287,10 +1099,10 @@
     body.dark .toast.error {
       background: rgba(180, 40, 40, 0.95);
     }
+
     @media (max-width: 600px) {
       .container { padding: 1.2rem 0.8rem; }
       .admin-header .title { font-size: 1.2rem; }
-      .login-card { padding: 2rem 1.5rem; }
       .editor-panel { padding: 1rem; }
       .editor-split { height: 300px; flex-direction: column; }
       .editor-split .preview { border-left: none; border-top: 1px solid rgba(0, 0, 0, 0.06); min-height: 150px; }
@@ -1316,34 +1128,6 @@
 </head>
 <body>
   <div class="container">
-    <div id="loginScreen">
-      <div class="login-card">
-        <h1>管理后台</h1>
-        <p class="sub">ks · 内容管理</p>
-        <div class="input-group">
-          <span class="input-icon"><i class="fas fa-key"></i></span>
-          <input type="password" id="inviteCode" placeholder="邀请码" autocomplete="off" />
-        </div>
-        <div class="input-group">
-          <span class="input-icon"><i class="fas fa-lock"></i></span>
-          <input type="password" id="passwordInput" placeholder="请输入密码" autocomplete="current-password" />
-        </div>
-        <div class="math-row">
-          <span class="math-question" id="mathQuestion">加载题目中...</span>
-          <input type="text" id="mathAnswer" placeholder="答案" autocomplete="off" />
-          <button type="button" class="refresh-btn" id="refreshMathBtn" aria-label="刷新题目">
-            <i class="fas fa-rotate-right"></i>
-          </button>
-        </div>
-        <div class="login-options">
-          <label>
-            <input type="checkbox" id="keepLogin" checked /> 保持登录
-          </label>
-        </div>
-        <button class="btn-login" id="loginBtn">登录</button>
-        <div class="error-msg" id="loginError"></div>
-      </div>
-    </div>
     <div id="mainApp">
       <div class="admin-header">
         <span class="title">管理后台</span>
@@ -1433,6 +1217,7 @@
       </div>
     </div>
   </div>
+
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal-box">
       <span class="modal-icon" id="modalIcon"><i class="fas fa-exclamation-triangle"></i></span>
@@ -1444,1241 +1229,1138 @@
       </div>
     </div>
   </div>
+
   <div class="toast" id="toast"></div>
+
   <script src="/libs/marked.min.js"></script>
   <script src="/libs/DOMPurify.min.js"></script>
   <script>
-    var mathQuestionText = '';
-    async function fetchMathQuestion() {
-      try {
-        var res = await fetch('/api/auth', {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' }
-        });
-        var data = await res.json();
-        if (data.question) {
-          mathQuestionText = data.question;
-          document.getElementById('mathQuestion').textContent = data.question;
-          document.getElementById('mathAnswer').value = '';
-          document.getElementById('mathAnswer').focus();
-        }
-      } catch (e) {
-        document.getElementById('mathQuestion').textContent = '加载题目失败，请刷新';
+    (function() {
+      // ========== 主题切换 ==========
+      var themeToggle = document.getElementById('themeToggle');
+      var themeIcon = document.getElementById('themeIcon');
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var currentTheme = localStorage.getItem('ks-theme') || (prefersDark ? 'dark' : 'light');
+      function setTheme(theme) {
+        document.body.classList.toggle('dark', theme === 'dark');
+        themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        localStorage.setItem('ks-theme', theme);
+        currentTheme = theme;
       }
-    }
-    var STORAGE_KEY = 'admin_logged_in';
-    var KEEP_LOGIN_KEY = 'admin_keep_login';
-    var TOKEN_KEY = 'admin_token';
-    var themeToggle = document.getElementById('themeToggle');
-    var themeIcon = document.getElementById('themeIcon');
-    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    var currentTheme = localStorage.getItem('ks-theme') || (prefersDark ? 'dark' : 'light');
-    function setTheme(theme) {
-      document.body.classList.toggle('dark', theme === 'dark');
-      themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-      localStorage.setItem('ks-theme', theme);
-      currentTheme = theme;
-    }
-    setTheme(currentTheme);
-    themeToggle.addEventListener('click', function() {
-      setTheme(currentTheme === 'dark' ? 'light' : 'dark');
-    });
-    var toastEl = document.getElementById('toast');
-    var toastTimer = null;
-    function showToast(msg, isError) {
-      toastEl.textContent = msg;
-      toastEl.className = 'toast';
-      if (isError) toastEl.classList.add('error');
-      clearTimeout(toastTimer);
-      void toastEl.offsetWidth;
-      toastEl.classList.add('show');
-      toastTimer = setTimeout(function() {
-        toastEl.classList.remove('show');
-      }, 3000);
-    }
-    var modalOverlay = document.getElementById('modalOverlay');
-    var modalIcon = document.getElementById('modalIcon');
-    var modalTitle = document.getElementById('modalTitle');
-    var modalDesc = document.getElementById('modalDesc');
-    var modalConfirm = document.getElementById('modalConfirm');
-    var modalCancel = document.getElementById('modalCancel');
-    var modalResolve = null;
-    function showModal(iconHtml, title, desc, confirmText, confirmClass) {
-      return new Promise(function(resolve) {
-        modalIcon.innerHTML = iconHtml || '<i class="fas fa-exclamation-triangle"></i>';
-        modalTitle.textContent = title || '确认操作';
-        modalDesc.innerHTML = desc || '确定要执行此操作吗？';
-        modalConfirm.textContent = confirmText || '确认';
-        modalConfirm.className = confirmClass || 'btn-confirm';
-        modalResolve = resolve;
-        modalOverlay.classList.add('active');
+      setTheme(currentTheme);
+      themeToggle.addEventListener('click', function() {
+        setTheme(currentTheme === 'dark' ? 'light' : 'dark');
       });
-    }
-    function closeModal(result) {
-      modalOverlay.classList.remove('active');
-      if (modalResolve) {
-        modalResolve(result);
-        modalResolve = null;
+
+      // ========== Toast 和 Modal ==========
+      var toastEl = document.getElementById('toast');
+      var toastTimer = null;
+      function showToast(msg, isError) {
+        toastEl.textContent = msg;
+        toastEl.className = 'toast';
+        if (isError) toastEl.classList.add('error');
+        clearTimeout(toastTimer);
+        void toastEl.offsetWidth;
+        toastEl.classList.add('show');
+        toastTimer = setTimeout(function() {
+          toastEl.classList.remove('show');
+        }, 3000);
       }
-    }
-    modalCancel.addEventListener('click', function() { closeModal(false); });
-    modalConfirm.addEventListener('click', function() { closeModal(true); });
-    modalOverlay.addEventListener('click', function(e) {
-      if (e.target === this) closeModal(false);
-    });
-    var loginScreen = document.getElementById('loginScreen');
-    var mainApp = document.getElementById('mainApp');
-    var passwordInput = document.getElementById('passwordInput');
-    var loginBtn = document.getElementById('loginBtn');
-    var loginError = document.getElementById('loginError');
-    var keepLoginCheck = document.getElementById('keepLogin');
-    var inviteCodeInput = document.getElementById('inviteCode');
-    var mathAnswerInput = document.getElementById('mathAnswer');
-    var refreshMathBtn = document.getElementById('refreshMathBtn');
-    refreshMathBtn.addEventListener('click', function() {
-      fetchMathQuestion();
-      mathAnswerInput.focus();
-    });
-    mathAnswerInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') doLogin();
-    });
-    if (localStorage.getItem(KEEP_LOGIN_KEY) === 'false') {
-      keepLoginCheck.checked = false;
-    } else {
-      keepLoginCheck.checked = true;
-    }
-    var loginAttempts = parseInt(localStorage.getItem('login_attempts')) || 0;
-    var lockUntil = parseInt(localStorage.getItem('lock_until')) || 0;
-    function resetLoginForm() {
-      inviteCodeInput.value = '';
-      passwordInput.value = '';
-      mathAnswerInput.value = '';
-      loginError.textContent = '';
-      loginAttempts = 0;
-      lockUntil = 0;
-      localStorage.removeItem('login_attempts');
-      localStorage.removeItem('lock_until');
-      fetchMathQuestion();
-    }
-    function getToken() {
-      return localStorage.getItem(TOKEN_KEY) || '';
-    }
-    function clearToken() {
-      localStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem(TOKEN_KEY);
-    }
-    function checkLogin() {
-      var loggedIn = localStorage.getItem(STORAGE_KEY);
-      var token = localStorage.getItem(TOKEN_KEY);
-      var keepLogin = localStorage.getItem(KEEP_LOGIN_KEY) !== 'false';
-      if (loggedIn === 'true' && token && keepLogin) {
-        loginScreen.classList.add('hidden');
-        mainApp.classList.add('active');
-        loadAll();
-        return true;
-      }
-      if (!keepLogin) {
-        clearToken();
-      }
-      return false;
-    }
-    async function doLogin() {
-      var inviteCode = inviteCodeInput.value.trim();
-      var pwd = passwordInput.value.trim();
-      var userAnswer = parseInt(mathAnswerInput.value.trim());
-      if (!inviteCode) {
-        loginError.textContent = '请输入邀请码';
-        return;
-      }
-      if (!pwd) {
-        loginError.textContent = '请输入密码';
-        return;
-      }
-      if (isNaN(userAnswer)) {
-        loginError.textContent = '请输入数学题答案';
-        return;
-      }
-      var attempts = parseInt(localStorage.getItem('login_attempts')) || 0;
-      var lockedUntil = parseInt(localStorage.getItem('lock_until')) || 0;
-      if (Date.now() < lockedUntil) {
-        var remaining = Math.ceil((lockedUntil - Date.now()) / 60000);
-        loginError.textContent = '尝试次数过多，请 ' + remaining + ' 分钟后重试';
-        return;
-      }
-      if (lockedUntil > 0 && Date.now() >= lockedUntil) {
-        localStorage.removeItem('login_attempts');
-        localStorage.removeItem('lock_until');
-        attempts = 0;
-        lockedUntil = 0;
-      }
-      loginBtn.disabled = true;
-      loginError.textContent = '';
-      try {
-        var res = await fetch('/api/auth', {
-          method: 'POST',
-          headers: {
-            'X-Invite-Code': inviteCode,
-            'X-Admin-Password': pwd,
-            'X-Math-Answer': String(userAnswer),
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({})
+
+      var modalOverlay = document.getElementById('modalOverlay');
+      var modalIcon = document.getElementById('modalIcon');
+      var modalTitle = document.getElementById('modalTitle');
+      var modalDesc = document.getElementById('modalDesc');
+      var modalConfirm = document.getElementById('modalConfirm');
+      var modalCancel = document.getElementById('modalCancel');
+      var modalResolve = null;
+      function showModal(iconHtml, title, desc, confirmText, confirmClass) {
+        return new Promise(function(resolve) {
+          modalIcon.innerHTML = iconHtml || '<i class="fas fa-exclamation-triangle"></i>';
+          modalTitle.textContent = title || '确认操作';
+          modalDesc.innerHTML = desc || '确定要执行此操作吗？';
+          modalConfirm.textContent = confirmText || '确认';
+          modalConfirm.className = confirmClass || 'btn-confirm';
+          modalResolve = resolve;
+          modalOverlay.classList.add('active');
         });
-        var data = await res.json();
-        if (data.error && data.error.includes('数学题')) {
-          loginError.textContent = data.error;
-          fetchMathQuestion();
-          loginBtn.disabled = false;
+      }
+      function closeModal(result) {
+        modalOverlay.classList.remove('active');
+        if (modalResolve) {
+          modalResolve(result);
+          modalResolve = null;
+        }
+      }
+      modalCancel.addEventListener('click', function() { closeModal(false); });
+      modalConfirm.addEventListener('click', function() { closeModal(true); });
+      modalOverlay.addEventListener('click', function(e) {
+        if (e.target === this) closeModal(false);
+      });
+
+      // ========== API 调用（带 Token） ==========
+      function getToken() {
+        return localStorage.getItem('admin_token') || '';
+      }
+      function clearToken() {
+        localStorage.removeItem('admin_logged_in');
+        localStorage.removeItem('admin_token');
+      }
+      async function apiCall(endpoint, options) {
+        var token = getToken();
+        var defaultOptions = {
+          headers: {
+            'X-Admin-Token': token,
+            'Content-Type': 'application/json'
+          }
+        };
+        var merged = { ...defaultOptions, ...options, headers: { ...defaultOptions.headers, ...(options?.headers || {}) } };
+        var res = await fetch('/api/' + endpoint, merged);
+        if (res.status === 401) {
+          showToast('登录已过期，请重新登录', true);
+          clearToken();
+          window.location.href = './index.html';
+          throw new Error('Unauthorized');
+        }
+        if (res.status === 403) {
+          showToast('请求来源不合法，请从 admin.cuizi.top 访问', true);
+          throw new Error('Forbidden');
+        }
+        return res;
+      }
+
+      // ========== 编辑器功能 ==========
+      var currentMode = 'article';
+      var editingIdx = -1;
+      var hardDeleteTarget = -1;
+      var EXPIRE_TIME = 48 * 60 * 60 * 1000;
+      var UNDO_PREFIX = 'undo_backup_';
+      var allArticles = [];
+      var allShuoshuo = [];
+      var allDrafts = [];
+      var currentFilter = 'all';
+      var currentSort = 'desc';
+
+      var editor = document.getElementById('mdEditor');
+      var previewArea = document.getElementById('previewArea');
+      var wordCountEl = document.getElementById('wordCount');
+      var publishBtn = document.getElementById('publishBtn');
+      var editTitle = document.getElementById('editTitle');
+      var editLocation = document.getElementById('editLocation');
+      var editDateText = document.getElementById('editDateText');
+      var editDatePicker = document.getElementById('editDatePicker');
+      var editTags = document.getElementById('editTags');
+
+      function escapeHtml(text) {
+        if (!text) return '';
+        var div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      function countWords(text) {
+        if (!text) return 0;
+        var clean = text
+          .replace(/```[\s\S]*?```/g, '')
+          .replace(/`[^`]+`/g, '')
+          .replace(/\*\*(.*?)\*\*/g, '$1')
+          .replace(/\*([^*]+)\*/g, '$1')
+          .replace(/~~(.*?)~~/g, '$1')
+          .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+          .replace(/!\[([^\]]*)\]\([^)]*\)/g, '')
+          .replace(/^#{1,6}\s+/gm, '')
+          .replace(/^-\s+/gm, '')
+          .replace(/^\d+\.\s+/gm, '')
+          .replace(/^>\s+/gm, '')
+          .replace(/^---$/gm, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+        return clean.length;
+      }
+
+      function updateWordCount() {
+        wordCountEl.textContent = countWords(editor ? editor.value : '');
+      }
+
+      function updatePreview() {
+        try {
+          var raw = editor.value || '';
+          var html = marked.parse(raw, { gfm: true, breaks: true });
+          var clean = DOMPurify.sanitize(html);
+          previewArea.innerHTML = clean;
+          previewArea.querySelectorAll('pre').forEach(function(pre) {
+            var code = pre.querySelector('code');
+            if (!code) return;
+            var lang = code.className.match(/language-(\w+)/);
+            if (lang && !pre.querySelector('.code-lang-label')) {
+              var label = document.createElement('div');
+              label.className = 'code-lang-label';
+              label.textContent = lang[1];
+              pre.style.cssText = 'position:relative;padding-top:0;overflow:hidden;';
+              pre.insertBefore(label, pre.firstChild);
+              code.style.cssText = 'display:block;padding:12px 16px;';
+            }
+          });
+        } catch (e) {
+          previewArea.innerHTML = '<span style="color:#e53935;font-size:.85rem;">预览渲染失败</span>';
+        }
+      }
+
+      if (editor) {
+        editor.addEventListener('input', function() {
+          updatePreview();
+          updateWordCount();
+        });
+        editor.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' && handleListEnter()) {
+            e.preventDefault();
+          }
+        });
+      }
+
+      function handleListEnter() {
+        var value = editor.value;
+        var cursorPos = editor.selectionStart;
+        var lines = value.split('\n');
+        var lineIndex = 0;
+        var charCount = 0;
+        for (var i = 0; i < lines.length; i++) {
+          charCount += lines[i].length + 1;
+          if (cursorPos <= charCount) {
+            lineIndex = i;
+            break;
+          }
+        }
+        if (lineIndex >= lines.length) return false;
+        var currentLine = lines[lineIndex];
+        var emptyUl = currentLine.match(/^(\s*)([-*+])\s*$/);
+        var emptyOl = currentLine.match(/^(\s*)(\d+)\.\s*$/);
+        if (emptyUl || emptyOl) {
+          var before = value.substring(0, cursorPos - currentLine.length);
+          var after = value.substring(cursorPos);
+          editor.value = before + after;
+          var newPos = cursorPos - currentLine.length;
+          editor.selectionStart = editor.selectionEnd = newPos;
+          editor.focus();
+          updatePreview();
+          updateWordCount();
+          return true;
+        }
+        var ulMatch = currentLine.match(/^(\s*)([-*+])\s+/);
+        if (ulMatch) {
+          var indent = ulMatch[1];
+          var marker = ulMatch[2];
+          var prefix = indent + marker + ' ';
+          var before = value.substring(0, cursorPos);
+          var after = value.substring(cursorPos);
+          editor.value = before + '\n' + prefix + after;
+          var newPos = cursorPos + 1 + prefix.length;
+          editor.selectionStart = editor.selectionEnd = newPos;
+          editor.focus();
+          updatePreview();
+          updateWordCount();
+          return true;
+        }
+        var olMatch = currentLine.match(/^(\s*)(\d+)\.\s+/);
+        if (olMatch) {
+          var indent = olMatch[1];
+          var num = parseInt(olMatch[2]) + 1;
+          var prefix = indent + num + '. ';
+          var before = value.substring(0, cursorPos);
+          var after = value.substring(cursorPos);
+          editor.value = before + '\n' + prefix + after;
+          var newPos = cursorPos + 1 + prefix.length;
+          editor.selectionStart = editor.selectionEnd = newPos;
+          editor.focus();
+          updatePreview();
+          updateWordCount();
+          return true;
+        }
+        return false;
+      }
+
+      // ========== 工具栏命令 ==========
+      document.querySelectorAll('#customToolbar button[data-cmd]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var cmd = this.dataset.cmd;
+          var start = editor.selectionStart;
+          var end = editor.selectionEnd;
+          var selected = '';
+          try { selected = editor.value.substring(start, end) || ''; } catch (e) {}
+          switch (cmd) {
+            case 'bold': wrapText('**', '**'); break;
+            case 'italic': wrapText('*', '*'); break;
+            case 'strike': wrapText('~~', '~~'); break;
+            case 'h1': insertText('# '); break;
+            case 'h2': insertText('## '); break;
+            case 'h3': insertText('### '); break;
+            case 'h4': insertText('#### '); break;
+            case 'h5': insertText('##### '); break;
+            case 'h6': insertText('###### '); break;
+            case 'ul': insertListMarker('- '); break;
+            case 'ol': insertListMarker('1. '); break;
+            case 'code': wrapText('`', '`'); break;
+            case 'codeblock': insertText('\n```\n\n```\n'); var pos = editor.selectionStart; editor.selectionStart = editor.selectionEnd = pos - 3; editor.focus(); break;
+            case 'quote': insertText('> '); break;
+            case 'link': selected ? wrapText('[', '](url)') : insertText('[](url)'); break;
+            case 'image': selected ? wrapText('![', '](图片url)') : insertText('![](图片url)'); break;
+            case 'table': insertText('\n| 列1 | 列2 | 列3 |\n|-----|-----|-----|\n| 内容 | 内容 | 内容 |\n'); break;
+            case 'hr': insertText('\n---\n'); break;
+          }
+          updatePreview();
+          updateWordCount();
+        });
+      });
+
+      function insertText(text) {
+        if (!editor) return;
+        var start = editor.selectionStart || 0;
+        var end = editor.selectionEnd || 0;
+        var value = editor.value;
+        editor.value = value.substring(0, start) + text + value.substring(end);
+        var pos = start + text.length;
+        editor.selectionStart = editor.selectionEnd = pos;
+        editor.focus();
+        updatePreview();
+        updateWordCount();
+      }
+
+      function wrapText(before, after) {
+        if (!editor) return;
+        var start = editor.selectionStart || 0;
+        var end = editor.selectionEnd || 0;
+        var value = editor.value;
+        var selected = '';
+        try { selected = value.substring(start, end) || ''; } catch (e) {}
+        editor.value = value.substring(0, start) + before + selected + after + value.substring(end);
+        var pos = start + before.length;
+        editor.selectionStart = pos;
+        editor.selectionEnd = pos + selected.length;
+        editor.focus();
+        updatePreview();
+        updateWordCount();
+      }
+
+      function insertListMarker(marker) {
+        if (!editor) return;
+        var start = editor.selectionStart || 0;
+        var value = editor.value;
+        var lines = value.split('\n');
+        var lineIndex = 0;
+        var charCount = 0;
+        for (var i = 0; i < lines.length; i++) {
+          charCount += lines[i].length + 1;
+          if (start <= charCount) {
+            lineIndex = i;
+            break;
+          }
+        }
+        if (lineIndex >= lines.length) return;
+        var currentLine = lines[lineIndex];
+        var indent = currentLine.match(/^(\s*)/)[1];
+        if (/^(\s*)([-*+]|\d+\.)\s+/.test(currentLine)) {
+          showToast('当前行已是列表', true);
           return;
         }
-        if (data.success) {
-          localStorage.removeItem('login_attempts');
-          localStorage.removeItem('lock_until');
-          var keepLogin = keepLoginCheck.checked;
-          localStorage.setItem(KEEP_LOGIN_KEY, String(keepLogin));
-          localStorage.setItem(TOKEN_KEY, data.token);
-          localStorage.setItem(STORAGE_KEY, 'true');
-          loginScreen.classList.add('hidden');
-          mainApp.classList.add('active');
-          loadAll();
-        } else {
-          attempts++;
-          localStorage.setItem('login_attempts', String(attempts));
-          if (attempts >= 5) {
-            var lockTime = Date.now() + 15 * 60 * 1000;
-            localStorage.setItem('lock_until', String(lockTime));
-            loginError.textContent = '尝试次数过多，请 15 分钟后重试';
-          } else {
-            loginError.textContent = '验证失败（' + attempts + '/5）';
+        var prefix = indent + marker;
+        var before = value.substring(0, start - currentLine.length);
+        var after = value.substring(start);
+        editor.value = before + prefix + currentLine.trimStart() + after;
+        var newPos = start + prefix.length;
+        editor.selectionStart = editor.selectionEnd = newPos;
+        editor.focus();
+        updatePreview();
+        updateWordCount();
+      }
+
+      // ========== 数据加载 ==========
+      function getCurrentData() {
+        return currentMode === 'article' ? allArticles : allShuoshuo;
+      }
+      function getCurrentEndpoint() {
+        return currentMode === 'article' ? 'posts' : 'shuoshuo';
+      }
+      function getUndoKey(mode, idx) {
+        return UNDO_PREFIX + mode + '_' + idx;
+      }
+      function getUndoBackup(mode, idx) {
+        var key = getUndoKey(mode, idx);
+        var raw = localStorage.getItem(key);
+        if (!raw) return null;
+        try {
+          var backup = JSON.parse(raw);
+          if (Date.now() - backup.savedAt >= EXPIRE_TIME) {
+            localStorage.removeItem(key);
+            return null;
           }
-          fetchMathQuestion();
-        }
-      } catch (e) {
-        loginError.textContent = '网络错误，请重试';
-      }
-      loginBtn.disabled = false;
-    }
-    loginBtn.addEventListener('click', doLogin);
-    passwordInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') doLogin();
-    });
-    inviteCodeInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') doLogin();
-    });
-    document.getElementById('logoutBtn').addEventListener('click', async function() {
-      var confirmed = await showModal(
-        '<i class="fas fa-sign-out-alt"></i>',
-        '确认退出',
-        '确定要退出当前账号吗？<br />退出后需要重新登录才能继续管理。',
-        '确认退出',
-        'btn-confirm-warning'
-      );
-      if (!confirmed) return;
-      var doubleConfirmed = await showModal(
-        '<i class="fas fa-shield-alt"></i>',
-        '二次确认',
-        '退出后未保存的更改将丢失。<br />确定要退出登录吗？',
-        '确定退出',
-        'btn-confirm-warning'
-      );
-      if (!doubleConfirmed) return;
-      clearToken();
-      if (localStorage.getItem(KEEP_LOGIN_KEY) === 'false') {
-        clearToken();
-      }
-      loginScreen.classList.remove('hidden');
-      mainApp.classList.remove('active');
-      resetLoginForm();
-      passwordInput.value = '';
-      loginError.textContent = '';
-      if (editor) {
-        editor.value = '';
-        updatePreview();
-        updateWordCount();
-      }
-      showToast('已安全退出');
-    });
-    var currentMode = 'article';
-    var editingIdx = -1;
-    var hardDeleteTarget = -1;
-    var EXPIRE_TIME = 48 * 60 * 60 * 1000;
-    var UNDO_PREFIX = 'undo_backup_';
-    var allArticles = [];
-    var allShuoshuo = [];
-    var allDrafts = [];
-    var currentFilter = 'all';
-    var currentSort = 'desc';
-    var editor = document.getElementById('mdEditor');
-    var previewArea = document.getElementById('previewArea');
-    var wordCountEl = document.getElementById('wordCount');
-    var publishBtn = document.getElementById('publishBtn');
-    var editTitle = document.getElementById('editTitle');
-    var editLocation = document.getElementById('editLocation');
-    var editDateText = document.getElementById('editDateText');
-    var editDatePicker = document.getElementById('editDatePicker');
-    var editTags = document.getElementById('editTags');
-    function escapeHtml(text) {
-      if (!text) return '';
-      var div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-    function countWords(text) {
-      if (!text) return 0;
-      var clean = text
-        .replace(/```[\s\S]*?```/g, '')
-        .replace(/`[^`]+`/g, '')
-        .replace(/\*\*(.*?)\*\*/g, '$1')
-        .replace(/\*([^*]+)\*/g, '$1')
-        .replace(/~~(.*?)~~/g, '$1')
-        .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
-        .replace(/!\[([^\]]*)\]\([^)]*\)/g, '')
-        .replace(/^#{1,6}\s+/gm, '')
-        .replace(/^-\s+/gm, '')
-        .replace(/^\d+\.\s+/gm, '')
-        .replace(/^>\s+/gm, '')
-        .replace(/^---$/gm, '')
-        .replace(/\s+/g, ' ')
-        .trim();
-      return clean.length;
-    }
-    function updateWordCount() {
-      wordCountEl.textContent = countWords(editor ? editor.value : '');
-    }
-    function updatePreview() {
-      try {
-        var raw = editor.value || '';
-        var html = marked.parse(raw, { gfm: true, breaks: true });
-        var clean = DOMPurify.sanitize(html);
-        previewArea.innerHTML = clean;
-        previewArea.querySelectorAll('pre').forEach(function(pre) {
-          var code = pre.querySelector('code');
-          if (!code) return;
-          var lang = code.className.match(/language-(\w+)/);
-          if (lang && !pre.querySelector('.code-lang-label')) {
-            var label = document.createElement('div');
-            label.className = 'code-lang-label';
-            label.textContent = lang[1];
-            pre.style.cssText = 'position:relative;padding-top:0;overflow:hidden;';
-            pre.insertBefore(label, pre.firstChild);
-            code.style.cssText = 'display:block;padding:12px 16px;';
-          }
-        });
-      } catch (e) {
-        previewArea.innerHTML = '<span style="color:#e53935;font-size:.85rem;">预览渲染失败</span>';
-      }
-    }
-    if (editor) {
-      editor.addEventListener('input', function() {
-        updatePreview();
-        updateWordCount();
-      });
-      editor.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && handleListEnter()) {
-          e.preventDefault();
-        }
-      });
-    }
-    function handleListEnter() {
-      var value = editor.value;
-      var cursorPos = editor.selectionStart;
-      var lines = value.split('\n');
-      var lineIndex = 0;
-      var charCount = 0;
-      for (var i = 0; i < lines.length; i++) {
-        charCount += lines[i].length + 1;
-        if (cursorPos <= charCount) {
-          lineIndex = i;
-          break;
-        }
-      }
-      if (lineIndex >= lines.length) return false;
-      var currentLine = lines[lineIndex];
-      var emptyUl = currentLine.match(/^(\s*)([-*+])\s*$/);
-      var emptyOl = currentLine.match(/^(\s*)(\d+)\.\s*$/);
-      if (emptyUl || emptyOl) {
-        var before = value.substring(0, cursorPos - currentLine.length);
-        var after = value.substring(cursorPos);
-        editor.value = before + after;
-        var newPos = cursorPos - currentLine.length;
-        editor.selectionStart = editor.selectionEnd = newPos;
-        editor.focus();
-        updatePreview();
-        updateWordCount();
-        return true;
-      }
-      var ulMatch = currentLine.match(/^(\s*)([-*+])\s+/);
-      if (ulMatch) {
-        var indent = ulMatch[1];
-        var marker = ulMatch[2];
-        var prefix = indent + marker + ' ';
-        var before = value.substring(0, cursorPos);
-        var after = value.substring(cursorPos);
-        editor.value = before + '\n' + prefix + after;
-        var newPos = cursorPos + 1 + prefix.length;
-        editor.selectionStart = editor.selectionEnd = newPos;
-        editor.focus();
-        updatePreview();
-        updateWordCount();
-        return true;
-      }
-      var olMatch = currentLine.match(/^(\s*)(\d+)\.\s+/);
-      if (olMatch) {
-        var indent = olMatch[1];
-        var num = parseInt(olMatch[2]) + 1;
-        var prefix = indent + num + '. ';
-        var before = value.substring(0, cursorPos);
-        var after = value.substring(cursorPos);
-        editor.value = before + '\n' + prefix + after;
-        var newPos = cursorPos + 1 + prefix.length;
-        editor.selectionStart = editor.selectionEnd = newPos;
-        editor.focus();
-        updatePreview();
-        updateWordCount();
-        return true;
-      }
-      return false;
-    }
-    document.querySelectorAll('#customToolbar button[data-cmd]').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var cmd = this.dataset.cmd;
-        var start = editor.selectionStart;
-        var end = editor.selectionEnd;
-        var selected = '';
-        try { selected = editor.value.substring(start, end) || ''; } catch (e) {}
-        switch (cmd) {
-          case 'bold': wrapText('**', '**'); break;
-          case 'italic': wrapText('*', '*'); break;
-          case 'strike': wrapText('~~', '~~'); break;
-          case 'h1': insertText('# '); break;
-          case 'h2': insertText('## '); break;
-          case 'h3': insertText('### '); break;
-          case 'h4': insertText('#### '); break;
-          case 'h5': insertText('##### '); break;
-          case 'h6': insertText('###### '); break;
-          case 'ul': insertListMarker('- '); break;
-          case 'ol': insertListMarker('1. '); break;
-          case 'code': wrapText('`', '`'); break;
-          case 'codeblock': insertText('\n```\n\n```\n'); var pos = editor.selectionStart; editor.selectionStart = editor.selectionEnd = pos - 3; editor.focus(); break;
-          case 'quote': insertText('> '); break;
-          case 'link': selected ? wrapText('[', '](url)') : insertText('[](url)'); break;
-          case 'image': selected ? wrapText('![', '](图片url)') : insertText('![](图片url)'); break;
-          case 'table': insertText('\n| 列1 | 列2 | 列3 |\n|-----|-----|-----|\n| 内容 | 内容 | 内容 |\n'); break;
-          case 'hr': insertText('\n---\n'); break;
-        }
-        updatePreview();
-        updateWordCount();
-      });
-    });
-    function insertText(text) {
-      if (!editor) return;
-      var start = editor.selectionStart || 0;
-      var end = editor.selectionEnd || 0;
-      var value = editor.value;
-      editor.value = value.substring(0, start) + text + value.substring(end);
-      var pos = start + text.length;
-      editor.selectionStart = editor.selectionEnd = pos;
-      editor.focus();
-      updatePreview();
-      updateWordCount();
-    }
-    function wrapText(before, after) {
-      if (!editor) return;
-      var start = editor.selectionStart || 0;
-      var end = editor.selectionEnd || 0;
-      var value = editor.value;
-      var selected = '';
-      try { selected = value.substring(start, end) || ''; } catch (e) {}
-      editor.value = value.substring(0, start) + before + selected + after + value.substring(end);
-      var pos = start + before.length;
-      editor.selectionStart = pos;
-      editor.selectionEnd = pos + selected.length;
-      editor.focus();
-      updatePreview();
-      updateWordCount();
-    }
-    function insertListMarker(marker) {
-      if (!editor) return;
-      var start = editor.selectionStart || 0;
-      var value = editor.value;
-      var lines = value.split('\n');
-      var lineIndex = 0;
-      var charCount = 0;
-      for (var i = 0; i < lines.length; i++) {
-        charCount += lines[i].length + 1;
-        if (start <= charCount) {
-          lineIndex = i;
-          break;
-        }
-      }
-      if (lineIndex >= lines.length) return;
-      var currentLine = lines[lineIndex];
-      var indent = currentLine.match(/^(\s*)/)[1];
-      if (/^(\s*)([-*+]|\d+\.)\s+/.test(currentLine)) {
-        showToast('当前行已是列表', true);
-        return;
-      }
-      var prefix = indent + marker;
-      var before = value.substring(0, start - currentLine.length);
-      var after = value.substring(start);
-      editor.value = before + prefix + currentLine.trimStart() + after;
-      var newPos = start + prefix.length;
-      editor.selectionStart = editor.selectionEnd = newPos;
-      editor.focus();
-      updatePreview();
-      updateWordCount();
-    }
-    async function apiCall(endpoint, options) {
-      var token = getToken();
-      var defaultOptions = {
-        headers: {
-          'X-Admin-Token': token,
-          'Content-Type': 'application/json'
-        }
-      };
-      var merged = { ...defaultOptions, ...options, headers: { ...defaultOptions.headers, ...(options?.headers || {}) } };
-      var res = await fetch('/api/' + endpoint, merged);
-      if (res.status === 401) {
-        showToast('登录已过期，请重新登录', true);
-        clearToken();
-        loginScreen.classList.remove('hidden');
-        mainApp.classList.remove('active');
-        throw new Error('Unauthorized');
-      }
-      if (res.status === 403) {
-        showToast('请求来源不合法，请从 admin.cuizi.top 访问', true);
-        throw new Error('Forbidden');
-      }
-      return res;
-    }
-    function getCurrentData() {
-      return currentMode === 'article' ? allArticles : allShuoshuo;
-    }
-    function getCurrentEndpoint() {
-      return currentMode === 'article' ? 'posts' : 'shuoshuo';
-    }
-    function getUndoKey(mode, idx) {
-      return UNDO_PREFIX + mode + '_' + idx;
-    }
-    function getUndoBackup(mode, idx) {
-      var key = getUndoKey(mode, idx);
-      var raw = localStorage.getItem(key);
-      if (!raw) return null;
-      try {
-        var backup = JSON.parse(raw);
-        if (Date.now() - backup.savedAt >= EXPIRE_TIME) {
+          return backup;
+        } catch (e) {
           localStorage.removeItem(key);
           return null;
         }
-        return backup;
-      } catch (e) {
-        localStorage.removeItem(key);
-        return null;
       }
-    }
-    function setDefaultDate() {
-      if (!editDateText.value) {
-        var today = new Date().toISOString().slice(0, 10);
-        editDateText.value = today;
-        editDatePicker.value = today;
-      }
-    }
-    function clearEditor() {
-      editTitle.value = '';
-      editLocation.value = '';
-      editDateText.value = '';
-      editDatePicker.value = '';
-      editTags.value = '';
-      if (editor) {
-        editor.value = '';
-        updatePreview();
-        updateWordCount();
-      }
-      editingIdx = -1;
-      publishBtn.textContent = currentMode === 'article' ? '发布文章' : '发布说说';
-      setDefaultDate();
-    }
-    async function loadArticles() {
-      try {
-        var res = await apiCall('posts', { method: 'GET' });
-        var data = await res.json();
-        allArticles = data.announcements || [];
-      } catch (e) {
-        allArticles = [];
-      }
-    }
-    async function loadShuoshuo() {
-      try {
-        var res = await apiCall('shuoshuo', { method: 'GET' });
-        allShuoshuo = await res.json();
-      } catch (e) {
-        allShuoshuo = [];
-      }
-    }
-    async function loadDrafts() {
-      try {
-        var res = await apiCall('drafts', { method: 'GET' });
-        var data = await res.json();
-        allDrafts = data.drafts || [];
-      } catch (e) {
-        allDrafts = [];
-      }
-    }
-    function renderUnifiedList() {
-      var list = document.getElementById('articleList');
-      var search = document.getElementById('listSearch').value.trim().toLowerCase();
-      var data = getCurrentData();
-      var filter = document.querySelector('#tabList .filter-btn.active')?.dataset?.filter || 'all';
-      var filtered = data.slice();
-      if (filter === 'published') filtered = filtered.filter(function(a) { return !a.delete; });
-      if (filter === 'deleted') filtered = filtered.filter(function(a) { return a.delete; });
-      if (search) {
-        filtered = filtered.filter(function(a) {
-          var c = (a.content || '').toLowerCase();
-          var t = (a.title || '').toLowerCase();
-          var l = (a.location || '').toLowerCase();
-          var tg = (a.tags || []).join(' ').toLowerCase();
-          return c.indexOf(search) !== -1 || t.indexOf(search) !== -1 || l.indexOf(search) !== -1 || tg.indexOf(search) !== -1;
-        });
-      }
-      filtered.sort(function(a, b) {
-        var da = a.date || '1970-01-01', db = b.date || '1970-01-01';
-        return currentSort === 'desc' ? db.localeCompare(da) : da.localeCompare(db);
-      });
-      document.getElementById('listCount').textContent = filtered.length + ' 项';
-      if (filtered.length === 0) {
-        list.innerHTML = '<div class="empty">没有内容</div>';
-        return;
-      }
-      var html = '';
-      filtered.forEach(function(item) {
-        var idx = data.indexOf(item);
-        var tagsHtml = (item.tags || []).map(function(t) {
-          return '<span class="tag">' + escapeHtml(t) + '</span>';
-        }).join(' ');
-        var deletedClass = item.delete ? 'deleted' : '';
-        var statusHtml = item.delete ? '<span class="status-deleted">已删除</span>' : '';
-        var displayTitle = currentMode === 'article' ? escapeHtml(item.title || '无标题') : escapeHtml((item.content || '').slice(0, 50)) + ((item.content || '').length > 50 ? '...' : '');
-        var metaParts = [item.date || ''];
-        if (currentMode === 'shuoshuo' && item.location) metaParts.push('<i class="fas fa-map-marker-alt"></i> ' + escapeHtml(item.location));
-        var metaHtml = metaParts.join(' · ') + ' ' + tagsHtml + ' ' + statusHtml;
-        var actionsHtml = '<button class="btn-edit" data-idx="' + idx + '">编辑</button>' +
-          (item.delete ? '<button class="btn-restore" data-idx="' + idx + '">恢复</button>' : '<button class="btn-soft-delete" data-idx="' + idx + '">删除</button>') +
-          '<button class="btn-hard-delete" data-idx="' + idx + '" data-title="' + (currentMode === 'article' ? escapeHtml(item.title || '无标题') : escapeHtml((item.content || '').slice(0, 30))) + '">硬删</button>';
-        var undoBackup = getUndoBackup(currentMode, idx);
-        if (undoBackup) {
-          actionsHtml += '<button class="btn-undo" data-idx="' + idx + '">撤销修改</button>';
+
+      function setDefaultDate() {
+        if (!editDateText.value) {
+          var today = new Date().toISOString().slice(0, 10);
+          editDateText.value = today;
+          editDatePicker.value = today;
         }
-        html += '<div class="article-item-admin ' + deletedClass + '">' +
-          '<div class="item-info">' +
-          '<div class="item-title">' + displayTitle + '</div>' +
-          '<div class="item-meta">' + metaHtml + '</div>' +
-          '</div>' +
-          '<div class="item-actions">' + actionsHtml + '</div>' +
-          '</div>';
-      });
-      list.innerHTML = html;
-      list.querySelectorAll('.btn-edit').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          var idx = parseInt(this.dataset.idx);
-          loadToEditor(idx);
-        });
-      });
-      list.querySelectorAll('.btn-soft-delete').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          var idx = parseInt(this.dataset.idx);
-          softDeleteItem(idx);
-        });
-      });
-      list.querySelectorAll('.btn-restore').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          var idx = parseInt(this.dataset.idx);
-          restoreItem(idx);
-        });
-      });
-      list.querySelectorAll('.btn-hard-delete').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          var idx = parseInt(this.dataset.idx);
-          var title = this.dataset.title;
-          showHardDeleteModal(idx, title);
-        });
-      });
-      list.querySelectorAll('.btn-undo').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          var idx = parseInt(this.dataset.idx);
-          undoItem(idx);
-        });
-      });
-    }
-    function loadToEditor(idx) {
-      var data = getCurrentData();
-      var item = data[idx];
-      if (!item) return;
-      var targetMode = currentMode;
-      document.querySelectorAll('.mode-btn').forEach(function(b) {
-        if (b.dataset.mode === targetMode) {
-          b.classList.add('active');
-          b.style.background = 'rgba(255,255,255,.6)';
-          b.style.color = '#3d2d8a';
-        } else {
-          b.classList.remove('active');
-          b.style.background = 'transparent';
-          b.style.color = '#6a6a92';
-        }
-      });
-      document.querySelectorAll('.article-only').forEach(function(el) {
-        el.style.display = targetMode === 'article' ? '' : 'none';
-      });
-      document.querySelectorAll('.shuoshuo-only').forEach(function(el) {
-        el.style.display = targetMode === 'shuoshuo' ? '' : 'none';
-      });
-      editingIdx = idx;
-      if (currentMode === 'article') {
-        editTitle.value = item.title || '';
-        editLocation.value = '';
-      } else {
+      }
+
+      function clearEditor() {
         editTitle.value = '';
-        editLocation.value = item.location || '';
-      }
-      var dateStr = item.date || '';
-      editDateText.value = dateStr;
-      if (dateStr && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-        editDatePicker.value = dateStr;
-      } else {
+        editLocation.value = '';
+        editDateText.value = '';
         editDatePicker.value = '';
-      }
-      editTags.value = (item.tags || []).join('，');
-      if (editor) {
-        editor.value = item.content || '';
-        updatePreview();
-        updateWordCount();
-      }
-      publishBtn.textContent = '更新' + (currentMode === 'article' ? '文章' : '说说');
-      document.querySelector('.tab[data-tab="write"]').click();
-      showToast('已加载');
-    }
-    async function softDeleteItem(idx) {
-      var result = await showModal(
-        '<i class="fas fa-trash-alt"></i>',
-        '软删除',
-        '确定要软删除此项吗？<br />软删除后仍可恢复。',
-        '确认软删除',
-        'btn-confirm-warning'
-      );
-      if (!result) return;
-      try {
-        var res = await apiCall(getCurrentEndpoint(), {
-          method: 'DELETE',
-          body: JSON.stringify({ id: idx })
-        });
-        var data = await res.json();
-        if (data.success) {
-          showToast('已删除');
-          await loadAll();
-          renderUnifiedList();
-          updateBadges();
-        } else {
-          showToast(data.error || '删除失败', true);
+        editTags.value = '';
+        if (editor) {
+          editor.value = '';
+          updatePreview();
+          updateWordCount();
         }
-      } catch (e) {
-        showToast('删除失败', true);
+        editingIdx = -1;
+        publishBtn.textContent = currentMode === 'article' ? '发布文章' : '发布说说';
+        setDefaultDate();
       }
-    }
-    async function restoreItem(idx) {
-      try {
-        var res = await apiCall(getCurrentEndpoint(), {
-          method: 'DELETE',
-          body: JSON.stringify({ id: idx, restore: true })
-        });
-        var data = await res.json();
-        if (data.success) {
-          showToast('已恢复');
-          await loadAll();
-          renderUnifiedList();
-          updateBadges();
-        } else {
-          showToast(data.error || '恢复失败', true);
+
+      async function loadArticles() {
+        try {
+          var res = await apiCall('posts', { method: 'GET' });
+          var data = await res.json();
+          allArticles = data.announcements || [];
+        } catch (e) {
+          allArticles = [];
         }
-      } catch (e) {
-        showToast('恢复失败', true);
       }
-    }
-    async function undoItem(idx) {
-      var backup = getUndoBackup(currentMode, idx);
-      if (!backup) {
-        showToast('没有可撤销的版本', true);
-        return;
+
+      async function loadShuoshuo() {
+        try {
+          var res = await apiCall('shuoshuo', { method: 'GET' });
+          allShuoshuo = await res.json();
+        } catch (e) {
+          allShuoshuo = [];
+        }
       }
-      var displayTitle = currentMode === 'article' ? (backup.title || '无标题') : (backup.content || '').slice(0, 50);
-      var result = await showModal(
-        '<i class="fas fa-undo-alt"></i>',
-        '撤销修改',
-        '确定要撤销对 <strong>' + escapeHtml(displayTitle) + '</strong> 的修改吗？<br />将恢复到修改前的版本。',
-        '确认撤销',
-        'btn-confirm-warning'
-      );
-      if (!result) return;
-      try {
-        var body = {
-          id: idx,
-          title: backup.title || '',
-          content: backup.content || '',
-          tags: backup.tags || [],
-          date: backup.date || ''
-        };
-        if (currentMode === 'shuoshuo' && backup.location) {
-          body.location = backup.location;
+
+      async function loadDrafts() {
+        try {
+          var res = await apiCall('drafts', { method: 'GET' });
+          var data = await res.json();
+          allDrafts = data.drafts || [];
+        } catch (e) {
+          allDrafts = [];
         }
-        var res = await apiCall(getCurrentEndpoint(), {
-          method: 'PUT',
-          body: JSON.stringify(body)
-        });
-        var data = await res.json();
-        if (data.success) {
-          showToast('已撤销');
-          localStorage.removeItem(getUndoKey(currentMode, idx));
-          await loadAll();
-          renderUnifiedList();
-          updateBadges();
-        } else {
-          showToast(data.error || '撤销失败', true);
-        }
-      } catch (e) {
-        showToast('撤销失败', true);
       }
-    }
-    function showHardDeleteModal(idx, title) {
-      hardDeleteTarget = idx;
-      var expected = currentMode === 'article' ? '我确定删除这篇文章' : '我确定删除这篇说说';
-      var descHtml = '你正在执行<strong>硬删除</strong>操作，该内容将从数据中<strong>彻底移除</strong>，无法恢复。<br /><br />输入 <strong style="color:#e53935;">' + expected + '</strong> 确认删除：<br /><br /><input type="text" id="hardDeleteConfirmInput" placeholder="输入确认语..." style="width:100%;padding:.6rem 1rem;border-radius:60px;border:2px solid #e53935;font-size:.9rem;font-family:inherit;background:rgba(255,255,255,.5);color:#1a1a2e;text-align:center;outline:none;">';
-      showModal(
-        '<i class="fas fa-exclamation-triangle"></i>',
-        '危险操作',
-        descHtml,
-        '确认硬删除',
-        'btn-confirm'
-      ).then(async function(confirmed) {
-        if (confirmed) {
-          var confirmInput = document.getElementById('hardDeleteConfirmInput');
-          if (confirmInput && confirmInput.value.trim() === expected) {
-            var secondConfirm = await showModal(
-              '<i class="fas fa-exclamation-circle"></i>',
-              '二次确认',
-              '你真的确定要彻底删除吗？删除后无法恢复！',
-              '确定删除',
-              'btn-confirm'
-            );
-            if (secondConfirm) {
-              await confirmHardDelete();
-            }
-          } else {
-            showToast('确认语输入不正确，取消删除', true);
-          }
-        }
-        hardDeleteTarget = -1;
-      });
-    }
-    async function confirmHardDelete() {
-      if (hardDeleteTarget === -1) return;
-      try {
-        localStorage.removeItem(getUndoKey(currentMode, hardDeleteTarget));
+
+      function renderUnifiedList() {
+        var list = document.getElementById('articleList');
+        var search = document.getElementById('listSearch').value.trim().toLowerCase();
         var data = getCurrentData();
-        data.splice(hardDeleteTarget, 1);
-        var res = await apiCall(getCurrentEndpoint(), {
-          method: 'PUT',
-          body: JSON.stringify({ hardDelete: true, items: data })
-        });
-        var result = await res.json();
-        if (result.success) {
-          showToast('已硬删除');
-          await loadAll();
-          renderUnifiedList();
-          updateBadges();
-        } else {
-          showToast(result.error || '硬删除失败', true);
+        var filter = document.querySelector('#tabList .filter-btn.active')?.dataset?.filter || 'all';
+        var filtered = data.slice();
+        if (filter === 'published') filtered = filtered.filter(function(a) { return !a.delete; });
+        if (filter === 'deleted') filtered = filtered.filter(function(a) { return a.delete; });
+        if (search) {
+          filtered = filtered.filter(function(a) {
+            var c = (a.content || '').toLowerCase();
+            var t = (a.title || '').toLowerCase();
+            var l = (a.location || '').toLowerCase();
+            var tg = (a.tags || []).join(' ').toLowerCase();
+            return c.indexOf(search) !== -1 || t.indexOf(search) !== -1 || l.indexOf(search) !== -1 || tg.indexOf(search) !== -1;
+          });
         }
-      } catch (e) {
-        showToast('硬删除失败', true);
+        filtered.sort(function(a, b) {
+          var da = a.date || '1970-01-01', db = b.date || '1970-01-01';
+          return currentSort === 'desc' ? db.localeCompare(da) : da.localeCompare(db);
+        });
+        document.getElementById('listCount').textContent = filtered.length + ' 项';
+        if (filtered.length === 0) {
+          list.innerHTML = '<div class="empty">没有内容</div>';
+          return;
+        }
+        var html = '';
+        filtered.forEach(function(item) {
+          var idx = data.indexOf(item);
+          var tagsHtml = (item.tags || []).map(function(t) {
+            return '<span class="tag">' + escapeHtml(t) + '</span>';
+          }).join(' ');
+          var deletedClass = item.delete ? 'deleted' : '';
+          var statusHtml = item.delete ? '<span class="status-deleted">已删除</span>' : '';
+          var displayTitle = currentMode === 'article' ? escapeHtml(item.title || '无标题') : escapeHtml((item.content || '').slice(0, 50)) + ((item.content || '').length > 50 ? '...' : '');
+          var metaParts = [item.date || ''];
+          if (currentMode === 'shuoshuo' && item.location) metaParts.push('<i class="fas fa-map-marker-alt"></i> ' + escapeHtml(item.location));
+          var metaHtml = metaParts.join(' · ') + ' ' + tagsHtml + ' ' + statusHtml;
+          var actionsHtml = '<button class="btn-edit" data-idx="' + idx + '">编辑</button>' +
+            (item.delete ? '<button class="btn-restore" data-idx="' + idx + '">恢复</button>' : '<button class="btn-soft-delete" data-idx="' + idx + '">删除</button>') +
+            '<button class="btn-hard-delete" data-idx="' + idx + '" data-title="' + (currentMode === 'article' ? escapeHtml(item.title || '无标题') : escapeHtml((item.content || '').slice(0, 30))) + '">硬删</button>';
+          var undoBackup = getUndoBackup(currentMode, idx);
+          if (undoBackup) {
+            actionsHtml += '<button class="btn-undo" data-idx="' + idx + '">撤销修改</button>';
+          }
+          html += '<div class="article-item-admin ' + deletedClass + '">' +
+            '<div class="item-info">' +
+            '<div class="item-title">' + displayTitle + '</div>' +
+            '<div class="item-meta">' + metaHtml + '</div>' +
+            '</div>' +
+            '<div class="item-actions">' + actionsHtml + '</div>' +
+            '</div>';
+        });
+        list.innerHTML = html;
+        // 事件绑定
+        list.querySelectorAll('.btn-edit').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var idx = parseInt(this.dataset.idx);
+            loadToEditor(idx);
+          });
+        });
+        list.querySelectorAll('.btn-soft-delete').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var idx = parseInt(this.dataset.idx);
+            softDeleteItem(idx);
+          });
+        });
+        list.querySelectorAll('.btn-restore').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var idx = parseInt(this.dataset.idx);
+            restoreItem(idx);
+          });
+        });
+        list.querySelectorAll('.btn-hard-delete').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var idx = parseInt(this.dataset.idx);
+            var title = this.dataset.title;
+            showHardDeleteModal(idx, title);
+          });
+        });
+        list.querySelectorAll('.btn-undo').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var idx = parseInt(this.dataset.idx);
+            undoItem(idx);
+          });
+        });
       }
-    }
-    function renderDraftList() {
-      var list = document.getElementById('draftList');
-      if (allDrafts.length === 0) {
-        list.innerHTML = '<div class="empty">没有草稿</div>';
-        return;
-      }
-      var html = '';
-      allDrafts.forEach(function(draft) {
-        var preview = (draft.content || '').replace(/\n/g, ' ').slice(0, 80) + (draft.content && draft.content.length > 80 ? '...' : '');
-        var tagsHtml = (draft.tags || []).map(function(t) {
-          return '<span class="tag">' + escapeHtml(t) + '</span>';
-        }).join(' ');
-        var typeLabel = draft.type === 'shuoshuo' ? '<i class="fas fa-comment"></i> 说说草稿' : '<i class="fas fa-file-alt"></i> 文章草稿';
-        html += '<div class="draft-item">' +
-          '<div class="draft-info">' +
-          '<div class="draft-title">' + escapeHtml(draft.title || '无标题') + ' <span style="font-size:.6rem;color:#8a8ab5;font-weight:400;">' + typeLabel + '</span></div>' +
-          '<div class="draft-meta">创建于 ' + (draft.created || '') + (draft.updated && draft.updated !== draft.created ? ' · 更新于 ' + draft.updated : '') + (draft.location ? ' · <i class="fas fa-map-marker-alt"></i> ' + escapeHtml(draft.location) : '') + '</div>' +
-          (tagsHtml ? '<div class="draft-tags">' + tagsHtml + '</div>' : '') +
-          '<div class="draft-preview">' + escapeHtml(preview) + '</div>' +
-          '</div>' +
-          '<div class="draft-actions">' +
-          '<button class="btn-continue" data-id="' + draft.id + '">继续编辑</button>' +
-          '<button class="btn-publish-draft" data-id="' + draft.id + '">发布</button>' +
-          '<button class="btn-delete-draft" data-id="' + draft.id + '">删除</button>' +
-          '</div>' +
-          '</div>';
-      });
-      list.innerHTML = html;
-      list.querySelectorAll('.btn-continue').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          var id = this.dataset.id;
-          var draft = allDrafts.find(function(d) { return d.id === id; });
-          if (draft) {
-            if (draft.type === 'shuoshuo') {
-              document.querySelector('.mode-btn[data-mode="shuoshuo"]').click();
-            } else {
-              document.querySelector('.mode-btn[data-mode="article"]').click();
-            }
-            editTitle.value = draft.title || '';
-            editLocation.value = draft.location || '';
-            var dateStr = draft.date || '';
-            editDateText.value = dateStr;
-            if (dateStr && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-              editDatePicker.value = dateStr;
-            } else {
-              editDatePicker.value = '';
-            }
-            editTags.value = (draft.tags || []).join('，');
-            if (editor) {
-              editor.value = draft.content || '';
-              updatePreview();
-              updateWordCount();
-            }
-            editingIdx = -1;
-            publishBtn.textContent = currentMode === 'article' ? '发布文章' : '发布说说';
-            document.querySelector('.tab[data-tab="write"]').click();
-            showToast('已加载草稿');
+
+      function loadToEditor(idx) {
+        var data = getCurrentData();
+        var item = data[idx];
+        if (!item) return;
+        var targetMode = currentMode;
+        document.querySelectorAll('.mode-btn').forEach(function(b) {
+          if (b.dataset.mode === targetMode) {
+            b.classList.add('active');
+            b.style.background = 'rgba(255,255,255,.6)';
+            b.style.color = '#3d2d8a';
+          } else {
+            b.classList.remove('active');
+            b.style.background = 'transparent';
+            b.style.color = '#6a6a92';
           }
         });
-      });
-      list.querySelectorAll('.btn-publish-draft').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          var id = this.dataset.id;
-          var draft = allDrafts.find(function(d) { return d.id === id; });
-          if (draft) {
-            if (draft.type === 'shuoshuo') {
-              document.querySelector('.mode-btn[data-mode="shuoshuo"]').click();
+        document.querySelectorAll('.article-only').forEach(function(el) {
+          el.style.display = targetMode === 'article' ? '' : 'none';
+        });
+        document.querySelectorAll('.shuoshuo-only').forEach(function(el) {
+          el.style.display = targetMode === 'shuoshuo' ? '' : 'none';
+        });
+        editingIdx = idx;
+        if (currentMode === 'article') {
+          editTitle.value = item.title || '';
+          editLocation.value = '';
+        } else {
+          editTitle.value = '';
+          editLocation.value = item.location || '';
+        }
+        var dateStr = item.date || '';
+        editDateText.value = dateStr;
+        if (dateStr && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+          editDatePicker.value = dateStr;
+        } else {
+          editDatePicker.value = '';
+        }
+        editTags.value = (item.tags || []).join('，');
+        if (editor) {
+          editor.value = item.content || '';
+          updatePreview();
+          updateWordCount();
+        }
+        publishBtn.textContent = '更新' + (currentMode === 'article' ? '文章' : '说说');
+        document.querySelector('.tab[data-tab="write"]').click();
+        showToast('已加载');
+      }
+
+      async function softDeleteItem(idx) {
+        var result = await showModal(
+          '<i class="fas fa-trash-alt"></i>',
+          '软删除',
+          '确定要软删除此项吗？<br />软删除后仍可恢复。',
+          '确认软删除',
+          'btn-confirm-warning'
+        );
+        if (!result) return;
+        try {
+          var res = await apiCall(getCurrentEndpoint(), {
+            method: 'DELETE',
+            body: JSON.stringify({ id: idx })
+          });
+          var data = await res.json();
+          if (data.success) {
+            showToast('已删除');
+            await loadAll();
+            renderUnifiedList();
+            updateBadges();
+          } else {
+            showToast(data.error || '删除失败', true);
+          }
+        } catch (e) {
+          showToast('删除失败', true);
+        }
+      }
+
+      async function restoreItem(idx) {
+        try {
+          var res = await apiCall(getCurrentEndpoint(), {
+            method: 'DELETE',
+            body: JSON.stringify({ id: idx, restore: true })
+          });
+          var data = await res.json();
+          if (data.success) {
+            showToast('已恢复');
+            await loadAll();
+            renderUnifiedList();
+            updateBadges();
+          } else {
+            showToast(data.error || '恢复失败', true);
+          }
+        } catch (e) {
+          showToast('恢复失败', true);
+        }
+      }
+
+      async function undoItem(idx) {
+        var backup = getUndoBackup(currentMode, idx);
+        if (!backup) {
+          showToast('没有可撤销的版本', true);
+          return;
+        }
+        var displayTitle = currentMode === 'article' ? (backup.title || '无标题') : (backup.content || '').slice(0, 50);
+        var result = await showModal(
+          '<i class="fas fa-undo-alt"></i>',
+          '撤销修改',
+          '确定要撤销对 <strong>' + escapeHtml(displayTitle) + '</strong> 的修改吗？<br />将恢复到修改前的版本。',
+          '确认撤销',
+          'btn-confirm-warning'
+        );
+        if (!result) return;
+        try {
+          var body = {
+            id: idx,
+            title: backup.title || '',
+            content: backup.content || '',
+            tags: backup.tags || [],
+            date: backup.date || ''
+          };
+          if (currentMode === 'shuoshuo' && backup.location) {
+            body.location = backup.location;
+          }
+          var res = await apiCall(getCurrentEndpoint(), {
+            method: 'PUT',
+            body: JSON.stringify(body)
+          });
+          var data = await res.json();
+          if (data.success) {
+            showToast('已撤销');
+            localStorage.removeItem(getUndoKey(currentMode, idx));
+            await loadAll();
+            renderUnifiedList();
+            updateBadges();
+          } else {
+            showToast(data.error || '撤销失败', true);
+          }
+        } catch (e) {
+          showToast('撤销失败', true);
+        }
+      }
+
+      function showHardDeleteModal(idx, title) {
+        hardDeleteTarget = idx;
+        var expected = currentMode === 'article' ? '我确定删除这篇文章' : '我确定删除这篇说说';
+        var descHtml = '你正在执行<strong>硬删除</strong>操作，该内容将从数据中<strong>彻底移除</strong>，无法恢复。<br /><br />输入 <strong style="color:#e53935;">' + expected + '</strong> 确认删除：<br /><br /><input type="text" id="hardDeleteConfirmInput" placeholder="输入确认语..." style="width:100%;padding:.6rem 1rem;border-radius:60px;border:2px solid #e53935;font-size:.9rem;font-family:inherit;background:rgba(255,255,255,.5);color:#1a1a2e;text-align:center;outline:none;">';
+        showModal(
+          '<i class="fas fa-exclamation-triangle"></i>',
+          '危险操作',
+          descHtml,
+          '确认硬删除',
+          'btn-confirm'
+        ).then(async function(confirmed) {
+          if (confirmed) {
+            var confirmInput = document.getElementById('hardDeleteConfirmInput');
+            if (confirmInput && confirmInput.value.trim() === expected) {
+              var secondConfirm = await showModal(
+                '<i class="fas fa-exclamation-circle"></i>',
+                '二次确认',
+                '你真的确定要彻底删除吗？删除后无法恢复！',
+                '确定删除',
+                'btn-confirm'
+              );
+              if (secondConfirm) {
+                await confirmHardDelete();
+              }
             } else {
-              document.querySelector('.mode-btn[data-mode="article"]').click();
+              showToast('确认语输入不正确，取消删除', true);
             }
-            editTitle.value = draft.title || '';
-            editLocation.value = draft.location || '';
-            var dateStr = draft.date || '';
-            editDateText.value = dateStr;
-            if (dateStr && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-              editDatePicker.value = dateStr;
-            } else {
-              editDatePicker.value = '';
-            }
-            editTags.value = (draft.tags || []).join('，');
-            if (editor) {
-              editor.value = draft.content || '';
-              updatePreview();
-              updateWordCount();
-            }
-            editingIdx = -1;
-            publishBtn.textContent = currentMode === 'article' ? '发布文章' : '发布说说';
-            deleteDraft(id).then(function() {
+          }
+          hardDeleteTarget = -1;
+        });
+      }
+
+      async function confirmHardDelete() {
+        if (hardDeleteTarget === -1) return;
+        try {
+          localStorage.removeItem(getUndoKey(currentMode, hardDeleteTarget));
+          var data = getCurrentData();
+          data.splice(hardDeleteTarget, 1);
+          var res = await apiCall(getCurrentEndpoint(), {
+            method: 'PUT',
+            body: JSON.stringify({ hardDelete: true, items: data })
+          });
+          var result = await res.json();
+          if (result.success) {
+            showToast('已硬删除');
+            await loadAll();
+            renderUnifiedList();
+            updateBadges();
+          } else {
+            showToast(result.error || '硬删除失败', true);
+          }
+        } catch (e) {
+          showToast('硬删除失败', true);
+        }
+      }
+
+      function renderDraftList() {
+        var list = document.getElementById('draftList');
+        if (allDrafts.length === 0) {
+          list.innerHTML = '<div class="empty">没有草稿</div>';
+          return;
+        }
+        var html = '';
+        allDrafts.forEach(function(draft) {
+          var preview = (draft.content || '').replace(/\n/g, ' ').slice(0, 80) + (draft.content && draft.content.length > 80 ? '...' : '');
+          var tagsHtml = (draft.tags || []).map(function(t) {
+            return '<span class="tag">' + escapeHtml(t) + '</span>';
+          }).join(' ');
+          var typeLabel = draft.type === 'shuoshuo' ? '<i class="fas fa-comment"></i> 说说草稿' : '<i class="fas fa-file-alt"></i> 文章草稿';
+          html += '<div class="draft-item">' +
+            '<div class="draft-info">' +
+            '<div class="draft-title">' + escapeHtml(draft.title || '无标题') + ' <span style="font-size:.6rem;color:#8a8ab5;font-weight:400;">' + typeLabel + '</span></div>' +
+            '<div class="draft-meta">创建于 ' + (draft.created || '') + (draft.updated && draft.updated !== draft.created ? ' · 更新于 ' + draft.updated : '') + (draft.location ? ' · <i class="fas fa-map-marker-alt"></i> ' + escapeHtml(draft.location) : '') + '</div>' +
+            (tagsHtml ? '<div class="draft-tags">' + tagsHtml + '</div>' : '') +
+            '<div class="draft-preview">' + escapeHtml(preview) + '</div>' +
+            '</div>' +
+            '<div class="draft-actions">' +
+            '<button class="btn-continue" data-id="' + draft.id + '">继续编辑</button>' +
+            '<button class="btn-publish-draft" data-id="' + draft.id + '">发布</button>' +
+            '<button class="btn-delete-draft" data-id="' + draft.id + '">删除</button>' +
+            '</div>' +
+            '</div>';
+        });
+        list.innerHTML = html;
+        list.querySelectorAll('.btn-continue').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var id = this.dataset.id;
+            var draft = allDrafts.find(function(d) { return d.id === id; });
+            if (draft) {
+              if (draft.type === 'shuoshuo') {
+                document.querySelector('.mode-btn[data-mode="shuoshuo"]').click();
+              } else {
+                document.querySelector('.mode-btn[data-mode="article"]').click();
+              }
+              editTitle.value = draft.title || '';
+              editLocation.value = draft.location || '';
+              var dateStr = draft.date || '';
+              editDateText.value = dateStr;
+              if (dateStr && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+                editDatePicker.value = dateStr;
+              } else {
+                editDatePicker.value = '';
+              }
+              editTags.value = (draft.tags || []).join('，');
+              if (editor) {
+                editor.value = draft.content || '';
+                updatePreview();
+                updateWordCount();
+              }
+              editingIdx = -1;
+              publishBtn.textContent = currentMode === 'article' ? '发布文章' : '发布说说';
               document.querySelector('.tab[data-tab="write"]').click();
-              document.getElementById('publishBtn').click();
-            });
-          }
-        });
-      });
-      list.querySelectorAll('.btn-delete-draft').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          var id = this.dataset.id;
-          showModal(
-            '<i class="fas fa-trash-alt"></i>',
-            '删除草稿',
-            '确定要删除这个草稿吗？',
-            '确认删除',
-            'btn-confirm'
-          ).then(async function(confirmed) {
-            if (confirmed) {
-              await deleteDraft(id);
+              showToast('已加载草稿');
             }
           });
         });
-      });
-    }
-    async function deleteDraft(id) {
-      try {
-        var res = await apiCall('drafts', {
-          method: 'DELETE',
-          body: JSON.stringify({ id: id })
+        list.querySelectorAll('.btn-publish-draft').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var id = this.dataset.id;
+            var draft = allDrafts.find(function(d) { return d.id === id; });
+            if (draft) {
+              if (draft.type === 'shuoshuo') {
+                document.querySelector('.mode-btn[data-mode="shuoshuo"]').click();
+              } else {
+                document.querySelector('.mode-btn[data-mode="article"]').click();
+              }
+              editTitle.value = draft.title || '';
+              editLocation.value = draft.location || '';
+              var dateStr = draft.date || '';
+              editDateText.value = dateStr;
+              if (dateStr && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+                editDatePicker.value = dateStr;
+              } else {
+                editDatePicker.value = '';
+              }
+              editTags.value = (draft.tags || []).join('，');
+              if (editor) {
+                editor.value = draft.content || '';
+                updatePreview();
+                updateWordCount();
+              }
+              editingIdx = -1;
+              publishBtn.textContent = currentMode === 'article' ? '发布文章' : '发布说说';
+              deleteDraft(id).then(function() {
+                document.querySelector('.tab[data-tab="write"]').click();
+                document.getElementById('publishBtn').click();
+              });
+            }
+          });
         });
-        var data = await res.json();
-        if (data.success) {
-          showToast('草稿已删除');
-          await loadDrafts();
-          renderDraftList();
-          updateBadges();
-        } else {
-          showToast(data.error || '删除失败', true);
-        }
-      } catch (e) {
-        showToast('删除失败', true);
+        list.querySelectorAll('.btn-delete-draft').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var id = this.dataset.id;
+            showModal(
+              '<i class="fas fa-trash-alt"></i>',
+              '删除草稿',
+              '确定要删除这个草稿吗？',
+              '确认删除',
+              'btn-confirm'
+            ).then(async function(confirmed) {
+              if (confirmed) {
+                await deleteDraft(id);
+              }
+            });
+          });
+        });
       }
-    }
-    async function loadAll() {
-      await loadArticles();
-      await loadShuoshuo();
-      await loadDrafts();
-      renderUnifiedList();
-      renderDraftList();
-      updateBadges();
-    }
-    function updateBadges() {
-      document.getElementById('listBadge').textContent = (currentMode === 'article' ? allArticles : allShuoshuo).length;
-      document.getElementById('draftBadge').textContent = allDrafts.length;
-    }
-    document.querySelectorAll('.mode-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.mode-btn').forEach(function(b) {
-          b.classList.remove('active');
-          b.style.background = 'transparent';
-          b.style.color = '#6a6a92';
-        });
-        this.classList.add('active');
-        this.style.background = 'rgba(255,255,255,.6)';
-        this.style.color = '#3d2d8a';
-        currentMode = this.dataset.mode;
-        document.querySelectorAll('.article-only').forEach(function(el) {
-          el.style.display = currentMode === 'article' ? '' : 'none';
-        });
-        document.querySelectorAll('.shuoshuo-only').forEach(function(el) {
-          el.style.display = currentMode === 'shuoshuo' ? '' : 'none';
-        });
-        publishBtn.textContent = currentMode === 'article' ? '发布文章' : '发布说说';
-        clearEditor();
+
+      async function deleteDraft(id) {
+        try {
+          var res = await apiCall('drafts', {
+            method: 'DELETE',
+            body: JSON.stringify({ id: id })
+          });
+          var data = await res.json();
+          if (data.success) {
+            showToast('草稿已删除');
+            await loadDrafts();
+            renderDraftList();
+            updateBadges();
+          } else {
+            showToast(data.error || '删除失败', true);
+          }
+        } catch (e) {
+          showToast('删除失败', true);
+        }
+      }
+
+      async function loadAll() {
+        await loadArticles();
+        await loadShuoshuo();
+        await loadDrafts();
         renderUnifiedList();
+        renderDraftList();
         updateBadges();
-      });
-    });
-    document.getElementById('publishBtn').addEventListener('click', async function() {
-      var content = editor ? editor.value.trim() : '';
-      if (!content) {
-        showToast('内容不能为空', true);
-        return;
       }
-      var tags = editTags.value.trim().split(/[，,、\s]+/).filter(Boolean);
-      var rawDate = editDateText.value.trim();
-      if (!rawDate) {
-        showToast('请填写日期', true);
-        return;
+
+      function updateBadges() {
+        document.getElementById('listBadge').textContent = (currentMode === 'article' ? allArticles : allShuoshuo).length;
+        document.getElementById('draftBadge').textContent = allDrafts.length;
       }
-      var formatted = rawDate.replace(/^(\d{4})-(\d{1,2})-(\d{1,2})$/, function(m, y, mth, d) {
-        return y + '-' + mth.padStart(2, '0') + '-' + d.padStart(2, '0');
-      });
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(formatted)) {
-        showToast('日期格式不对，要用 YYYY-MM-DD', true);
-        return;
-      }
-      var parts = formatted.split('-');
-      var year = parseInt(parts[0]), month = parseInt(parts[1]), day = parseInt(parts[2]);
-      var dateObj = new Date(year, month - 1, day);
-      if (dateObj.getFullYear() !== year || dateObj.getMonth() !== month - 1 || dateObj.getDate() !== day) {
-        showToast('日期不存在（如2月31日）', true);
-        return;
-      }
-      var date = formatted;
-      var body = { content: content, tags: tags, date: date };
-      if (currentMode === 'article') {
-        var title = editTitle.value.trim();
-        if (!title) { showToast('请输入标题', true); return; }
-        body.title = title;
-      } else {
-        var location = editLocation.value.trim();
-        if (location) body.location = location;
-      }
-      if (editingIdx >= 0) {
-        body.id = editingIdx;
-        var oldItem = getCurrentData()[editingIdx];
-        if (oldItem) {
-          var backup = {
-            title: oldItem.title || '',
-            content: oldItem.content || '',
-            tags: oldItem.tags || [],
-            date: oldItem.date || '',
-            location: oldItem.location || '',
-            savedAt: Date.now()
-          };
-          localStorage.setItem(getUndoKey(currentMode, editingIdx), JSON.stringify(backup));
-        }
-      }
-      this.disabled = true;
-      try {
-        var res = await apiCall(getCurrentEndpoint(), {
-          method: editingIdx >= 0 ? 'PUT' : 'POST',
-          body: JSON.stringify(body)
-        });
-        var data = await res.json();
-        if (data.success) {
-          showToast(editingIdx >= 0 ? '更新成功！' : '发布成功！');
+
+      // ========== 模式切换 ==========
+      document.querySelectorAll('.mode-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.mode-btn').forEach(function(b) {
+            b.classList.remove('active');
+            b.style.background = 'transparent';
+            b.style.color = '#6a6a92';
+          });
+          this.classList.add('active');
+          this.style.background = 'rgba(255,255,255,.6)';
+          this.style.color = '#3d2d8a';
+          currentMode = this.dataset.mode;
+          document.querySelectorAll('.article-only').forEach(function(el) {
+            el.style.display = currentMode === 'article' ? '' : 'none';
+          });
+          document.querySelectorAll('.shuoshuo-only').forEach(function(el) {
+            el.style.display = currentMode === 'shuoshuo' ? '' : 'none';
+          });
+          publishBtn.textContent = currentMode === 'article' ? '发布文章' : '发布说说';
           clearEditor();
-          await loadAll();
           renderUnifiedList();
           updateBadges();
-        } else {
-          showToast(data.error || '发布失败', true);
+        });
+      });
+
+      // ========== 发布按钮 ==========
+      document.getElementById('publishBtn').addEventListener('click', async function() {
+        var content = editor ? editor.value.trim() : '';
+        if (!content) {
+          showToast('内容不能为空', true);
+          return;
         }
-      } catch (e) {
-        showToast('请求失败', true);
-      }
-      this.disabled = false;
-    });
-    document.getElementById('saveDraftBtn').addEventListener('click', async function() {
-      var content = editor ? editor.value : '';
-      if (!content) {
-        showToast('内容为空，无需保存', true);
-        return;
-      }
-      var rawDate = editDateText.value.trim();
-      if (rawDate) {
+        var tags = editTags.value.trim().split(/[，,、\s]+/).filter(Boolean);
+        var rawDate = editDateText.value.trim();
+        if (!rawDate) {
+          showToast('请填写日期', true);
+          return;
+        }
         var formatted = rawDate.replace(/^(\d{4})-(\d{1,2})-(\d{1,2})$/, function(m, y, mth, d) {
           return y + '-' + mth.padStart(2, '0') + '-' + d.padStart(2, '0');
         });
-        if (/^\d{4}-\d{2}-\d{2}$/.test(formatted)) {
-          var parts = formatted.split('-');
-          var year = parseInt(parts[0]), month = parseInt(parts[1]), day = parseInt(parts[2]);
-          var dateObj = new Date(year, month - 1, day);
-          if (dateObj.getFullYear() === year && dateObj.getMonth() === month - 1 && dateObj.getDate() === day) {
-            editDateText.value = formatted;
-          }
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(formatted)) {
+          showToast('日期格式不对，要用 YYYY-MM-DD', true);
+          return;
         }
-      }
-      var title = editTitle.value.trim() || '无标题';
-      var location = editLocation.value.trim();
-      var tags = editTags.value.trim().split(/[，,、\s]+/).filter(Boolean);
-      var date = editDateText.value.trim() || '';
-      this.disabled = true;
-      try {
-        var res = await apiCall('drafts', {
-          method: 'POST',
-          body: JSON.stringify({
-            title: title,
-            content: content,
-            tags: tags,
-            date: date,
-            location: location,
-            type: currentMode
-          })
-        });
-        var data = await res.json();
-        if (data.success) {
-          showToast('草稿已保存');
-          await loadDrafts();
-          renderDraftList();
-          updateBadges();
+        var parts = formatted.split('-');
+        var year = parseInt(parts[0]), month = parseInt(parts[1]), day = parseInt(parts[2]);
+        var dateObj = new Date(year, month - 1, day);
+        if (dateObj.getFullYear() !== year || dateObj.getMonth() !== month - 1 || dateObj.getDate() !== day) {
+          showToast('日期不存在（如2月31日）', true);
+          return;
+        }
+        var date = formatted;
+        var body = { content: content, tags: tags, date: date };
+        if (currentMode === 'article') {
+          var title = editTitle.value.trim();
+          if (!title) { showToast('请输入标题', true); return; }
+          body.title = title;
         } else {
-          showToast(data.error || '保存失败', true);
+          var location = editLocation.value.trim();
+          if (location) body.location = location;
         }
-      } catch (e) {
-        showToast('保存失败', true);
-      }
-      this.disabled = false;
-    });
-    document.getElementById('cancelEditBtn').addEventListener('click', function() {
-      if (editingIdx >= 0 || (editor && editor.value) || editTitle.value || editLocation.value || editDateText.value || editTags.value) {
-        showModal(
-          '<i class="fas fa-trash-alt"></i>',
-          '清空内容',
-          '确定要清空当前编辑的内容吗？<br />未保存的修改将丢失。',
-          '确认清空',
-          'btn-confirm-warning'
-        ).then(function(confirmed) {
-          if (confirmed) {
-            clearEditor();
-            showToast('已清空');
+        if (editingIdx >= 0) {
+          body.id = editingIdx;
+          var oldItem = getCurrentData()[editingIdx];
+          if (oldItem) {
+            var backup = {
+              title: oldItem.title || '',
+              content: oldItem.content || '',
+              tags: oldItem.tags || [],
+              date: oldItem.date || '',
+              location: oldItem.location || '',
+              savedAt: Date.now()
+            };
+            localStorage.setItem(getUndoKey(currentMode, editingIdx), JSON.stringify(backup));
           }
+        }
+        this.disabled = true;
+        try {
+          var res = await apiCall(getCurrentEndpoint(), {
+            method: editingIdx >= 0 ? 'PUT' : 'POST',
+            body: JSON.stringify(body)
+          });
+          var data = await res.json();
+          if (data.success) {
+            showToast(editingIdx >= 0 ? '更新成功！' : '发布成功！');
+            clearEditor();
+            await loadAll();
+            renderUnifiedList();
+            updateBadges();
+          } else {
+            showToast(data.error || '发布失败', true);
+          }
+        } catch (e) {
+          showToast('请求失败', true);
+        }
+        this.disabled = false;
+      });
+
+      // ========== 保存草稿 ==========
+      document.getElementById('saveDraftBtn').addEventListener('click', async function() {
+        var content = editor ? editor.value : '';
+        if (!content) {
+          showToast('内容为空，无需保存', true);
+          return;
+        }
+        var rawDate = editDateText.value.trim();
+        if (rawDate) {
+          var formatted = rawDate.replace(/^(\d{4})-(\d{1,2})-(\d{1,2})$/, function(m, y, mth, d) {
+            return y + '-' + mth.padStart(2, '0') + '-' + d.padStart(2, '0');
+          });
+          if (/^\d{4}-\d{2}-\d{2}$/.test(formatted)) {
+            var parts = formatted.split('-');
+            var year = parseInt(parts[0]), month = parseInt(parts[1]), day = parseInt(parts[2]);
+            var dateObj = new Date(year, month - 1, day);
+            if (dateObj.getFullYear() === year && dateObj.getMonth() === month - 1 && dateObj.getDate() === day) {
+              editDateText.value = formatted;
+            }
+          }
+        }
+        var title = editTitle.value.trim() || '无标题';
+        var location = editLocation.value.trim();
+        var tags = editTags.value.trim().split(/[，,、\s]+/).filter(Boolean);
+        var date = editDateText.value.trim() || '';
+        this.disabled = true;
+        try {
+          var res = await apiCall('drafts', {
+            method: 'POST',
+            body: JSON.stringify({
+              title: title,
+              content: content,
+              tags: tags,
+              date: date,
+              location: location,
+              type: currentMode
+            })
+          });
+          var data = await res.json();
+          if (data.success) {
+            showToast('草稿已保存');
+            await loadDrafts();
+            renderDraftList();
+            updateBadges();
+          } else {
+            showToast(data.error || '保存失败', true);
+          }
+        } catch (e) {
+          showToast('保存失败', true);
+        }
+        this.disabled = false;
+      });
+
+      // ========== 清空 ==========
+      document.getElementById('cancelEditBtn').addEventListener('click', function() {
+        if (editingIdx >= 0 || (editor && editor.value) || editTitle.value || editLocation.value || editDateText.value || editTags.value) {
+          showModal(
+            '<i class="fas fa-trash-alt"></i>',
+            '清空内容',
+            '确定要清空当前编辑的内容吗？<br />未保存的修改将丢失。',
+            '确认清空',
+            'btn-confirm-warning'
+          ).then(function(confirmed) {
+            if (confirmed) {
+              clearEditor();
+              showToast('已清空');
+            }
+          });
+        }
+      });
+
+      // ========== 列表筛选和排序 ==========
+      document.querySelectorAll('#tabList .filter-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('#tabList .filter-btn').forEach(function(b) { b.classList.remove('active'); });
+          this.classList.add('active');
+          currentFilter = this.dataset.filter;
+          renderUnifiedList();
         });
-      }
-    });
-    document.querySelectorAll('#tabList .filter-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('#tabList .filter-btn').forEach(function(b) { b.classList.remove('active'); });
-        this.classList.add('active');
-        currentFilter = this.dataset.filter;
+      });
+
+      document.getElementById('sortBtn').addEventListener('click', function() {
+        var btn = this;
+        if (currentSort === 'desc') {
+          currentSort = 'asc';
+          btn.innerHTML = '<i class="fas fa-sort-amount-up"></i> 正序';
+        } else {
+          currentSort = 'desc';
+          btn.innerHTML = '<i class="fas fa-sort-amount-down"></i> 倒序';
+        }
         renderUnifiedList();
       });
-    });
-    document.getElementById('sortBtn').addEventListener('click', function() {
-      var btn = this;
-      if (currentSort === 'desc') {
-        currentSort = 'asc';
-        btn.innerHTML = '<i class="fas fa-sort-amount-up"></i> 正序';
-      } else {
-        currentSort = 'desc';
-        btn.innerHTML = '<i class="fas fa-sort-amount-down"></i> 倒序';
-      }
-      renderUnifiedList();
-    });
-    document.getElementById('listSearch').addEventListener('input', function() {
-      renderUnifiedList();
-    });
-    var tabs = document.querySelectorAll('.tab');
-    var tabContents = {
-      write: document.getElementById('tabWrite'),
-      list: document.getElementById('tabList'),
-      drafts: document.getElementById('tabDrafts')
-    };
-    tabs.forEach(function(tab) {
-      tab.addEventListener('click', function() {
-        tabs.forEach(function(t) { t.classList.remove('active'); });
-        this.classList.add('active');
-        var target = this.dataset.tab;
-        Object.keys(tabContents).forEach(function(key) {
-          tabContents[key].classList.toggle('active', key === target);
+
+      document.getElementById('listSearch').addEventListener('input', function() {
+        renderUnifiedList();
+      });
+
+      // ========== Tab 切换 ==========
+      var tabs = document.querySelectorAll('.tab');
+      var tabContents = {
+        write: document.getElementById('tabWrite'),
+        list: document.getElementById('tabList'),
+        drafts: document.getElementById('tabDrafts')
+      };
+      tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          tabs.forEach(function(t) { t.classList.remove('active'); });
+          this.classList.add('active');
+          var target = this.dataset.tab;
+          Object.keys(tabContents).forEach(function(key) {
+            tabContents[key].classList.toggle('active', key === target);
+          });
+          if (target === 'list') renderUnifiedList();
+          if (target === 'drafts') {
+            loadDrafts();
+            renderDraftList();
+          }
         });
-        if (target === 'list') renderUnifiedList();
-        if (target === 'drafts') {
-          loadDrafts();
-          renderDraftList();
+      });
+
+      // ========== 日期联动 ==========
+      editDateText.addEventListener('input', function() {
+        var val = this.value.trim();
+        if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(val)) {
+          var parts = val.split('-');
+          var y = parts[0], m = parts[1].padStart(2, '0'), d = parts[2].padStart(2, '0');
+          editDatePicker.value = y + '-' + m + '-' + d;
         }
       });
-    });
-    editDateText.addEventListener('input', function() {
-      var val = this.value.trim();
-      if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(val)) {
-        var parts = val.split('-');
-        var y = parts[0], m = parts[1].padStart(2, '0'), d = parts[2].padStart(2, '0');
-        editDatePicker.value = y + '-' + m + '-' + d;
-      }
-    });
-    editDatePicker.addEventListener('change', function() {
-      if (this.value) {
-        editDateText.value = this.value;
-      }
-    });
-    setDefaultDate();
-    if (editor) {
-      updatePreview();
-      updateWordCount();
-    }
-    fetchMathQuestion();
-    if (!checkLogin()) {
-      loginScreen.classList.remove('hidden');
-      mainApp.classList.remove('active');
-    }
-    setTimeout(function() { updateWordCount(); }, 500);
-    window.addEventListener('beforeunload', function() {
-      if (localStorage.getItem(KEEP_LOGIN_KEY) === 'false') {
+      editDatePicker.addEventListener('change', function() {
+        if (this.value) {
+          editDateText.value = this.value;
+        }
+      });
+
+      // ========== 退出登录 ==========
+      document.getElementById('logoutBtn').addEventListener('click', async function() {
+        var confirmed = await showModal(
+          '<i class="fas fa-sign-out-alt"></i>',
+          '确认退出',
+          '确定要退出当前账号吗？<br />退出后需要重新登录才能继续管理。',
+          '确认退出',
+          'btn-confirm-warning'
+        );
+        if (!confirmed) return;
+        var doubleConfirmed = await showModal(
+          '<i class="fas fa-shield-alt"></i>',
+          '二次确认',
+          '退出后未保存的更改将丢失。<br />确定要退出登录吗？',
+          '确定退出',
+          'btn-confirm-warning'
+        );
+        if (!doubleConfirmed) return;
         clearToken();
+        if (localStorage.getItem('admin_keep_login') === 'false') {
+          localStorage.removeItem('admin_keep_login');
+        }
+        window.location.href = './index.html';
+      });
+
+      // ========== 初始化 ==========
+      setDefaultDate();
+      if (editor) {
+        updatePreview();
+        updateWordCount();
       }
-    });
+      // 加载数据
+      loadAll();
+      setTimeout(function() { updateWordCount(); }, 500);
+
+      // 处理硬删除确认输入框动态事件（因为是在 modal 中动态生成）
+      document.addEventListener('input', function(e) {
+        if (e.target && e.target.id === 'hardDeleteConfirmInput') {
+          // 不需要额外处理，只用于读取值
+        }
+      });
+    })();
   </script>
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"91fbf2e723a14893b836d95ba4694dbf","r":1}' crossorigin="anonymous"></script>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"91fbf2e723a14893b836d95ba4694dbf","r":1}' crossorigin="anonymous"></script>
 </body>
 </html>
