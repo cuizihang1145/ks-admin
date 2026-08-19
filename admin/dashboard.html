@@ -639,9 +639,22 @@ function loadFriendList() {
       return getDeletedFriends();
     })
     .then(function(deleted) {
-      allDeletedFriends = deleted || [];
-      renderUnifiedList();
-      updateBadges();
+      // 自动清理脏数据：删除 url 或 name 为空字符串的条目
+      var cleaned = deleted.filter(function(f) {
+        return f.url && f.url.trim() !== '' && f.name && f.name.trim() !== '';
+      });
+      if (cleaned.length !== deleted.length) {
+        // 如果有脏数据被清理，更新到 IndexedDB
+        return setDeletedFriends(cleaned).then(function() {
+          allDeletedFriends = cleaned;
+          renderUnifiedList();
+          updateBadges();
+        });
+      } else {
+        allDeletedFriends = deleted;
+        renderUnifiedList();
+        updateBadges();
+      }
     })
     .catch(function() {
       allFriends = [];
