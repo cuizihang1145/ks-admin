@@ -36,30 +36,63 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-      const { id, title, content, tags, date, location, type } = req.body;
+      const { id, title, content, tags, date, location, type, name, url, desc, logo, feed } = req.body;
 
       if (id) {
         const idx = drafts.drafts.findIndex(d => d.id === id);
         if (idx === -1) return res.status(404).json({ error: '草稿不存在' });
-        if (title !== undefined) drafts.drafts[idx].title = title;
-        if (content !== undefined) drafts.drafts[idx].content = content;
-        if (tags !== undefined) drafts.drafts[idx].tags = tags;
-        if (date !== undefined) drafts.drafts[idx].date = date;
-        if (location !== undefined) drafts.drafts[idx].location = location;
-        if (type !== undefined) drafts.drafts[idx].type = type;
-        drafts.drafts[idx].updated = new Date().toISOString();
+
+        const draft = drafts.drafts[idx];
+        if (draft.type === 'friend') {
+          if (name !== undefined) draft.name = name;
+          if (url !== undefined) draft.url = url;
+          if (desc !== undefined) draft.desc = desc;
+          if (logo !== undefined) draft.logo = logo;
+          if (feed !== undefined) draft.feed = feed;
+        } else {
+          if (title !== undefined) draft.title = title;
+          if (content !== undefined) draft.content = content;
+          if (tags !== undefined) draft.tags = tags;
+          if (date !== undefined) draft.date = date;
+          if (location !== undefined) draft.location = location;
+          if (type !== undefined) draft.type = type;
+        }
+        draft.updated = new Date().toISOString();
       } else {
-        drafts.drafts.push({
-          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-          title: title || '无标题',
-          content: content || '',
-          tags: tags || [],
-          date: date || '',
-          location: location || '',
-          type: type || 'article',
-          created: new Date().toISOString(),
-          updated: new Date().toISOString()
-        });
+        if (type === 'friend') {
+          if (!name || name.trim() === '') {
+            return res.status(400).json({ error: '名称不能为空' });
+          }
+          if (!url || url.trim() === '') {
+            return res.status(400).json({ error: '链接不能为空' });
+          }
+          if (!desc || desc.trim() === '') {
+            return res.status(400).json({ error: '简介不能为空' });
+          }
+          drafts.drafts.push({
+            id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+            type: 'friend',
+            name: name.trim(),
+            url: url.trim(),
+            desc: desc.trim(),
+            logo: logo?.trim() || '',
+            feed: feed?.trim() || '',
+            created: new Date().toISOString(),
+            updated: new Date().toISOString()
+          });
+        } else {
+          drafts.drafts.push({
+            id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+            title: title || '无标题',
+            content: content || '',
+            tags: tags || [],
+            date: date || '',
+            location: location || '',
+            type: type || 'article',
+            created: new Date().toISOString(),
+            updated: new Date().toISOString()
+          });
+        }
       }
 
       await writeFile(ADMIN_REPO, 'draft.json', drafts, sha, '保存草稿');
@@ -78,4 +111,4 @@ export default async function handler(req, res) {
     console.error('Error:', error.message);
     return res.status(500).json({ error: error.message });
   }
-        }
+}
