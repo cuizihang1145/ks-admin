@@ -178,13 +178,13 @@
       color: #6a6a8a;
     }
 
-    /* 完全去掉所有宽度限制，让元素自然排列 */
+    /* 数学题行 — 占满宽度，输入框自动填满剩余空间，不溢出 */
     .math-row {
       display: flex;
       gap: 0.5rem;
       align-items: center;
       margin-bottom: 0.6rem;
-      justify-content: center;
+      width: 100%;
     }
     .math-row .math-question {
       font-size: 0.82rem;
@@ -201,7 +201,8 @@
       background: rgba(136, 204, 255, 0.08);
     }
     .math-row input {
-      flex-shrink: 0;
+      flex: 1;
+      min-width: 0;
       margin-bottom: 0;
       padding: 0.65rem 0.8rem;
       border-radius: 60px;
@@ -212,6 +213,9 @@
       transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
       -webkit-appearance: none;
       appearance: none;
+      /* 保证不会溢出父容器 */
+      max-width: 100%;
+      box-sizing: border-box;
     }
     body.dark .math-row input {
       background: rgba(255, 255, 255, 0.06);
@@ -364,13 +368,14 @@
       .login-card { padding: 2rem 1.5rem; }
       .theme-toggle { top: 14px; right: 16px; width: 38px; height: 38px; font-size: 1rem; }
       .footer-note { bottom: 16px; font-size: 0.6rem; }
+      /* 在小屏上允许输入框缩小，但宽度保持 100% */
+      .math-row input { padding: 0.5rem 0.6rem; font-size: 0.8rem; }
+      .math-row .refresh-btn { width: 34px; height: 34px; font-size: 0.9rem; }
+      .math-row { gap: 0.3rem; }
     }
     @media (max-width: 380px) {
       .login-card { padding: 1.6rem 1.2rem; }
       .math-row .math-question { font-size: 0.7rem; padding: 0.3rem 0.5rem; }
-      .math-row input { padding: 0.5rem 0.6rem; font-size: 0.8rem; }
-      .math-row .refresh-btn { width: 34px; height: 34px; font-size: 0.9rem; }
-      .math-row { gap: 0.3rem; }
     }
   </style>
 </head>
