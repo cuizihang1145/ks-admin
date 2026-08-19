@@ -657,27 +657,16 @@ function renderUnifiedList() {
 
   if (currentMode === 'friend') {
     var allItems = [];
-    var deletedKeys = {};
-
-    allDeletedFriends.forEach(function(f) {
-      var key = f.name + '|' + f.url;
-      deletedKeys[key] = true;
-    });
 
     allFriends.forEach(function(f) {
-      var key = f.name + '|' + f.url;
-      if (!deletedKeys[key]) {
-        allItems.push({ data: f, deleted: false });
-      }
+      var deleted = allDeletedFriends.some(function(df) { return df.url === f.url; });
+      allItems.push({ data: f, deleted: deleted });
     });
 
-    allDeletedFriends.forEach(function(f) {
-      var key = f.name + '|' + f.url;
-      var exists = allFriends.some(function(af) { return (af.name + '|' + af.url) === key; });
-      if (exists) {
-        allItems.push({ data: f, deleted: true });
-      } else {
-        allItems.push({ data: f, deleted: true });
+    allDeletedFriends.forEach(function(df) {
+      var exists = allFriends.some(function(f) { return f.url === df.url; });
+      if (!exists) {
+        allItems.push({ data: df, deleted: true });
       }
     });
 
@@ -703,14 +692,14 @@ function renderUnifiedList() {
       var deletedClass = isDeleted ? 'deleted' : '';
       var actionsHtml = '';
       if (isDeleted) {
-        actionsHtml += '<button class="btn-restore-friend" data-name="' + escapeHtml(friend.name) + '" data-url="' + escapeHtml(friend.url) + '" data-desc="' + escapeHtml(friend.desc || '') + '" data-logo="' + escapeHtml(friend.logo || '') + '" data-feed="' + escapeHtml(friend.feed || '') + '">恢复</button>';
-        actionsHtml += '<button class="btn-delete-record" data-name="' + escapeHtml(friend.name) + '" data-url="' + escapeHtml(friend.url) + '">删除记录</button>';
+        actionsHtml += '<button class="btn-restore-friend" data-name="' + escapeHtml(friend.name || '') + '" data-url="' + escapeHtml(friend.url || '') + '" data-desc="' + escapeHtml(friend.desc || '') + '" data-logo="' + escapeHtml(friend.logo || '') + '" data-feed="' + escapeHtml(friend.feed || '') + '">恢复</button>';
+        actionsHtml += '<button class="btn-delete-record" data-url="' + escapeHtml(friend.url || '') + '">删除记录</button>';
       } else {
         var idx = allFriends.indexOf(friend);
         actionsHtml += '<button class="btn-edit-friend" data-idx="' + idx + '">编辑</button>';
-        actionsHtml += '<button class="btn-delete-friend" data-idx="' + idx + '" data-name="' + escapeHtml(friend.name) + '" data-url="' + escapeHtml(friend.url) + '" data-desc="' + escapeHtml(friend.desc || '') + '" data-logo="' + escapeHtml(friend.logo || '') + '" data-feed="' + escapeHtml(friend.feed || '') + '">删除</button>';
+        actionsHtml += '<button class="btn-delete-friend" data-idx="' + idx + '" data-name="' + escapeHtml(friend.name || '') + '" data-url="' + escapeHtml(friend.url || '') + '" data-desc="' + escapeHtml(friend.desc || '') + '" data-logo="' + escapeHtml(friend.logo || '') + '" data-feed="' + escapeHtml(friend.feed || '') + '">删除</button>';
       }
-      html += '<div class="article-item-admin ' + deletedClass + '"><div class="item-info"><div class="item-title">' + escapeHtml(friend.name) + '</div><div class="item-meta"><span>' + escapeHtml(friend.url) + '</span></div></div><div class="item-actions">' + actionsHtml + '</div></div>';
+      html += '<div class="article-item-admin ' + deletedClass + '"><div class="item-info"><div class="item-title">' + escapeHtml(friend.name || '未命名') + '</div><div class="item-meta"><span>' + escapeHtml(friend.url || '') + '</span></div></div><div class="item-actions">' + actionsHtml + '</div></div>';
     });
     list.innerHTML = html;
     bindFriendEvents(list);
@@ -798,9 +787,8 @@ function bindFriendEvents(list) {
 
   list.querySelectorAll('.btn-delete-record').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      var name = this.dataset.name;
       var url = this.dataset.url;
-      deleteFriendRecord(name, url);
+      deleteFriendRecord(url);
     });
   });
 }
@@ -854,7 +842,7 @@ function deleteFriendWithConfirm(idx, name, url, desc, logo, feed) {
         if (data.success) {
           var backup = { name: name, url: url, desc: desc, logo: logo, feed: feed };
           getDeletedFriends().then(function(list) {
-            var exists = list.some(function(f) { return f.name === name && f.url === url; });
+            var exists = list.some(function(f) { return f.url === url; });
             if (!exists) {
               list.push(backup);
               setDeletedFriends(list).then(function() {
@@ -876,6 +864,10 @@ function deleteFriendWithConfirm(idx, name, url, desc, logo, feed) {
 }
 
 function restoreFriend(name, url, desc, logo, feed) {
+  if (!name || name.trim() === '') {
+    showToast('名称不能为空', true);
+    return;
+  }
   showModal(
     '<i class="fas fa-undo-alt"></i>',
     '恢复友链',
@@ -892,7 +884,7 @@ function restoreFriend(name, url, desc, logo, feed) {
     .then(function(data) {
       if (data.success) {
         getDeletedFriends().then(function(list) {
-          var newList = list.filter(function(f) { return !(f.name === name && f.url === url); });
+          var newList = list.filter(function(f) { return f.url !== url; });
           setDeletedFriends(newList).then(function() {
             showToast('已恢复');
             loadFriendList();
@@ -906,21 +898,21 @@ function restoreFriend(name, url, desc, logo, feed) {
   });
 }
 
-function deleteFriendRecord(name, url) {
+function deleteFriendRecord(url) {
   showModal(
     '<i class="fas fa-trash-alt"></i>',
     '删除恢复记录',
-    '确定要删除友链 <strong>' + escapeHtml(name) + '</strong> 的恢复记录吗？<br>删除后将无法通过"恢复"按钮找回。',
+    '确定要删除这条友链的恢复记录吗？<br>删除后将无法通过"恢复"按钮找回。',
     '确认删除',
     'btn-confirm'
   ).then(function(confirmed) {
     if (!confirmed) return;
-    getDeletedFriends().then(function(list) {
-      var newList = list.filter(function(f) { return !(f.name === name && f.url === url); });
-      setDeletedFriends(newList).then(function() {
-        showToast('记录已删除');
-        loadFriendList();
-      });
+    var newList = allDeletedFriends.filter(function(f) { return f.url !== url; });
+    allDeletedFriends = newList;
+    setDeletedFriends(newList).then(function() {
+      showToast('记录已删除');
+      renderUnifiedList();
+      updateBadges();
     });
   });
 }
@@ -1626,7 +1618,15 @@ function updateBadges() {
   var total;
   if (currentMode === 'article') total = allArticles.length;
   else if (currentMode === 'shuoshuo') total = allShuoshuo.length;
-  else total = allFriends.length + allDeletedFriends.length;
+  else {
+    var merged = allFriends.slice();
+    allDeletedFriends.forEach(function(df) {
+      if (!merged.some(function(f) { return f.url === df.url; })) {
+        merged.push(df);
+      }
+    });
+    total = merged.length;
+  }
   document.getElementById('listBadge').textContent = total;
   document.getElementById('draftBadge').textContent = allDrafts.length;
 }
