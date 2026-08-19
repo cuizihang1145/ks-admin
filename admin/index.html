@@ -178,7 +178,7 @@
       color: #6a6a8a;
     }
 
-    /* 数学题行 — 原版样式：题目 | 输入框 | 刷新按钮 同一行 */
+    /* 数学题行 — 完全原版：题目 | 输入框 | 刷新按钮 同一行，无换行 */
     .math-row {
       display: flex;
       gap: 0.5rem;
@@ -361,16 +361,19 @@
       color: #6a6a8a;
     }
 
+    /* 原版没有对 .math-row 做响应式换行，所以不加任何 wrap */
     @media (max-width: 480px) {
       .login-card { padding: 2rem 1.5rem; }
       .theme-toggle { top: 14px; right: 16px; width: 38px; height: 38px; font-size: 1rem; }
       .footer-note { bottom: 16px; font-size: 0.6rem; }
-      .math-row { flex-wrap: wrap; justify-content: center; }
-      .math-row input { max-width: 100%; flex: 1 1 100%; }
+      /* 原版在窄屏下也没换行，但为了适应极小屏，让输入框稍微缩小 */
+      .math-row input { max-width: 100px; }
     }
     @media (max-width: 380px) {
       .login-card { padding: 1.6rem 1.2rem; }
       .math-row .math-question { font-size: 0.7rem; padding: 0.3rem 0.5rem; }
+      .math-row input { max-width: 80px; font-size: 0.8rem; padding: 0.5rem 0.6rem; }
+      .math-row .refresh-btn { width: 34px; height: 34px; font-size: 0.9rem; }
     }
   </style>
 </head>
@@ -521,7 +524,7 @@
             localStorage.setItem(KEEP_LOGIN_KEY, String(keep));
             localStorage.setItem(TOKEN_KEY, data.token);
             localStorage.setItem(STORAGE_KEY, 'true');
-            // 修正跳转路径：绝对路径，指向 admin/dashboard.html
+            // 跳转到主界面（绝对路径）
             window.location.href = '/admin/dashboard.html';
           } else {
             attempts++;
@@ -558,7 +561,6 @@
         var token = localStorage.getItem(TOKEN_KEY);
         var keep = localStorage.getItem(KEEP_LOGIN_KEY) !== 'false';
         if (loggedIn === 'true' && token && keep) {
-          // 已登录，直接跳转到主界面
           window.location.href = '/admin/dashboard.html';
         }
         if (!keep) {
