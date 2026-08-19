@@ -528,7 +528,7 @@
             localStorage.setItem(TOKEN_KEY, data.token);
             localStorage.setItem(STORAGE_KEY, 'true');
             // 登录成功，跳转到主界面
-            window.location.href = './index.html';
+            window.location.href = './dashboard.html';
           } else {
             attempts++;
             localStorage.setItem('login_attempts', String(attempts));
