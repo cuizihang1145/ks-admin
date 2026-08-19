@@ -178,13 +178,13 @@
       color: #6a6a8a;
     }
 
-    /* 修正：撑满整行，输入框自动拉伸占满剩余空间 */
+    /* 数学题行 — 整体居中，三个元素紧挨着 */
     .math-row {
       display: flex;
       gap: 0.5rem;
       align-items: center;
       margin-bottom: 0.6rem;
-      width: 100%;
+      justify-content: center;
     }
     .math-row .math-question {
       font-size: 0.82rem;
@@ -201,9 +201,8 @@
       background: rgba(136, 204, 255, 0.08);
     }
     .math-row input {
-      flex: 1; /* 自动拉伸占满中间空间 */
-      min-width: 60px;
-      max-width: 160px;
+      flex-shrink: 0;
+      width: 100px;
       margin-bottom: 0;
       padding: 0.65rem 0.8rem;
       border-radius: 60px;
@@ -366,13 +365,14 @@
       .login-card { padding: 2rem 1.5rem; }
       .theme-toggle { top: 14px; right: 16px; width: 38px; height: 38px; font-size: 1rem; }
       .footer-note { bottom: 16px; font-size: 0.6rem; }
-      .math-row input { flex: 1; max-width: 120px; }
+      .math-row input { width: 80px; }
     }
     @media (max-width: 380px) {
       .login-card { padding: 1.6rem 1.2rem; }
       .math-row .math-question { font-size: 0.7rem; padding: 0.3rem 0.5rem; }
-      .math-row input { padding: 0.5rem 0.6rem; font-size: 0.8rem; max-width: 100px; }
+      .math-row input { width: 70px; padding: 0.5rem 0.6rem; font-size: 0.8rem; }
       .math-row .refresh-btn { width: 34px; height: 34px; font-size: 0.9rem; }
+      .math-row { gap: 0.3rem; }
     }
   </style>
 </head>
