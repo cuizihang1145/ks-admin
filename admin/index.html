@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>管理后台 · 登录</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
   <style>
     * {
       margin: 0;
@@ -24,7 +23,7 @@
       -webkit-tap-highlight-color: transparent !important;
     }
     body {
-      font-family: 'Inter', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
       background: #f5f3ff;
       color: #1a1a2e;
       min-height: 100vh;
@@ -178,13 +177,15 @@
     body.dark .login-card .input-group .input-icon {
       color: #6a6a8a;
     }
-    .login-card .math-row {
+
+    /* 数学题行 — 恢复原样：题目 | 输入框 | 刷新按钮 在同一行 */
+    .math-row {
       display: flex;
       gap: 0.5rem;
       align-items: center;
       margin-bottom: 0.6rem;
     }
-    .login-card .math-row .math-question {
+    .math-row .math-question {
       font-size: 0.82rem;
       font-weight: 600;
       color: #6b5acf;
@@ -194,11 +195,11 @@
       padding: 0.4rem 0.7rem;
       border-radius: 40px;
     }
-    body.dark .login-card .math-row .math-question {
+    body.dark .math-row .math-question {
       color: #88ccff;
       background: rgba(136, 204, 255, 0.08);
     }
-    .login-card .math-row input {
+    .math-row input {
       flex: 1;
       min-width: 60px;
       max-width: 130px;
@@ -213,16 +214,16 @@
       -webkit-appearance: none;
       appearance: none;
     }
-    body.dark .login-card .math-row input {
+    body.dark .math-row input {
       background: rgba(255, 255, 255, 0.06);
       border-color: rgba(255, 255, 255, 0.08);
       color: #e8e6f0;
     }
-    .login-card .math-row input:focus {
+    .math-row input:focus {
       border-color: #6b5acf;
       box-shadow: 0 0 0 3px rgba(107, 90, 207, 0.12);
     }
-    .login-card .math-row .refresh-btn {
+    .math-row .refresh-btn {
       background: rgba(255, 255, 255, 0.3);
       border: 1px solid rgba(0, 0, 0, 0.06);
       border-radius: 50%;
@@ -237,19 +238,20 @@
       font-size: 1rem;
       flex-shrink: 0;
     }
-    body.dark .login-card .math-row .refresh-btn {
+    body.dark .math-row .refresh-btn {
       background: rgba(255, 255, 255, 0.06);
       border-color: rgba(255, 255, 255, 0.08);
       color: #9a96b8;
     }
-    .login-card .math-row .refresh-btn:hover {
+    .math-row .refresh-btn:hover {
       background: rgba(107, 90, 207, 0.12);
       color: #6b5acf;
     }
-    body.dark .login-card .math-row .refresh-btn:hover {
+    body.dark .math-row .refresh-btn:hover {
       background: rgba(136, 204, 255, 0.12);
       color: #88ccff;
     }
+
     .login-card .login-options {
       display: flex;
       align-items: center;
@@ -363,11 +365,12 @@
       .login-card { padding: 2rem 1.5rem; }
       .theme-toggle { top: 14px; right: 16px; width: 38px; height: 38px; font-size: 1rem; }
       .footer-note { bottom: 16px; font-size: 0.6rem; }
+      .math-row { flex-wrap: wrap; justify-content: center; }
+      .math-row input { max-width: 100%; flex: 1 1 100%; }
     }
     @media (max-width: 380px) {
       .login-card { padding: 1.6rem 1.2rem; }
-      .login-card .math-row { flex-wrap: wrap; justify-content: center; }
-      .login-card .math-row input { max-width: 100%; flex: 1 1 100%; }
+      .math-row .math-question { font-size: 0.7rem; padding: 0.3rem 0.5rem; }
     }
   </style>
 </head>
@@ -391,6 +394,7 @@
       <span class="input-icon"><i class="fas fa-lock"></i></span>
       <input type="password" id="passwordInput" placeholder="请输入密码" autocomplete="current-password" />
     </div>
+    <!-- 数学题行：题目 | 输入框 | 刷新按钮 同一行 -->
     <div class="math-row">
       <span class="math-question" id="mathQuestion">加载题目中...</span>
       <input type="text" id="mathAnswer" placeholder="答案" autocomplete="off" />
@@ -411,20 +415,10 @@
 
   <script>
     (function() {
-      var mathQuestionText = '';
-      var loginBtn = document.getElementById('loginBtn');
-      var passwordInput = document.getElementById('passwordInput');
-      var inviteCodeInput = document.getElementById('inviteCode');
-      var mathAnswerInput = document.getElementById('mathAnswer');
-      var loginError = document.getElementById('loginError');
-      var keepLoginCheck = document.getElementById('keepLogin');
-      var refreshMathBtn = document.getElementById('refreshMathBtn');
-
       var STORAGE_KEY = 'admin_logged_in';
-      var KEEP_LOGIN_KEY = 'admin_keep_login';
       var TOKEN_KEY = 'admin_token';
+      var KEEP_LOGIN_KEY = 'admin_keep_login';
 
-      // —— 主题切换 ——
       var themeToggle = document.getElementById('themeToggle');
       var themeIcon = document.getElementById('themeIcon');
       var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -440,15 +434,26 @@
         setTheme(currentTheme === 'dark' ? 'light' : 'dark');
       });
 
-      // —— 保持登录状态 ——
       if (localStorage.getItem(KEEP_LOGIN_KEY) === 'false') {
-        keepLoginCheck.checked = false;
+        document.getElementById('keepLogin').checked = false;
       } else {
-        keepLoginCheck.checked = true;
+        document.getElementById('keepLogin').checked = true;
       }
 
-      // —— 获取数学题 ——
+      var inviteCodeInput = document.getElementById('inviteCode');
+      var passwordInput = document.getElementById('passwordInput');
+      var mathAnswerInput = document.getElementById('mathAnswer');
+      var loginBtn = document.getElementById('loginBtn');
+      var loginError = document.getElementById('loginError');
+      var refreshMathBtn = document.getElementById('refreshMathBtn');
+      var keepLoginCheck = document.getElementById('keepLogin');
+      var mathQuestionEl = document.getElementById('mathQuestion');
+
+      // ——— 数学题加载（只调用一次，刷新按钮才重新加载） ———
+      var mathLoading = false;
       function fetchMathQuestion() {
+        if (mathLoading) return;
+        mathLoading = true;
         fetch('/api/auth', {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
@@ -456,35 +461,27 @@
         .then(function(res) { return res.json(); })
         .then(function(data) {
           if (data.question) {
-            mathQuestionText = data.question;
-            document.getElementById('mathQuestion').textContent = data.question;
+            mathQuestionEl.textContent = data.question;
             mathAnswerInput.value = '';
             mathAnswerInput.focus();
           }
+          mathLoading = false;
         })
         .catch(function() {
-          document.getElementById('mathQuestion').textContent = '加载题目失败，请刷新';
+          mathQuestionEl.textContent = '加载失败，请刷新';
+          mathLoading = false;
         });
       }
 
-      // —— 登录逻辑 ——
+      // ——— 登录 ———
       function doLogin() {
         var inviteCode = inviteCodeInput.value.trim();
         var pwd = passwordInput.value.trim();
         var userAnswer = parseInt(mathAnswerInput.value.trim());
 
-        if (!inviteCode) {
-          loginError.textContent = '请输入邀请码';
-          return;
-        }
-        if (!pwd) {
-          loginError.textContent = '请输入密码';
-          return;
-        }
-        if (isNaN(userAnswer)) {
-          loginError.textContent = '请输入数学题答案';
-          return;
-        }
+        if (!inviteCode) { loginError.textContent = '请输入邀请码'; return; }
+        if (!pwd) { loginError.textContent = '请输入密码'; return; }
+        if (isNaN(userAnswer)) { loginError.textContent = '请输入数学题答案'; return; }
 
         var attempts = parseInt(localStorage.getItem('login_attempts')) || 0;
         var lockedUntil = parseInt(localStorage.getItem('lock_until')) || 0;
@@ -527,7 +524,6 @@
             localStorage.setItem(KEEP_LOGIN_KEY, String(keep));
             localStorage.setItem(TOKEN_KEY, data.token);
             localStorage.setItem(STORAGE_KEY, 'true');
-            // 登录成功，跳转到主界面
             window.location.href = './dashboard.html';
           } else {
             attempts++;
@@ -550,29 +546,23 @@
         });
       }
 
-      // —— 事件绑定 ——
+      // ——— 事件绑定 ———
       loginBtn.addEventListener('click', doLogin);
-      passwordInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') doLogin();
-      });
-      inviteCodeInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') doLogin();
-      });
-      mathAnswerInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') doLogin();
-      });
+      passwordInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
+      inviteCodeInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
+      mathAnswerInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
       refreshMathBtn.addEventListener('click', function() {
         fetchMathQuestion();
         mathAnswerInput.focus();
       });
 
-      // —— 检查是否已登录（如果已登录则直接跳转） ——
+      // ——— 检查是否已登录（跳转） ———
       function checkLogin() {
         var loggedIn = localStorage.getItem(STORAGE_KEY);
         var token = localStorage.getItem(TOKEN_KEY);
         var keep = localStorage.getItem(KEEP_LOGIN_KEY) !== 'false';
         if (loggedIn === 'true' && token && keep) {
-          window.location.href = './index.html';
+          window.location.href = './dashboard.html';
         }
         if (!keep) {
           localStorage.removeItem(TOKEN_KEY);
@@ -581,10 +571,10 @@
       }
       checkLogin();
 
-      // —— 加载数学题 ——
+      // ——— 初始化加载数学题（只一次） ———
       fetchMathQuestion();
 
-      // —— 点击输入框自动选中 ——
+      // ——— 点击输入框自动选中 ———
       document.querySelectorAll('.input-group input, .math-row input').forEach(function(el) {
         el.addEventListener('focus', function() { this.select(); });
       });
