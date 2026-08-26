@@ -1,4 +1,4 @@
-import { checkAuth } from './utils.js';
+import { writeFile, checkAuth } from './utils.js';
 import { neon } from '@neondatabase/serverless';
 
 const MAIN_REPO = 'cuizihang1145/cuizihang1145.github.io';
@@ -21,24 +21,12 @@ function json(data, status = 200) {
 }
 
 async function readYoulian() {
-    const url = `https://raw.githubusercontent.com/${MAIN_REPO}/main/youlian.json`;
-    const resp = await fetch(url);
+    const resp = await fetch('https://www.cuizi.top/youlian.json');
     if (!resp.ok) throw new Error('读取 youlian.json 失败');
     return await resp.json();
 }
 
-async function writeYoulian(data) {
-    // 通过主站 API 写入
-    const resp = await fetch('https://www.cuizi.top/api/youlian', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data }),
-    });
-    if (!resp.ok) throw new Error('写入 youlian.json 失败');
-    return resp.json();
-}
-
-export default async function handler(req) {
+export default async function handler(req, res) {
     const protocol = req.headers['x-forwarded-proto'] || 'https';
     const host = req.headers.host;
     const url = new URL(req.url, `${protocol}://${host}`);
@@ -83,7 +71,7 @@ export default async function handler(req) {
                 feed: app.feed_url || ''
             };
             friends.push(newItem);
-            await writeYoulian(friends);
+            await writeFile(MAIN_REPO, 'youlian.json', friends, null, `通过友链申请：${app.site_name}`);
             await sql`DELETE FROM friend_applications WHERE id = ${id}`;
             return json({ success: true, message: '已通过审核' });
         } catch (err) {
@@ -169,7 +157,7 @@ export default async function handler(req) {
             feed: feed?.trim() || ''
         };
         friends.push(newItem);
-        await writeYoulian(friends);
+        await writeFile(MAIN_REPO, 'youlian.json', friends, null, `添加友链：${newItem.name}`);
         return json({ success: true, message: '添加成功' });
     }
 
@@ -181,8 +169,8 @@ export default async function handler(req) {
         }
         const deleted = friends[idx];
         friends.splice(idx, 1);
-        await writeYoulian(friends);
-        return json({ success: true, message: `删除友链：${deleted.name}` });
+        await writeFile(MAIN_REPO, 'youlian.json', friends, null, `删除友链：${deleted.name}`);
+        return json({ success: true, message: '删除成功' });
     }
 
     return json({ error: '方法不允许' }, 405);
