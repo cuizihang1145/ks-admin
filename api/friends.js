@@ -1,6 +1,176 @@
-export default function handler(req, res) {
-    res.status(200).json({
-        status: 'ok',
-        message: '函数运行正常，可以正常访问了'
-    });
+import { neon } from '@neondatabase/serverless';
+import { readFile, writeFile, checkAuth } from './utils.js';
+
+const MAIN_REPO = 'cuizihang1145/cuizihang1145.github.io';
+
+export default async function handler(req, res) {
+    const sql = neon(process.env.DATABASE_URL);
+
+    const protocol = req.headers['x-forwarded-proto'] || 'https';
+    const host = req.headers.host;
+    const url = new URL(req.url, `${protocol}://${host}`);
+    const pathname = url.pathname;
+    const method = req.method;
+
+    // 设置 CORS 头
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Admin-Token');
+
+    if (method === 'OPTIONS') {
+        return res.status(204).end();
+    }
+
+    const referer = req.headers.referer || '';
+    const allowedDomains = ['admin.cuizi.top', 'cuizi.top', 'localhost'];
+    let isAllowed = false;
+    for (const domain of allowedDomains) {
+        if (referer.includes(domain)) {
+            isAllowed = true;
+            break;
+        }
+    }
+    if (!isAllowed) {
+        return res.status(403).json({ error: '请求来源不合法' });
+    }
+
+    if (!checkAuth(req)) {
+        return res.status(401).json({ error: '未授权' });
+    }
+
+    // 读 youlian.json（通过 GitHub API，需要 TOKEN）
+    async function readYoulian() {
+        const result = await readFile(MAIN_REPO, 'youlian.json');
+        return result.data;
+    }
+
+    async function writeYoulian(data, msg) {
+        const result = await readFile(MAIN_REPO, 'youlian.json');
+        await writeFile(MAIN_REPO, 'youlian.json', data, result.sha, msg);
+    }
+
+    // 通过审核
+    if (pathname === '/api/friends/approve' && method === 'POST') {
+        try {
+            const { id } = req.body;
+            const result = await sql`SELECT * FROM friend_applications WHERE id = ${id}`;
+            if (result.length === 0) {
+                return res.status(404).json({ error: '申请不存在' });
+            }
+            const app = result[0];
+            const friends = await readYoulian();
+            const newItem = {
+                name: app.site_name,
+                url: app.site_url,
+                desc: app.site_desc || '',
+                logo: app.logo_url || '',
+                feed: app.feed_url || ''
+            };
+            friends.push(newItem);
+            await writeYoulian(friends, `通过友链申请：${app.site_name}`);
+            await sql`DELETE FROM friend_applications WHERE id = ${id}`;
+            return res.status(200).json({ success: true, message: '已通过审核' });
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ error: err.message });
+        }
+    }
+
+    // 打回
+    if (pathname.startsWith('/api/friends/pending/') && method === 'DELETE') {
+        try {
+            const id = parseInt(pathname.split('/').pop());
+            if (isNaN(id)) {
+                return res.status(400).json({ error: '无效ID' });
+            }
+            await sql`DELETE FROM friend_applications WHERE id = ${id}`;
+            return res.status(200).json({ success: true, message: '已打回' });
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ error: err.message });
+        }
+    }
+
+    // 修改待审核
+    if (pathname.startsWith('/api/friends/pending/') && method === 'PUT') {
+        try {
+            const id = parseInt(pathname.split('/').pop());
+            if (isNaN(id)) {
+                return res.status(400).json({ error: '无效ID' });
+            }
+            const { name, url, desc, logo, feed, reason, email } = req.body;
+            if (!name || !url || !desc) {
+                return res.status(400).json({ error: '名称、链接、简介为必填' });
+            }
+            await sql`
+                UPDATE friend_applications 
+                SET site_name = ${name}, 
+                    site_url = ${url}, 
+                    site_desc = ${desc}, 
+                    logo_url = ${logo || ''}, 
+                    feed_url = ${feed || ''}, 
+                    apply_reason = ${reason || ''}, 
+                    contact_email = ${email || ''}
+                WHERE id = ${id}
+            `;
+            return res.status(200).json({ success: true, message: '已更新' });
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ error: err.message });
+        }
+    }
+
+    // 其他所有请求：读 youlian.json
+    try {
+        const friends = await readYoulian();
+
+        if (method === 'GET') {
+            const type = url.searchParams.get('type');
+            if (type === 'pending') {
+                const rows = await sql`SELECT * FROM friend_applications ORDER BY created_at DESC`;
+                return res.status(200).json(rows);
+            }
+            return res.status(200).json(friends);
+        }
+
+        if (method === 'POST') {
+            const { name, url, desc, logo, feed } = req.body;
+            if (!name || name.trim() === '') {
+                return res.status(400).json({ error: '名称不能为空' });
+            }
+            if (!url || url.trim() === '') {
+                return res.status(400).json({ error: '链接不能为空' });
+            }
+            if (!desc || desc.trim() === '') {
+                return res.status(400).json({ error: '简介不能为空' });
+            }
+            const newItem = {
+                name: name.trim(),
+                url: url.trim(),
+                desc: desc.trim(),
+                logo: logo?.trim() || '',
+                feed: feed?.trim() || ''
+            };
+            friends.push(newItem);
+            await writeYoulian(friends, `添加友链：${newItem.name}`);
+            return res.status(200).json({ success: true, message: '添加成功' });
+        }
+
+        if (method === 'DELETE') {
+            const { id } = req.body;
+            const idx = parseInt(id);
+            if (isNaN(idx) || idx < 0 || idx >= friends.length) {
+                return res.status(400).json({ error: '友链不存在' });
+            }
+            const deleted = friends[idx];
+            friends.splice(idx, 1);
+            await writeYoulian(friends, `删除友链：${deleted.name}`);
+            return res.status(200).json({ success: true, message: '删除成功' });
+        }
+
+        return res.status(405).json({ error: '方法不允许' });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: err.message });
+    }
 }
