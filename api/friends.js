@@ -1,4 +1,4 @@
-import { readFile, writeFile, checkAuth } from './utils.js';
+import { checkAuth } from './utils.js';
 import { neon } from '@neondatabase/serverless';
 
 const MAIN_REPO = 'cuizihang1145/cuizihang1145.github.io';
@@ -20,7 +20,25 @@ function json(data, status = 200) {
     });
 }
 
-export default async function handler(req, res) {
+async function readYoulian() {
+    const url = `https://raw.githubusercontent.com/${MAIN_REPO}/main/youlian.json`;
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('读取 youlian.json 失败');
+    return await resp.json();
+}
+
+async function writeYoulian(data) {
+    // 通过主站 API 写入
+    const resp = await fetch('https://www.cuizi.top/api/youlian', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data }),
+    });
+    if (!resp.ok) throw new Error('写入 youlian.json 失败');
+    return resp.json();
+}
+
+export default async function handler(req) {
     const protocol = req.headers['x-forwarded-proto'] || 'https';
     const host = req.headers.host;
     const url = new URL(req.url, `${protocol}://${host}`);
@@ -56,9 +74,7 @@ export default async function handler(req, res) {
                 return json({ error: '申请不存在' }, 404);
             }
             const app = result[0];
-            const friendsResult = await readFile(MAIN_REPO, 'youlian.json');
-            const friends = friendsResult.data;
-            const sha = friendsResult.sha;
+            const friends = await readYoulian();
             const newItem = {
                 name: app.site_name,
                 url: app.site_url,
@@ -67,7 +83,7 @@ export default async function handler(req, res) {
                 feed: app.feed_url || ''
             };
             friends.push(newItem);
-            await writeFile(MAIN_REPO, 'youlian.json', friends, sha, `通过友链申请：${app.site_name}`);
+            await writeYoulian(friends);
             await sql`DELETE FROM friend_applications WHERE id = ${id}`;
             return json({ success: true, message: '已通过审核' });
         } catch (err) {
@@ -118,9 +134,7 @@ export default async function handler(req, res) {
         }
     }
 
-    const result = await readFile(MAIN_REPO, 'youlian.json');
-    const friends = result.data;
-    const sha = result.sha;
+    const friends = await readYoulian();
 
     if (method === 'GET') {
         const type = url.searchParams.get('type');
@@ -155,7 +169,7 @@ export default async function handler(req, res) {
             feed: feed?.trim() || ''
         };
         friends.push(newItem);
-        await writeFile(MAIN_REPO, 'youlian.json', friends, sha, `添加友链：${newItem.name}`);
+        await writeYoulian(friends);
         return json({ success: true, message: '添加成功' });
     }
 
@@ -167,8 +181,8 @@ export default async function handler(req, res) {
         }
         const deleted = friends[idx];
         friends.splice(idx, 1);
-        await writeFile(MAIN_REPO, 'youlian.json', friends, sha, `删除友链：${deleted.name}`);
-        return json({ success: true, message: '删除成功' });
+        await writeYoulian(friends);
+        return json({ success: true, message: `删除友链：${deleted.name}` });
     }
 
     return json({ error: '方法不允许' }, 405);
