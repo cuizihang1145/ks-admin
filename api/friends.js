@@ -21,7 +21,9 @@ function json(data, status = 200) {
 }
 
 export default async function handler(req, res) {
-    const url = new URL(req.url);
+    const protocol = req.headers['x-forwarded-proto'] || 'https';
+    const host = req.headers.host;
+    const url = new URL(req.url, `${protocol}://${host}`);
     const pathname = url.pathname;
     const method = req.method;
 
