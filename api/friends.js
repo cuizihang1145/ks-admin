@@ -1,26 +1,14 @@
-const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Token',
-};
-
-function json(data, status = 200) {
-    return new Response(JSON.stringify(data), {
-        status,
+// 这个文件的唯一作用：让 Vercel 构建日志显示它被识别为 Serverless Function
+export default function handler(req) {
+    return new Response(JSON.stringify({
+        status: 'ok',
+        timestamp: Date.now(),
+        message: '如果看到这条消息，说明函数已成功部署并执行'
+    }), {
+        status: 200,
         headers: {
             'Content-Type': 'application/json',
-            ...corsHeaders,
+            'Access-Control-Allow-Origin': '*',
         },
     });
-}
-
-export default async function handler(req) {
-    const method = req.method;
-
-    if (method === 'OPTIONS') {
-        return new Response(null, { status: 204, headers: corsHeaders });
-    }
-
-    // 直接返回空数组，不连数据库，不读文件，不调 GitHub API
-    return json({ success: true, data: [], message: '测试版本，没连任何东西' });
 }
