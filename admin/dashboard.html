@@ -100,11 +100,7 @@
 </div>
 </div>
 <div class="editor-footer"><span>字数：<span class="word-count" id="wordCount">0</span></span></div>
-<div class="editor-actions" id="editorActions">
-<button class="btn-publish" id="publishBtn">发布</button>
-<button class="btn-save-draft" id="saveDraftBtn">存草稿</button>
-<button class="btn-cancel" id="cancelEditBtn">清空</button>
-</div>
+<div class="editor-actions" id="editorActions"></div>
 </div>
 </div>
 </div>
@@ -338,7 +334,6 @@ var UNDO_PREFIX = 'undo_backup_';
 var editor = document.getElementById('mdEditor');
 var previewArea = document.getElementById('previewArea');
 var wordCountEl = document.getElementById('wordCount');
-var publishBtn = document.getElementById('publishBtn');
 var editTitle = document.getElementById('editTitle');
 var editLocation = document.getElementById('editLocation');
 var editDateText = document.getElementById('editDateText');
@@ -365,12 +360,37 @@ var articleEditor = document.getElementById('articleEditor');
 var shuoshuoEditor = document.getElementById('shuoshuoEditor');
 var friendEditor = document.getElementById('friendEditor');
 var markdownEditor = document.getElementById('markdownEditor');
+var editorActions = document.getElementById('editorActions');
 
 function loadCurrentData() {
 if (currentMode === 'article') return allArticles;
 if (currentMode === 'shuoshuo') return allShuoshuo;
 if (currentMode === 'friend') return allFriends;
 return [];
+}
+
+function rebuildEditorActions() {
+var actionsHtml = '';
+var isFriend = currentMode === 'friend';
+var isPending = editingPendingId !== null;
+var isEditingFriend = editingFriendIdx !== null;
+var isEditingArticle = editingIdx >= 0;
+
+if (isPending) {
+actionsHtml = '<button class="btn-publish-pending" id="publishBtn"><i class="fas fa-check"></i> 发布</button>' +
+'<button class="btn-save-db" id="saveDbBtn"><i class="fas fa-save"></i> 修改到数据库</button>' +
+'<button class="btn-cancel" id="cancelEditBtn">清空</button>';
+} else if (isFriend || isEditingFriend) {
+actionsHtml = '<button class="btn-publish" id="publishBtn">' + (isEditingFriend ? '更新友链' : '添加友链') + '</button>' +
+'<button class="btn-save-draft" id="saveDraftBtn">存草稿</button>' +
+'<button class="btn-cancel" id="cancelEditBtn">清空</button>';
+} else {
+var label = currentMode === 'article' ? (isEditingArticle ? '更新文章' : '发布文章') : (isEditingArticle ? '更新说说' : '发布说说');
+actionsHtml = '<button class="btn-publish" id="publishBtn">' + label + '</button>' +
+'<button class="btn-save-draft" id="saveDraftBtn">存草稿</button>' +
+'<button class="btn-cancel" id="cancelEditBtn">清空</button>';
+}
+editorActions.innerHTML = actionsHtml;
 }
 
 function switchMode(mode) {
@@ -394,7 +414,7 @@ loadDraftForMode(mode);
 editingFriendIdx = null;
 editingPendingId = null;
 pendingRefArea.style.display = 'none';
-publishBtn.textContent = mode === 'article' ? '发布文章' : mode === 'shuoshuo' ? '发布说说' : '添加友链';
+rebuildEditorActions();
 
 if (mode === 'friend') {
 loadFriendList().then(function() {
@@ -658,13 +678,7 @@ if (editor) { editor.value = ''; updatePreview(); updateWordCount(); }
 editingIdx = -1;
 editingFriendIdx = null;
 editingPendingId = null;
-publishBtn.textContent = currentMode === 'article' ? '发布文章' : currentMode === 'shuoshuo' ? '发布说说' : '添加友链';
-var actions = document.getElementById('editorActions');
-actions.innerHTML = '';
-actions.innerHTML = '<button class="btn-publish" id="publishBtn">发布</button><button class="btn-save-draft" id="saveDraftBtn">存草稿</button><button class="btn-cancel" id="cancelEditBtn">清空</button>';
-document.getElementById('publishBtn').addEventListener('click', publishHandler);
-document.getElementById('saveDraftBtn').addEventListener('click', saveDraftHandler);
-document.getElementById('cancelEditBtn').addEventListener('click', cancelEditHandler);
+rebuildEditorActions();
 deleteState('editor_draft');
 setDefaultDate();
 }
@@ -923,13 +937,7 @@ friendFeed.value = friend.feed || '';
 pendingRefArea.style.display = 'none';
 editingFriendIdx = idx;
 editingPendingId = null;
-publishBtn.textContent = '更新友链';
-var actions = document.getElementById('editorActions');
-actions.innerHTML = '';
-actions.innerHTML = '<button class="btn-publish" id="publishBtn">更新友链</button><button class="btn-save-draft" id="saveDraftBtn">存草稿</button><button class="btn-cancel" id="cancelEditBtn">清空</button>';
-document.getElementById('publishBtn').addEventListener('click', publishHandler);
-document.getElementById('saveDraftBtn').addEventListener('click', saveDraftHandler);
-document.getElementById('cancelEditBtn').addEventListener('click', cancelEditHandler);
+rebuildEditorActions();
 document.querySelector('.tab[data-tab="write"]').click();
 showToast('已加载友链，修改后点击更新');
 }
@@ -1124,12 +1132,7 @@ pendingTime.textContent = pending.created_at ? new Date(pending.created_at).toLo
 pendingRefArea.style.display = '';
 editingPendingId = id;
 editingFriendIdx = null;
-var actions = document.getElementById('editorActions');
-actions.innerHTML = '';
-actions.innerHTML = '<button class="btn-publish-pending" id="publishBtn"><i class="fas fa-check"></i> 发布</button><button class="btn-save-db" id="saveDbBtn"><i class="fas fa-save"></i> 修改到数据库</button><button class="btn-cancel" id="cancelEditBtn">清空</button>';
-document.getElementById('publishBtn').addEventListener('click', publishPendingHandler);
-document.getElementById('saveDbBtn').addEventListener('click', saveDbHandler);
-document.getElementById('cancelEditBtn').addEventListener('click', cancelEditHandler);
+rebuildEditorActions();
 document.querySelector('.tab[data-tab="write"]').click();
 showToast('已加载待审核友链，可编辑后发布或保存到数据库');
 }
@@ -1328,7 +1331,6 @@ showToast('友链更新成功！');
 clearEditor();
 deleteState('editor_draft');
 editingFriendIdx = null;
-publishBtn.textContent = '添加友链';
 loadFriendList();
 } else {
 showToast(data.error || '更新失败', true);
@@ -1618,7 +1620,7 @@ editor.value = item.content || '';
 updatePreview();
 updateWordCount();
 }
-publishBtn.textContent = '更新' + (mode === 'article' ? '文章' : '说说');
+rebuildEditorActions();
 document.querySelector('.tab[data-tab="write"]').click();
 showToast('已加载');
 }
@@ -1813,13 +1815,7 @@ friendFeed.value = draft.feed || '';
 pendingRefArea.style.display = 'none';
 editingIdx = -1;
 editingPendingId = null;
-publishBtn.textContent = '添加友链';
-var actions = document.getElementById('editorActions');
-actions.innerHTML = '';
-actions.innerHTML = '<button class="btn-publish" id="publishBtn">添加友链</button><button class="btn-save-draft" id="saveDraftBtn">存草稿</button><button class="btn-cancel" id="cancelEditBtn">清空</button>';
-document.getElementById('publishBtn').addEventListener('click', publishHandler);
-document.getElementById('saveDraftBtn').addEventListener('click', saveDraftHandler);
-document.getElementById('cancelEditBtn').addEventListener('click', cancelEditHandler);
+rebuildEditorActions();
 document.querySelector('.tab[data-tab="write"]').click();
 showToast('已加载友链草稿');
 return;
@@ -1845,7 +1841,7 @@ updateWordCount();
 }
 editingIdx = -1;
 editingPendingId = null;
-publishBtn.textContent = mode === 'article' ? '发布文章' : '发布说说';
+rebuildEditorActions();
 document.querySelector('.tab[data-tab="write"]').click();
 showToast('已加载草稿');
 });
@@ -1866,13 +1862,7 @@ friendFeed.value = draft.feed || '';
 pendingRefArea.style.display = 'none';
 editingIdx = -1;
 editingPendingId = null;
-publishBtn.textContent = '添加友链';
-var actions = document.getElementById('editorActions');
-actions.innerHTML = '';
-actions.innerHTML = '<button class="btn-publish" id="publishBtn">添加友链</button><button class="btn-save-draft" id="saveDraftBtn">存草稿</button><button class="btn-cancel" id="cancelEditBtn">清空</button>';
-document.getElementById('publishBtn').addEventListener('click', publishHandler);
-document.getElementById('saveDraftBtn').addEventListener('click', saveDraftHandler);
-document.getElementById('cancelEditBtn').addEventListener('click', cancelEditHandler);
+rebuildEditorActions();
 deleteDraft(id).then(function() {
 document.querySelector('.tab[data-tab="write"]').click();
 document.getElementById('publishBtn').click();
@@ -1900,7 +1890,7 @@ updateWordCount();
 }
 editingIdx = -1;
 editingPendingId = null;
-publishBtn.textContent = mode === 'article' ? '发布文章' : '发布说说';
+rebuildEditorActions();
 deleteDraft(id).then(function() {
 document.querySelector('.tab[data-tab="write"]').click();
 document.getElementById('publishBtn').click();
@@ -2054,17 +2044,26 @@ if (editor) {
 updatePreview();
 updateWordCount();
 }
-document.getElementById('publishBtn').addEventListener('click', publishHandler);
-document.getElementById('saveDraftBtn').addEventListener('click', saveDraftHandler);
-document.getElementById('cancelEditBtn').addEventListener('click', cancelEditHandler);
+
+editorActions.addEventListener('click', function(e) {
+var target = e.target.closest('button');
+if (!target) return;
+var id = target.id;
+if (id === 'publishBtn') {
+publishHandler();
+} else if (id === 'saveDraftBtn') {
+saveDraftHandler();
+} else if (id === 'cancelEditBtn') {
+cancelEditHandler();
+} else if (id === 'saveDbBtn') {
+saveDbHandler();
+}
+});
+
+rebuildEditorActions();
 loadAll().then(function() {
 loadDraftForMode(currentMode);
 });
-
-document.addEventListener('input', function(e) {
-if (e.target && e.target.id === 'hardDeleteConfirmInput') {}
-});
 </script>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"91fbf2e723a14893b836d95ba4694dbf","r":1}' crossorigin="anonymous"></script>
 </body>
 </html>
