@@ -9,7 +9,6 @@ export default async function handler(req, res) {
 
     const sql = neon(process.env.DATABASE_URL);
 
-    // CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Admin-Token');
@@ -18,7 +17,6 @@ export default async function handler(req, res) {
       return res.status(204).end();
     }
 
-    // 来源校验
     const referer = req.headers.referer || '';
     const allowedDomains = ['admin.cuizi.top', 'cuizi.top', 'localhost'];
     let isAllowed = false;
@@ -36,14 +34,12 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: '密码错误' });
     }
 
-    // 读取文件
     const result = await readFile(MAIN_REPO, 'youlian.json');
     const friends = result.data;
     const sha = result.sha;
 
     const { action, id, name, url, desc, logo, feed, reason, email } = req.body;
 
-    // ===== GET =====
     if (req.method === 'GET') {
       const type = req.query?.type || '';
       if (type === 'pending') {
@@ -53,9 +49,7 @@ export default async function handler(req, res) {
       return res.status(200).json(friends);
     }
 
-    // ===== POST：所有写操作都走这里 =====
     if (req.method === 'POST') {
-      // 1. 通过审核
       if (action === 'approve') {
         if (!id) return res.status(400).json({ error: '缺少申请ID' });
         const rows = await sql`SELECT * FROM friend_applications WHERE id = ${id}`;
@@ -69,18 +63,15 @@ export default async function handler(req, res) {
           feed: app.feed_url || ''
         });
         await writeFile(MAIN_REPO, 'youlian.json', friends, sha, `通过友链申请：${app.site_name}`);
-        await sql`DELETE FROM friend_applications WHERE id = ${id}`;
         return res.status(200).json({ success: true, message: '已通过审核' });
       }
 
-      // 2. 打回
       if (action === 'reject') {
         if (!id) return res.status(400).json({ error: '缺少申请ID' });
         await sql`DELETE FROM friend_applications WHERE id = ${id}`;
         return res.status(200).json({ success: true, message: '已打回' });
       }
 
-      // 3. 修改待审核
       if (action === 'update') {
         if (!id) return res.status(400).json({ error: '缺少申请ID' });
         if (!name || !url || !desc) {
@@ -100,7 +91,6 @@ export default async function handler(req, res) {
         return res.status(200).json({ success: true, message: '已更新' });
       }
 
-      // 4. 新增友链（原有功能）
       if (!action || action === 'add') {
         if (!name || !url || !desc) {
           return res.status(400).json({ error: '名称、链接、简介不能为空' });
@@ -119,7 +109,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: '未知 action: ' + action });
     }
 
-    // ===== PUT：编辑已有友链 =====
     if (req.method === 'PUT') {
       const idx = parseInt(id);
       if (isNaN(idx) || idx < 0 || idx >= friends.length) {
@@ -135,7 +124,6 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: '编辑成功' });
     }
 
-    // ===== DELETE：删除已有友链 =====
     if (req.method === 'DELETE') {
       const idx = parseInt(id);
       if (isNaN(idx) || idx < 0 || idx >= friends.length) {
@@ -152,4 +140,4 @@ export default async function handler(req, res) {
     console.error('Error:', error.message);
     return res.status(500).json({ error: error.message });
   }
-}
+          }
