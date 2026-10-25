@@ -1,0 +1,1693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UpKram · 实时预览</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/emoji-js/lib/emoji.min.js"></script>
+<link rel="stylesheet" href="upkram-all.css">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;display:flex;flex-direction:column;height:100vh;overflow:hidden;background:#f5f5fa;color:#1f2330;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased;transition:background .25s ease,color .25s ease}
+body.dark{background:#1a1a2e;color:#e8e8f5}
+.app-bar{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:10px 14px;border-bottom:1px solid #e4e4ee;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);z-index:10}
+body.dark .app-bar{background:rgba(30,28,52,.88);border-bottom-color:#2f2d4a}
+.brand{display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px;letter-spacing:.01em}
+.brand i{color:#6366f1;font-size:16px}
+.brand small{font-weight:400;font-size:11px;color:#9a9ab0;padding:2px 7px;border:1px solid currentColor;border-radius:999px;opacity:.75}
+.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid #d9d9e6;background:#fff;color:#3a3a52;font:inherit;font-size:13px;line-height:1.4;cursor:pointer;transition:all .15s;white-space:nowrap;-webkit-tap-highlight-color:transparent}
+.btn:hover{border-color:#6366f1;color:#6366f1;background:#f0f0ff}
+.btn:active{transform:translateY(1px)}
+.btn-icon{padding:6px 10px;font-size:14px}
+.btn-group{display:flex;align-items:center}
+.btn-group .btn{border-radius:0;margin-left:-1px}
+.btn-group .btn:first-child{border-top-left-radius:8px;border-bottom-left-radius:8px;margin-left:0}
+.btn-group .btn:last-child{border-top-right-radius:8px;border-bottom-right-radius:8px}
+.btn.engine-all{border-color:#6366f1;color:#6366f1;background:rgba(99,102,241,.08);font-weight:600}
+.btn.engine-ni{border-color:#10b981;color:#10b981;background:rgba(16,185,129,.08);font-weight:600}
+.btn.mode-btn.active{background:#6366f1;color:#fff;border-color:#6366f1;font-weight:600;z-index:1}
+body.dark .btn{background:#2a2845;color:#d6d6ea;border-color:#3d3a5c}
+body.dark .btn:hover{border-color:#8b8bff;color:#b9b9ff;background:#322f52}
+body.dark .btn.engine-all{border-color:#8b8bff;color:#b9b9ff;background:rgba(139,139,255,.12)}
+body.dark .btn.engine-ni{border-color:#2ecc8f;color:#2ecc8f;background:rgba(46,204,143,.12)}
+body.dark .btn.mode-btn.active{background:#6366f1;color:#fff;border-color:#6366f1}
+.divider-v{width:1px;height:20px;background:#d9d9e6;margin:0 4px}
+body.dark .divider-v{background:#3d3a5c}
+.workspace{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:1fr 6px 1fr;transition:grid-template-columns .15s}
+.workspace.editor-only{grid-template-columns:1fr!important}
+.workspace.editor-only .divider,.workspace.editor-only .pane:nth-child(3){display:none!important}
+.pane{display:flex;flex-direction:column;min-width:0;min-height:0}
+.pane-head{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 16px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9090a8;border-bottom:1px solid #e8e8f0;background:rgba(255,255,255,.45);flex-wrap:wrap}
+body.dark .pane-head{color:#8e8eb0;border-bottom-color:#2f2d4a;background:rgba(255,255,255,.02)}
+.pane-head .meta{font-weight:400;letter-spacing:0;text-transform:none;font-size:12px;font-variant-numeric:tabular-nums;opacity:.85}
+.quick-tools{display:flex;align-items:center;gap:4px;margin-right:auto;margin-left:10px;overflow-x:auto;white-space:nowrap;scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;max-width:100%}
+.quick-tools::-webkit-scrollbar{display:none}
+.tool-btn{background:transparent;border:1px solid transparent;color:#6a6a85;cursor:pointer;padding:4px 8px;border-radius:4px;font-size:13px;transition:all .15s;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;gap:4px}
+.tool-btn:hover{background:#e4e4ee;color:#1f2330;border-color:#d9d9e6}
+body.dark .tool-btn{color:#a0a0c0}
+body.dark .tool-btn:hover{background:#3d3a5c;color:#fff;border-color:#3d3a5c}
+.tool-btn.txt-h{font-weight:700;font-size:13px;font-family:system-ui,sans-serif}
+.custom-dropdown-menu{position:absolute;background:#fff;border:1px solid #d9d9e6;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.15);padding:8px;z-index:10000;min-width:260px;max-height:70vh;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:4px}
+body.dark .custom-dropdown-menu{background:#2a2845;border-color:#3d3a5c;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.custom-dropdown-item{padding:6px 8px;font-size:12.5px;color:#3a3a52;border-radius:4px;cursor:pointer;white-space:nowrap;text-align:left;transition:background .15s;overflow:hidden;text-overflow:ellipsis}
+.custom-dropdown-item:hover{background:#f0f0ff;color:#6366f1}
+body.dark .custom-dropdown-item{color:#d6d6ea}
+body.dark .custom-dropdown-item:hover{background:#3d3a5c;color:#b9b9ff}
+.dropdown-header{grid-column:1/-1;padding:4px 8px;font-size:11px;font-weight:bold;color:#9090a8;text-transform:uppercase;border-bottom:1px solid #e4e4ee;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between}
+body.dark .dropdown-header{border-bottom-color:#3d3a5c}
+.form-modal-mask{position:fixed;inset:0;z-index:99999;background:rgba(20,18,40,.55);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:20px}
+.form-dialog{width:100%;max-width:680px;max-height:90vh;background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.35);display:flex;flex-direction:column;overflow:hidden;animation:formIn .2s cubic-bezier(.34,1.56,.64,1)}
+@keyframes formIn{from{opacity:0;transform:scale(.94) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+body.dark .form-dialog{background:#232140;color:#e8e8f5}
+.form-dialog-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #e4e4ee;flex-shrink:0;gap:10px}
+.form-dialog-head h3{margin:0;font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.form-dialog-head h3 i{color:#6366f1;font-size:15px;flex-shrink:0}
+body.dark .form-dialog-head{border-bottom-color:#2f2d4a}
+.form-dialog-close{width:30px;height:30px;border:none;background:transparent;font-size:20px;cursor:pointer;color:#6a6a85;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+.form-dialog-close:hover{background:rgba(0,0,0,.06);color:#1f2330}
+body.dark .form-dialog-close{color:#a0a0c0}
+body.dark .form-dialog-close:hover{background:rgba(255,255,255,.08);color:#fff}
+.form-dialog-body{padding:16px 18px;overflow-y:auto;flex:1 1 auto}
+.form-dialog-foot{padding:12px 18px;border-top:1px solid #e4e4ee;display:flex;justify-content:flex-end;gap:8px;flex-shrink:0;flex-wrap:wrap}
+body.dark .form-dialog-foot{border-top-color:#2f2d4a}
+.form-group{margin-bottom:14px}
+.form-group:last-child{margin-bottom:0}
+.form-group>label{display:block;font-size:12.5px;font-weight:600;margin-bottom:6px;color:#3a3a52;min-height:17px;line-height:17px}
+body.dark .form-group>label{color:#d6d6ea}
+.form-hint{font-size:11.5px;color:#9a9ab0;margin-top:4px;line-height:1.4}
+.form-input,.form-textarea,.form-select{width:100%;padding:7px 10px;border-radius:6px;border:1px solid #d9d9e6;background:#fff;color:inherit;font:inherit;font-size:13px;outline:none;transition:border-color .15s,box-shadow .15s}
+.form-input:focus,.form-textarea:focus,.form-select:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+.form-textarea{min-height:60px;resize:vertical;font-family:inherit;line-height:1.5}
+body.dark .form-input,body.dark .form-textarea,body.dark .form-select{background:#1a1830;border-color:#3d3a5c}
+body.dark .form-input:focus,body.dark .form-textarea:focus,body.dark .form-select:focus{border-color:#8b8bff;box-shadow:0 0 0 3px rgba(139,139,255,.15)}
+.form-row{display:flex;gap:8px;align-items:flex-end;margin-bottom:8px;flex-wrap:wrap}
+.form-row>*{flex-shrink:0}
+.form-row>.form-input,.form-row>.form-textarea,.form-row>.form-select{flex:1 1 120px;min-width:0}
+.form-row>.form-group{flex:1 1 120px;min-width:0;margin-bottom:0}
+.form-row .w-small{flex:0 0 72px!important}
+.form-row .w-mid{flex:0 0 120px!important}
+.btn.small{padding:4px 10px;font-size:12px;border-radius:6px}
+.btn.danger{color:#e74c6f;border-color:#f8c8d2}
+.btn.danger:hover{background:#fef2f5;border-color:#e74c6f;color:#e74c6f}
+.msg-editor,.item-editor{padding:12px;border-radius:8px;background:#fafaff;border:1px solid #e4e4ee;margin-bottom:10px;position:relative}
+body.dark .msg-editor,body.dark .item-editor{background:#1a1830;border-color:#3d3a5c}
+.user-row{padding:8px 10px;border-radius:8px;background:#fafaff;border:1px solid #e4e4ee;margin-bottom:8px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+body.dark .user-row{background:#1a1830;border-color:#3d3a5c}
+.user-row .user-name{flex:0 0 90px!important}
+.user-row .user-color{flex:0 0 110px!important}
+.user-row .user-avatar{flex:1 1 160px!important;min-width:100px}
+.side-btn[data-side="right"]{background:#6366f1;color:#fff;border-color:#6366f1}
+.side-btn[data-side="right"]:hover{background:#4d4fc0;color:#fff}
+.tbl-preview-edit{border:1px solid #e4e4ee;border-radius:8px;overflow:auto;max-height:420px;background:#fff}
+body.dark .tbl-preview-edit{background:#1a1830;border-color:#3d3a5c}
+.tbl-preview-caption{padding:8px 12px;background:#f5f5fa;border-bottom:1px solid #e4e4ee;font-size:12.5px;font-weight:600;color:#3a3a52;display:flex;align-items:center;gap:6px}
+body.dark .tbl-preview-caption{background:#2a2845;border-bottom-color:#3d3a5c;color:#d6d6ea}
+.tbl-preview-caption-empty{color:#a0a0c0;font-style:italic;font-weight:400}
+.tbl-preview-edit table{width:100%;border-collapse:collapse;font-size:12px}
+.tbl-preview-edit th,.tbl-preview-edit td{border-bottom:1px solid #e4e4ee;border-right:1px solid #e4e4ee;padding:0}
+.tbl-preview-edit th:last-child,.tbl-preview-edit td:last-child{border-right:none}
+.tbl-preview-edit tr:last-child td{border-bottom:none}
+.tbl-preview-edit th{background:#f5f5fa}
+body.dark .tbl-preview-edit th{background:#2a2845}
+body.dark .tbl-preview-edit th,body.dark .tbl-preview-edit td{border-color:#3d3a5c}
+.tbl-preview-edit .tbl-edit-head,.tbl-preview-edit .tbl-edit-cell{width:100%;box-sizing:border-box;border:none;background:transparent;color:inherit;font:inherit;font-size:12px;padding:6px 8px;outline:none;min-width:80px}
+.tbl-preview-edit .tbl-edit-head{font-weight:600}
+.tbl-preview-edit .tbl-edit-head:focus,.tbl-preview-edit .tbl-edit-cell:focus{background:rgba(99,102,241,.08);box-shadow:inset 0 0 0 2px #6366f1}
+.tbl-preview-edit .tbl-align-row th{padding:0;background:#f0f0f8}
+body.dark .tbl-preview-edit .tbl-align-row th{background:#1a1830}
+.tbl-preview-edit .tbl-edit-align{width:100%;border:none;background:transparent;color:inherit;font:inherit;font-size:11px;padding:3px 4px;outline:none;cursor:pointer;text-align:center}
+#editor{flex:1 1 auto;width:100%;min-height:0;padding:18px 20px 60px;border:0;outline:0;resize:none;background:transparent;color:inherit;font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13.5px;line-height:1.75;tab-size:2}
+#editor::placeholder{color:#a9a9bd}
+.preview-scroll{flex:1 1 auto;min-height:0;overflow:auto;padding:22px 28px 90px;overscroll-behavior:contain;position:relative}
+#content{max-width:800px;margin:0 auto}
+.divider{position:relative;cursor:col-resize;background:transparent;touch-action:none}
+.divider::after{content:'';position:absolute;inset:0 2px;border-radius:3px;background:#e3e3ee;transition:background .15s}
+.divider:hover::after,.divider.dragging::after{background:#6366f1}
+body.dark .divider::after{background:#2c2a47}
+body.dark .divider:hover::after,body.dark .divider.dragging::after{background:#7c7cff}
+.drop-mask{position:fixed;inset:0;z-index:10000;background:rgba(99,102,241,.2);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;border:4px dashed #6366f1;pointer-events:none}
+.drop-mask.on{display:flex}
+.drop-mask span{background:#6366f1;color:#fff;padding:12px 24px;border-radius:8px;font-size:20px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{border-radius:8px;border:3px solid transparent;background-clip:content-box;background-color:#cccddd}
+::-webkit-scrollbar-thumb:hover{background-color:#adaec6}
+body.dark ::-webkit-scrollbar-thumb{background-color:#3a3860}
+body.dark ::-webkit-scrollbar-thumb:hover{background-color:#4c4980}
+.modal-mask{position:fixed;inset:0;background:rgba(20,18,40,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px}
+.modal-mask.on{display:flex}
+.modal{width:100%;max-width:900px;max-height:90vh;background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.35);display:flex;flex-direction:column;overflow:hidden;font-family:'Inter',system-ui,sans-serif}
+body.dark .modal{background:#232140;color:#e8e8f5}
+.modal-head{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px;border-bottom:1px solid #e4e4ee}
+body.dark .modal-head{border-bottom-color:#2f2d4a}
+.modal-head h3{margin:0;font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
+.modal-head h3 i{color:#6366f1}
+.modal-close{width:32px;height:32px;border:none;border-radius:8px;background:transparent;color:#6a6a85;cursor:pointer;font-size:18px;display:inline-flex;align-items:center;justify-content:center;transition:background .15s,color .15s;-webkit-tap-highlight-color:transparent}
+.modal-close:hover{background:rgba(0,0,0,.06);color:#1f2330}
+body.dark .modal-close{color:#a0a0c0}
+body.dark .modal-close:hover{background:rgba(255,255,255,.08);color:#fff}
+.modal-body{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:14px 18px;gap:10px}
+.modal-tip{font-size:12.5px;color:#6a6a85;line-height:1.55;margin:0}
+body.dark .modal-tip{color:#9a9ac0}
+.modal-tip code{background:rgba(99,102,241,.12);color:#4d4fc0;padding:1px 5px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:11.5px}
+body.dark .modal-tip code{background:rgba(139,139,255,.18);color:#b9b9ff}
+#export-text{flex:1 1 auto;min-height:260px;width:100%;resize:none;padding:12px 14px;border:1px solid #d9d9e6;border-radius:10px;background:#fafaff;color:#1f2330;font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:12px;line-height:1.55;white-space:pre;overflow:auto;outline:none;tab-size:2}
+#export-text:focus{border-color:#6366f1}
+body.dark #export-text{background:#1a1830;border-color:#3d3a5c;color:#d6d6ea}
+.modal-foot{flex:0 0 auto;display:flex;gap:8px;padding:12px 18px 16px;border-top:1px solid #e4e4ee;flex-wrap:wrap}
+body.dark .modal-foot{border-top-color:#2f2d4a}
+.btn-primary{background:#6366f1;color:#fff;border-color:#6366f1}
+.btn-primary:hover{background:#4d4fc0;border-color:#4d4fc0;color:#fff}
+body.dark .btn-primary{background:#6d6dff;border-color:#6d6dff}
+body.dark .btn-primary:hover{background:#8b8bff;border-color:#8b8bff;color:#fff}
+.immersive-mask{position:fixed;inset:0;z-index:9998;background:#f5f5fa;color:#1f2330;display:none;flex-direction:column;transition:background .25s ease,color .25s ease}
+body.dark .immersive-mask{background:#1a1a2e;color:#e8e8f5}
+.immersive-mask.on{display:flex}
+.immersive-bar{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:1px solid #e4e4ee;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+body.dark .immersive-bar{background:rgba(30,28,52,.88);border-bottom-color:#2f2d4a}
+.immersive-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid #d9d9e6;background:#fff;color:#3a3a52;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap;transition:border-color .15s,color .15s;-webkit-tap-highlight-color:transparent}
+.immersive-btn.btn-icon{padding:6px 10px}
+.immersive-btn:hover{border-color:#6366f1;color:#6366f1}
+body.dark .immersive-btn{background:#2a2845;color:#d6d6ea;border-color:#3d3a5c}
+body.dark .immersive-btn:hover{border-color:#8b8bff;color:#b9b9ff}
+.immersive-brand{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px;letter-spacing:.01em}
+.immersive-brand i{color:#6366f1;font-size:16px}
+.immersive-bar-actions{display:flex;align-items:center;gap:6px}
+.immersive-body{flex:1 1 auto;min-height:0;overflow:auto;padding:22px 20px 90px;overscroll-behavior:contain}
+.immersive-container{max-width:800px;margin:0 auto}
+@media(max-width:860px){.workspace{grid-template-columns:1fr;grid-template-rows:1fr 1fr}.workspace.editor-only{grid-template-rows:1fr!important}.divider{display:none}.preview-scroll{padding:16px 18px 60px}#editor{padding:14px 16px 40px}.hide-text-mobile span.label{display:none}.hide-text-mobile{padding:6px 10px;font-size:14px}}
+@media(max-width:620px){.btn{padding:6px 8px;font-size:12px}.btn-icon{padding:6px 8px;font-size:13px}.app-bar{gap:8px;justify-content:flex-start}.custom-dropdown-menu{grid-template-columns:1fr;min-width:180px}.form-dialog{max-height:95vh}}
+</style>
+</head>
+<body>
+<datalist id="color-suggest">
+<option value="red">红色 #e74c6f</option>
+<option value="green">绿色 #10b981</option>
+<option value="orange">橙色 #d97706</option>
+<option value="yellow">黄色 #f59e0b</option>
+<option value="blue">蓝色 #4a90d9</option>
+<option value="purple">紫色 #6b5acf</option>
+<option value="pink">粉色 #ec4899</option>
+<option value="cyan">青色 #06b6d4</option>
+<option value="gray">灰色 #8a8ab5</option>
+<option value="#6b5acf">#6b5acf</option>
+<option value="#e74c6f">#e74c6f</option>
+<option value="#10b981">#10b981</option>
+<option value="#4a90d9">#4a90d9</option>
+<option value="#f59e0b">#f59e0b</option>
+</datalist>
+<div class="drop-mask" id="drop-mask"><span>松手导入 Markdown 文件</span></div>
+<header class="app-bar">
+<div class="brand"><i class="fa-solid fa-feather-pointed"></i> UpKram <small>实时预览</small></div>
+<div class="actions">
+<button class="btn engine-all" id="btn-engine" title="切换解析引擎"><i class="fa-solid fa-microchip"></i> 引擎: <span id="engine-label">All</span></button>
+<div class="divider-v"></div>
+<div class="btn-group">
+<button class="btn btn-icon" id="btn-import" title="导入本地 .md 文件"><i class="fa-solid fa-folder-open"></i></button>
+<button class="btn btn-icon" id="btn-sample" title="载入示例"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+<button class="btn btn-icon" id="btn-clear" title="清空输入"><i class="fa-solid fa-eraser"></i></button>
+</div>
+<div class="btn-group">
+<button class="btn hide-text-mobile" id="btn-copy-md" title="复制 Markdown"><i class="fa-solid fa-file-lines"></i> <span class="label">复制 MD</span></button>
+<button class="btn hide-text-mobile" id="btn-copy-html" title="复制 HTML"><i class="fa-solid fa-code"></i> <span class="label">复制 HTML</span></button>
+<button class="btn hide-text-mobile" id="btn-export" title="导出单文件"><i class="fa-solid fa-file-export"></i> <span class="label">导出</span></button>
+</div>
+<div class="divider-v"></div>
+<div class="btn-group">
+<button class="btn btn-icon mode-btn" id="mode-edit" title="纯编辑"><i class="fa-solid fa-pen-to-square"></i></button>
+<button class="btn btn-icon mode-btn active" id="mode-split" title="分屏"><i class="fa-solid fa-columns"></i></button>
+<button class="btn btn-icon mode-btn" id="mode-view" title="全屏浏览"><i class="fa-solid fa-expand"></i></button>
+</div>
+<div class="divider-v"></div>
+<button class="btn btn-icon" id="btn-theme" title="切换深色 / 浅色"><i class="fa-solid fa-moon"></i></button>
+</div>
+</header>
+<main class="workspace" id="workspace">
+<section class="pane">
+<div class="pane-head">
+<span><i class="fa-regular fa-pen-to-square"></i> Markdown 输入</span>
+<div class="quick-tools">
+<button class="tool-btn txt-h" id="btn-h-dropdown" title="标题">H</button>
+<button class="tool-btn" id="btn-text-dropdown" title="基础排版"><i class="fa-solid fa-font"></i></button>
+<button class="tool-btn" id="btn-code-dropdown" title="代码与公式"><i class="fa-solid fa-code"></i></button>
+<button class="tool-btn" id="btn-inline-dropdown" title="行内装饰"><i class="fa-solid fa-wand-magic"></i></button>
+<button class="tool-btn" id="btn-block-dropdown" title="区块与容器"><i class="fa-solid fa-layer-group"></i></button>
+<button class="tool-btn" id="btn-form-dropdown" title="表单构建器"><i class="fa-solid fa-list-check"></i></button>
+<button class="tool-btn" id="btn-callout-dropdown" title="提示框"><i class="fa-solid fa-circle-info"></i></button>
+</div>
+</div>
+<textarea id="editor" spellcheck="false" autocomplete="off" placeholder="在这里输入 Markdown，右侧实时预览……&#10;支持拖拽文件、粘贴截图，以及列表回车自动补齐。"></textarea>
+</section>
+<div class="divider" id="divider" title="拖动调整宽度"></div>
+<section class="pane">
+<div class="pane-head">
+<span><i class="fa-regular fa-eye"></i> 预览</span>
+<span class="meta" id="stats" style="margin-right:auto;margin-left:12px;">0 行 · 0 字 · 约 0 分钟</span>
+<label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;text-transform:none;letter-spacing:0;color:#6a6a85;"><input type="checkbox" id="sync-scroll" checked style="accent-color:#6366f1"> 双向滚动</label>
+</div>
+<div class="preview-scroll" id="previewScroll"><div id="content"></div></div>
+</section>
+</main>
+<div class="modal-mask" id="export-modal">
+<div class="modal" role="dialog" aria-modal="true">
+<div class="modal-head"><h3><i class="fa-solid fa-file-export"></i> 单文件 HTML</h3><button class="modal-close" id="modal-close" title="关闭">&times;</button></div>
+<div class="modal-body"><p class="modal-tip" id="export-tip"></p><textarea id="export-text" spellcheck="false" readonly></textarea></div>
+<div class="modal-foot">
+<button class="btn btn-primary" id="btn-copy-all"><i class="fa-solid fa-clipboard"></i> 复制全部</button>
+<button class="btn" id="btn-select-all"><i class="fa-solid fa-check-double"></i> 全选文本</button>
+<button class="btn" id="btn-download"><i class="fa-solid fa-download"></i> 下载 HTML</button>
+</div>
+</div>
+</div>
+<div class="immersive-mask" id="immersive-mask">
+<div class="immersive-bar">
+<button class="immersive-btn" id="immersive-back" type="button" title="返回编辑器"><i class="fa-solid fa-arrow-left"></i> 返回</button>
+<span class="immersive-brand"><i class="fa-solid fa-feather-pointed"></i> UpKram</span>
+<div class="immersive-bar-actions">
+<button class="immersive-btn btn-icon" id="immersive-to-top-bar" type="button" title="回到顶部"><i class="fa-solid fa-arrow-up"></i></button>
+<button class="immersive-btn btn-icon" id="immersive-theme" type="button" title="切换主题"><i class="fa-solid fa-moon"></i></button>
+</div>
+</div>
+<div class="immersive-body" id="immersive-body"><div class="immersive-container"><div id="immersive-content"></div></div></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>if(window.mermaid){try{mermaid.initialize({startOnLoad:false})}catch(e){}}</script>
+<script src="upkram-all.js"></script>
+<script>window.UK_ALL=window.KSMarkdown||window.kramup;</script>
+<script src="upkram-ni.js"></script>
+<script>window.UK_NI=window.KSMarkdown||window.kramup;</script>
+<script>
+(function(){
+'use strict';
+var apiAll=window.UK_ALL,apiNi=window.UK_NI,useNiMode=false,ghCalloutMode=false;
+var isSyncingLeft=false,isSyncingRight=false;
+var editor=document.getElementById('editor');
+var previewScroll=document.getElementById('previewScroll');
+var previewHost=document.getElementById('content');
+var statsEl=document.getElementById('stats');
+var workspace=document.getElementById('workspace');
+var divider=document.getElementById('divider');
+var themeBtn=document.getElementById('btn-theme');
+var exportBtn=document.getElementById('btn-export');
+var engineBtn=document.getElementById('btn-engine');
+var engineLabel=document.getElementById('engine-label');
+var dropMask=document.getElementById('drop-mask');
+var syncScrollChk=document.getElementById('sync-scroll');
+var modeEdit=document.getElementById('mode-edit');
+var modeSplit=document.getElementById('mode-split');
+var modeView=document.getElementById('mode-view');
+var exportModal=document.getElementById('export-modal');
+var exportText=document.getElementById('export-text');
+var exportTip=document.getElementById('export-tip');
+var modalClose=document.getElementById('modal-close');
+var btnCopyAll=document.getElementById('btn-copy-all');
+var btnSelectAll=document.getElementById('btn-select-all');
+var btnDownload=document.getElementById('btn-download');
+var immersiveMask=document.getElementById('immersive-mask');
+var immersiveBody=document.getElementById('immersive-body');
+var immersiveContent=document.getElementById('immersive-content');
+var immersiveBack=document.getElementById('immersive-back');
+var immersiveTheme=document.getElementById('immersive-theme');
+var immersiveToTopBar=document.getElementById('immersive-to-top-bar');
+var STORE_SRC='upkram.source',STORE_THEME='upkram.theme';
+var STORE_SRC_LEGACY='kramup.source',STORE_THEME_LEGACY='kramup.theme';
+var _toastEl=null,_toastTimer=null;
+function showToast(msg){
+if(!_toastEl){_toastEl=document.createElement('div');_toastEl.style.cssText='position:fixed;left:50%;bottom:36px;transform:translateX(-50%) translateY(8px);background:rgba(30,28,52,.92);color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;z-index:99999;opacity:0;pointer-events:none;transition:opacity .22s ease,transform .22s ease;box-shadow:0 6px 20px rgba(0,0,0,.3);font-family:inherit;letter-spacing:.2px;max-width:80vw;text-align:center';document.body.appendChild(_toastEl);}
+_toastEl.textContent=msg;void _toastEl.offsetWidth;
+_toastEl.style.opacity='1';_toastEl.style.transform='translateX(-50%) translateY(0)';
+clearTimeout(_toastTimer);
+_toastTimer=setTimeout(function(){_toastEl.style.opacity='0';_toastEl.style.transform='translateX(-50%) translateY(8px)';},1500);
+}
+function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function openFormDialog(title,icon,bodyHtml,onGenerate){
+var existing=document.querySelector('.form-modal-mask');
+if(existing)existing.remove();
+var mask=document.createElement('div');
+mask.className='form-modal-mask';
+mask.innerHTML='<div class="form-dialog"><div class="form-dialog-head"><h3><i class="'+(icon||'fa-solid fa-pen-to-square')+'"></i>'+title+'</h3><button class="form-dialog-close" type="button">×</button></div><div class="form-dialog-body">'+bodyHtml+'</div><div class="form-dialog-foot"><button type="button" class="btn btn-primary form-insert"><i class="fa-solid fa-arrow-down"></i> 插入</button><button type="button" class="btn form-cancel">取消</button></div></div>';
+document.body.appendChild(mask);
+function close(){if(mask.parentNode)mask.remove();}
+mask.querySelector('.form-dialog-close').onclick=close;
+mask.querySelector('.form-cancel').onclick=close;
+mask.addEventListener('click',function(e){if(e.target===mask)close();});
+document.addEventListener('keydown',function esc(e){if(e.key==='Escape'){close();document.removeEventListener('keydown',esc);}});
+mask.querySelector('.form-insert').onclick=function(){
+try{
+var md=onGenerate(mask);
+if(!md)return;
+var start=editor.selectionStart,end=editor.selectionEnd;
+editor.setRangeText(md,start,end,'end');
+editor.selectionStart=editor.selectionEnd=start+md.length;
+editor.focus();scheduleRender(true);close();showToast('已插入 '+title);
+}catch(err){alert('生成失败：'+(err&&err.message?err.message:err));}
+};
+setTimeout(function(){var firstInput=mask.querySelector('input, textarea, select');if(firstInput)firstInput.focus();},80);
+}
+function createChatMsgEditor(){
+var el=document.createElement('div');
+el.className='msg-editor';
+el.innerHTML=
+'<div class="form-row">'+
+'<input class="form-input msg-name" placeholder="说话人" value="张三" style="flex:1 1 80px">'+
+'<input class="form-input msg-time w-small" placeholder="时间" value="09:30">'+
+'<button type="button" class="btn small side-btn" data-side="left">左</button>'+
+'<select class="form-select msg-type w-mid">'+
+'<option value="text">文本</option>'+
+'<option value="redpacket">红包</option>'+
+'<option value="transfer">转账</option>'+
+'<option value="card">名片</option>'+
+'<option value="image">图片</option>'+
+'<option value="quote">引用</option>'+
+'</select>'+
+'<button type="button" class="btn small danger msg-remove">×</button>'+
+'</div>'+
+'<div class="form-row"><input class="form-input msg-status" placeholder="状态（气泡下方，可选，如：已读/送达）"></div>'+
+'<div class="msg-extra"></div>'+
+'<textarea class="form-textarea msg-content" placeholder="消息内容"></textarea>';
+var typeSelect=el.querySelector('.msg-type');
+var extra=el.querySelector('.msg-extra');
+var content=el.querySelector('.msg-content');
+var sideBtn=el.querySelector('.side-btn');
+sideBtn.addEventListener('click',function(){
+if(sideBtn.dataset.side==='left'){sideBtn.dataset.side='right';sideBtn.textContent='右';}
+else{sideBtn.dataset.side='left';sideBtn.textContent='左';}
+});
+function renderExtra(){
+var type=typeSelect.value;
+extra.innerHTML='';
+content.style.display='';
+if(type==='redpacket'){
+extra.innerHTML='<div class="form-row">'+
+'<input class="form-input rp-blessing" placeholder="祝福语" value="恭喜发财，大吉大利" style="flex:2 1 160px">'+
+'<input class="form-input rp-amount w-small" placeholder="金额" value="100">'+
+'</div>'+
+'<textarea class="form-textarea rp-winners" style="min-height:60px" placeholder="中奖者（每行一个，格式：姓名:金额）&#10;例如：&#10;李四:60&#10;王五:40"></textarea>';
+content.style.display='none';
+}else if(type==='transfer'){
+extra.innerHTML='<div class="form-row">'+
+'<input class="form-input tf-amount w-mid" placeholder="金额" value="200">'+
+'<input class="form-input tf-note" placeholder="备注" value="转账备注" style="flex:1 1 160px">'+
+'</div>';
+content.style.display='none';
+}else if(type==='card'){
+extra.innerHTML='<div class="form-row">'+
+'<input class="form-input card-name" placeholder="姓名" value="李四" style="flex:1 1 100px">'+
+'<input class="form-input card-desc" placeholder="描述" value="职位或简介" style="flex:2 1 180px">'+
+'</div>';
+content.style.display='none';
+}else if(type==='image'){
+extra.innerHTML='<div class="form-row">'+
+'<input class="form-input img-url" placeholder="图片 URL" value="https://picsum.photos/280/180" style="flex:2 1 220px">'+
+'<input class="form-input img-alt w-mid" placeholder="alt" value="">'+
+'</div>';
+content.style.display='none';
+}else if(type==='quote'){
+extra.innerHTML='<div class="form-row">'+
+'<input class="form-input quote-name" placeholder="引用的人" value="" style="flex:1 1 100px">'+
+'<input class="form-input quote-id w-mid" placeholder="引用消息 id（可空）" value="">'+
+'</div>';
+content.placeholder='回复内容';
+}
+}
+typeSelect.addEventListener('change',renderExtra);
+renderExtra();
+el.querySelector('.msg-remove').addEventListener('click',function(){el.remove();});
+return el;
+}
+function openChatForm(){
+var body=
+'<div class="form-group"><label>群聊标题（可空）</label><input id="chat-form-title" class="form-input" placeholder="例如：项目组"></div>'+
+'<div class="form-group"><label>参与人（可设置头像 / 颜色）</label>'+
+'<div id="chat-form-users"></div>'+
+'<button type="button" class="btn small" id="chat-form-add-user"><i class="fa-solid fa-plus"></i> 添加参与人</button></div>'+
+'<div class="form-group"><label>消息列表</label>'+
+'<div id="chat-form-msgs"></div>'+
+'<button type="button" class="btn small" id="chat-form-add-msg"><i class="fa-solid fa-plus"></i> 添加消息</button></div>';
+openFormDialog('聊天消息构建器','fa-solid fa-comments',body,function(mask){
+var title=mask.querySelector('#chat-form-title').value.trim();
+var lines=[];
+lines.push(':::chat'+(title?' '+title:''));
+var userRows=mask.querySelectorAll('#chat-form-users .user-row');
+if(userRows.length){
+var userLines=[];
+userRows.forEach(function(row){
+var n=row.querySelector('.user-name').value.trim();
+var c=row.querySelector('.user-color').value.trim();
+var a=row.querySelector('.user-avatar').value.trim();
+if(!n)return;
+var parts=[n+':'];
+if(c)parts.push('color='+c);
+if(a)parts.push('avatar='+a);
+userLines.push(parts.join(' '));
+});
+if(userLines.length){lines.push(':::users');lines.push.apply(lines,userLines);lines.push(':::');}
+}
+var msgEditors=mask.querySelectorAll('.msg-editor');
+if(!msgEditors.length)throw new Error('至少需要一条消息');
+msgEditors.forEach(function(me){
+var name=me.querySelector('.msg-name').value.trim()||'某人';
+var time=me.querySelector('.msg-time').value.trim()||'09:30';
+var side=me.querySelector('.side-btn').dataset.side||'left';
+var status=me.querySelector('.msg-status').value.trim();
+var type=me.querySelector('.msg-type').value;
+var header=':::msg '+name+' '+side+' '+time;
+if(status)header+=' "'+status.replace(/"/g,'\\"')+'"';
+if(type==='text'){
+var c=me.querySelector('.msg-content').value.trim()||' ';
+lines.push(header);lines.push(c);lines.push(':::');
+}else if(type==='redpacket'){
+var b=me.querySelector('.rp-blessing').value.trim()||'恭喜发财，大吉大利';
+var am=me.querySelector('.rp-amount').value.trim()||'100';
+var wStr='';
+var wText=me.querySelector('.rp-winners').value.trim();
+if(wText){var ws=wText.split('\n').map(function(l){return l.trim().replace(/[：:]\s*/g,':');}).filter(Boolean);if(ws.length)wStr=' winners="'+ws.join('|')+'"';}
+lines.push(header);lines.push(':::redpacket blessing='+b+' amount='+am+wStr);lines.push(':::');lines.push(':::');
+}else if(type==='transfer'){
+var ta=me.querySelector('.tf-amount').value.trim()||'200';
+var tn=me.querySelector('.tf-note').value.trim();
+lines.push(header);lines.push(':::transfer amount='+ta+(tn?' note='+tn:''));lines.push(':::');lines.push(':::');
+}else if(type==='card'){
+var cn=me.querySelector('.card-name').value.trim()||'某人';
+var cd=me.querySelector('.card-desc').value.trim();
+lines.push(header);lines.push(':::card name='+cn+(cd?' desc='+cd:''));lines.push(':::');lines.push(':::');
+}else if(type==='image'){
+var iu=me.querySelector('.img-url').value.trim();
+var ia=me.querySelector('.img-alt').value.trim();
+if(!iu)throw new Error('图片 URL 不能为空');
+lines.push(header);lines.push(':::img url='+iu+(ia?' alt='+ia:''));lines.push(':::');lines.push(':::');
+}else if(type==='quote'){
+var qn=me.querySelector('.quote-name').value.trim()||name;
+var qid=me.querySelector('.quote-id').value.trim();
+var c=me.querySelector('.msg-content').value.trim()||' ';
+lines.push(header);lines.push(':::quote '+qn+(qid?' id='+qid:''));lines.push(':::');lines.push(c);lines.push(':::');
+}
+});
+lines.push(':::');
+return lines.join('\n');
+});
+var mask=document.querySelector('.form-modal-mask');
+var userList=mask.querySelector('#chat-form-users');
+var msgList=mask.querySelector('#chat-form-msgs');
+function addUser(){
+var row=document.createElement('div');
+row.className='user-row';
+row.innerHTML='<input class="form-input user-name" placeholder="姓名" value="张三">'+
+'<input class="form-input user-color" list="color-suggest" placeholder="颜色" value="#e74c6f">'+
+'<input class="form-input user-avatar" placeholder="头像 URL（可空）">'+
+'<button type="button" class="btn small danger user-remove">×</button>';
+row.querySelector('.user-remove').onclick=function(){row.remove();};
+userList.appendChild(row);
+}
+mask.querySelector('#chat-form-add-user').onclick=addUser;
+mask.querySelector('#chat-form-add-msg').onclick=function(){msgList.appendChild(createChatMsgEditor());};
+addUser();addUser();addUser();
+msgList.appendChild(createChatMsgEditor());
+}
+function openUsersForm(){
+var body='<div class="form-group"><label>参与人列表</label><div id="uf-users"></div><button type="button" class="btn small" id="uf-add"><i class="fa-solid fa-plus"></i> 添加参与人</button></div>';
+openFormDialog('用户表构建器','fa-solid fa-users',body,function(mask){
+var rows=mask.querySelectorAll('#uf-users .user-row');
+if(!rows.length)throw new Error('至少需要一位参与人');
+var lines=[':::users'];
+rows.forEach(function(row){
+var n=row.querySelector('.user-name').value.trim();
+var c=row.querySelector('.user-color').value.trim();
+var a=row.querySelector('.user-avatar').value.trim();
+if(!n)return;
+var parts=[n+':'];
+if(c)parts.push('color='+c);
+if(a)parts.push('avatar='+a);
+lines.push(parts.join(' '));
+});
+lines.push(':::');
+return lines.join('\n');
+});
+var mask=document.querySelector('.form-modal-mask');
+var list=mask.querySelector('#uf-users');
+function addRow(){
+var row=document.createElement('div');
+row.className='user-row';
+row.innerHTML='<input class="form-input user-name" placeholder="姓名" value="张三">'+
+'<input class="form-input user-color" list="color-suggest" placeholder="颜色" value="#e74c6f">'+
+'<input class="form-input user-avatar" placeholder="头像 URL（可空）">'+
+'<button type="button" class="btn small danger user-remove">×</button>';
+row.querySelector('.user-remove').onclick=function(){row.remove();};
+list.appendChild(row);
+}
+mask.querySelector('#uf-add').onclick=addRow;
+addRow();addRow();
+}
+/* ==== 表格构建器（可视化全编辑） ==== */
+function openTableForm(){
+var body=
+'<div class="form-row">'+
+'<div class="form-group" style="flex:1"><label>数据行数（不含表头）</label><input id="tbl-rows" class="form-input" type="number" min="1" max="50" value="3"></div>'+
+'<div class="form-group" style="flex:1"><label>列数</label><input id="tbl-cols" class="form-input" type="number" min="1" max="20" value="3"></div>'+
+'</div>'+
+'<div class="form-group"><label>表格标题（可选，加 {sort} 启用排序）</label><input id="tbl-caption" class="form-input" placeholder="如：成绩单 {sort}"></div>'+
+'<div class="form-group"><label>直接编辑下方每个单元格（表头 + 每列对齐 + 数据）</label><div id="tbl-preview" class="tbl-preview-edit"></div></div>';
+openFormDialog('表格生成器','fa-solid fa-table',body,function(mask){
+var caption=mask.querySelector('#tbl-caption').value.trim();
+var headers=[],aligns=[],data=[];
+mask.querySelectorAll('#tbl-preview .tbl-edit-head').forEach(function(inp){headers.push(inp.value);});
+mask.querySelectorAll('#tbl-preview .tbl-edit-align').forEach(function(sel){aligns.push(sel.value);});
+mask.querySelectorAll('#tbl-preview .tbl-edit-row').forEach(function(row){
+var cells=[];
+row.querySelectorAll('.tbl-edit-cell').forEach(function(inp){cells.push(inp.value);});
+data.push(cells);
+});
+if(!headers.length)throw new Error('至少需要一列');
+function escCell(s){
+s=String(s==null?'':s);
+return s.replace(/\\/g,'\\\\').replace(/\|/g,'\\|');
+}
+function sepFor(a){
+if(a==='left')return':---';
+if(a==='center')return':---:';
+if(a==='right')return'---:';
+return'---';
+}
+var lines=[];
+if(caption)lines.push('Table: '+caption);
+lines.push('| '+headers.map(function(h){return escCell(h)||' ';}).join(' | ')+' |');
+lines.push('| '+aligns.map(sepFor).join(' | ')+' |');
+data.forEach(function(row){
+lines.push('| '+row.map(function(c){return escCell(c)||' ';}).join(' | ')+' |');
+});
+return '\n'+lines.join('\n')+'\n';
+});
+var mask=document.querySelector('.form-modal-mask');
+var rowsInput=mask.querySelector('#tbl-rows');
+var colsInput=mask.querySelector('#tbl-cols');
+var captionInput=mask.querySelector('#tbl-caption');
+var previewEl=mask.querySelector('#tbl-preview');
+function collect(){
+var headers=[],aligns=[],data=[];
+previewEl.querySelectorAll('.tbl-edit-head').forEach(function(inp){headers.push(inp.value);});
+previewEl.querySelectorAll('.tbl-edit-align').forEach(function(sel){aligns.push(sel.value);});
+previewEl.querySelectorAll('.tbl-edit-row').forEach(function(row){
+var cells=[];
+row.querySelectorAll('.tbl-edit-cell').forEach(function(inp){cells.push(inp.value);});
+data.push(cells);
+});
+return {headers:headers,aligns:aligns,data:data};
+}
+function renderCaption(){
+var caption=captionInput.value.trim();
+var capEl=previewEl.querySelector('.tbl-preview-caption');
+if(!capEl)return;
+if(caption){
+capEl.className='tbl-preview-caption';
+capEl.innerHTML='<i class="fa-solid fa-table"></i> '+escHtml(caption)+(/\{sort\}/i.test(caption)?' <span style="font-size:11px;opacity:.7;margin-left:4px">（开启排序）</span>':'');
+}else{
+capEl.className='tbl-preview-caption tbl-preview-caption-empty';
+capEl.textContent='（无表格标题）';
+}
+}
+function renderTable(){
+var rows=Math.max(1,parseInt(rowsInput.value)||1);
+var cols=Math.max(1,parseInt(colsInput.value)||1);
+var state=collect();
+var headers=state.headers.slice(0,cols);
+while(headers.length<cols)headers.push('');
+var aligns=state.aligns.slice(0,cols);
+while(aligns.length<cols)aligns.push('left');
+var data=[];
+for(var r=0;r<rows;r++){
+var oldRow=state.data[r]||[];
+var newRow=oldRow.slice(0,cols);
+while(newRow.length<cols)newRow.push('');
+data.push(newRow);
+}
+var caption=captionInput.value.trim();
+var capHtml=caption?'<div class="tbl-preview-caption"><i class="fa-solid fa-table"></i> '+escHtml(caption)+(/\{sort\}/i.test(caption)?' <span style="font-size:11px;opacity:.7;margin-left:4px">（开启排序）</span>':'')+'</div>':'<div class="tbl-preview-caption tbl-preview-caption-empty">（无表格标题）</div>';
+var html=capHtml+'<table>';
+html+='<thead><tr>';
+for(var c=0;c<cols;c++){
+html+='<th><input class="tbl-edit-head" value="'+escHtml(headers[c])+'" placeholder="列 '+(c+1)+'"></th>';
+}
+html+='</tr>';
+html+='<tr class="tbl-align-row">';
+for(var c=0;c<cols;c++){
+html+='<th><select class="tbl-edit-align">'+
+'<option value="left"'+(aligns[c]==='left'?' selected':'')+'>左对齐</option>'+
+'<option value="center"'+(aligns[c]==='center'?' selected':'')+'>居中</option>'+
+'<option value="right"'+(aligns[c]==='right'?' selected':'')+'>右对齐</option>'+
+'</select></th>';
+}
+html+='</tr></thead>';
+html+='<tbody>';
+for(var r=0;r<rows;r++){
+html+='<tr class="tbl-edit-row">';
+for(var c=0;c<cols;c++){
+html+='<td><input class="tbl-edit-cell" value="'+escHtml(data[r][c])+'" placeholder="内容"></td>';
+}
+html+='</tr>';
+}
+html+='</tbody></table>';
+previewEl.innerHTML=html;
+}
+colsInput.addEventListener('input',renderTable);
+rowsInput.addEventListener('input',renderTable);
+captionInput.addEventListener('input',renderCaption);
+renderTable();
+}
+function openCodeForm(){
+var langs=[['js','JavaScript'],['ts','TypeScript'],['python','Python'],['java','Java'],['go','Go'],['rust','Rust'],['php','PHP'],['swift','Swift'],['ruby','Ruby'],['html','HTML'],['css','CSS'],['vue','Vue'],['react','React/JSX'],['bash','Bash'],['sql','SQL'],['json','JSON'],['yaml','YAML'],['md','Markdown'],['mermaid','Mermaid'],['diff','Diff'],['','无语言']];
+var opts=langs.map(function(l){return '<option value="'+l[0]+'">'+l[1]+'</option>';}).join('');
+var body=
+'<div class="form-row">'+
+'<div class="form-group" style="flex:2"><label>语言</label><select id="code-lang" class="form-select">'+opts+'</select></div>'+
+'<div class="form-group" style="flex:1"><label>高亮行</label><input id="code-hl" class="form-input" placeholder="如 2,4-5"></div>'+
+'</div>'+
+'<div class="form-group"><label>文件名 / 标签（可选，显示在代码块顶部）</label><input id="code-title" class="form-input" placeholder="例如：app.js"></div>'+
+'<div class="form-group"><label>代码内容</label><textarea id="code-content" class="form-textarea" style="min-height:160px;font-family:\'JetBrains Mono\',monospace" placeholder="粘贴代码..."></textarea></div>';
+openFormDialog('代码块生成器','fa-solid fa-code',body,function(mask){
+var lang=mask.querySelector('#code-lang').value;
+var hl=mask.querySelector('#code-hl').value.trim();
+var title=mask.querySelector('#code-title').value.trim();
+var content=mask.querySelector('#code-content').value;
+if(!content.trim())throw new Error('代码内容不能为空');
+var meta='';
+if(title)meta+=' title="'+title.replace(/"/g,'\\"')+'"';
+if(hl)meta+=' hl='+hl;
+return '\n```'+lang+meta+'\n'+content.replace(/^\n+|\n+$/g,'')+'\n```\n';
+});
+}
+function openImageForm(){
+var body='<div class="form-group"><label>图片 URL *</label><input id="img-url" class="form-input" placeholder="https://..."></div>'+
+'<div class="form-group"><label>Alt 文字</label><input id="img-alt" class="form-input" placeholder="图片描述"></div>'+
+'<div class="form-row">'+
+'<div class="form-group" style="flex:1"><label>宽度</label><input id="img-w" class="form-input" placeholder="px"></div>'+
+'<div class="form-group" style="flex:1"><label>高度</label><input id="img-h" class="form-input" placeholder="px"></div>'+
+'</div>';
+openFormDialog('图片插入器','fa-solid fa-image',body,function(mask){
+var url=mask.querySelector('#img-url').value.trim();
+if(!url)throw new Error('图片 URL 不能为空');
+var alt=mask.querySelector('#img-alt').value.trim();
+var w=mask.querySelector('#img-w').value.trim();
+var h=mask.querySelector('#img-h').value.trim();
+var size='';
+if(w||h)size=' = '+(w||'')+'x'+(h||'');
+return '!['+alt+']('+url+size+')';
+});
+}
+function openMediaForm(){
+var body='<div class="form-group"><label>媒体类型</label><select id="md-type" class="form-select"><option value="video">视频 !video</option><option value="audio">音频 !audio</option></select></div>'+
+'<div class="form-group"><label>URL *</label><input id="md-url" class="form-input" placeholder="https://..."></div>'+
+'<div class="form-group"><label>标题 / Alt</label><input id="md-title" class="form-input" placeholder="媒体标题"></div>'+
+'<div class="form-group" id="md-subs-wrap"><label>字幕文件 URL（音频专用，可空）</label><input id="md-subs" class="form-input" placeholder="字幕 .vtt / .srt / .lrc 文件地址"></div>'+
+'<div class="form-group" id="md-cover-wrap"><label>封面 URL（音频专用，可空）</label><input id="md-cover" class="form-input" placeholder="封面图 URL"></div>';
+openFormDialog('媒体插入器','fa-solid fa-photo-film',body,function(mask){
+var type=mask.querySelector('#md-type').value;
+var url=mask.querySelector('#md-url').value.trim();
+if(!url)throw new Error('URL 不能为空');
+var title=mask.querySelector('#md-title').value.trim();
+if(type==='video')return '!video['+title+']('+url+')';
+var subs=mask.querySelector('#md-subs').value.trim();
+var cover=mask.querySelector('#md-cover').value.trim();
+var parts=[url];
+if(cover||subs)parts.push(cover||'');
+if(subs)parts.push(subs);
+return '!audio['+title+']('+parts.join(' = ')+')';
+});
+var mask=document.querySelector('.form-modal-mask');
+mask.querySelector('#md-type').onchange=function(){
+var v=this.value;
+mask.querySelector('#md-subs-wrap').style.display=v==='audio'?'':'none';
+mask.querySelector('#md-cover-wrap').style.display=v==='audio'?'':'none';
+};
+mask.querySelector('#md-type').onchange();
+}
+function openLinkCardForm(){
+var body='<div class="form-group"><label>URL *</label><input id="lc-url" class="form-input" placeholder="https://..."></div>'+
+'<div class="form-group"><label>网站名称</label><input id="lc-website" class="form-input" placeholder="Example Site"></div>'+
+'<div class="form-group"><label>描述内容</label><textarea id="lc-content" class="form-textarea" placeholder="卡片里显示的描述文字"></textarea></div>'+
+'<div class="form-group"><label>作者 / 来源</label><input id="lc-author" class="form-input" placeholder="可选"></div>'+
+'<div class="form-group"><label>封面图片 URL</label><input id="lc-img" class="form-input" placeholder="可选"></div>'+
+'<div class="form-group"><label>样式</label><select id="lc-style" class="form-select"><option value="normal">普通卡片</option><option value="big">大卡片</option></select></div>';
+openFormDialog('链接卡片生成器','fa-solid fa-link',body,function(mask){
+var url=mask.querySelector('#lc-url').value.trim();
+if(!url)throw new Error('URL 不能为空');
+var website=mask.querySelector('#lc-website').value.trim();
+var content=mask.querySelector('#lc-content').value.trim();
+var author=mask.querySelector('#lc-author').value.trim();
+var img=mask.querySelector('#lc-img').value.trim();
+var style=mask.querySelector('#lc-style').value;
+var lines=[':::link'+(style==='big'?' big':'')];
+lines.push('url: '+url);
+if(website)lines.push('website: '+website);
+if(content)lines.push('content: '+content);
+if(author)lines.push('author: '+author);
+if(img)lines.push('img: '+img);
+lines.push(':::');
+return '\n'+lines.join('\n')+'\n';
+});
+}
+function createMcqOption(){
+var el=document.createElement('div');
+el.className='item-editor';
+el.innerHTML=
+'<div class="form-row">'+
+'<input class="form-input opt-marker w-small" placeholder="A" value="A">'+
+'<input class="form-input opt-text" placeholder="选项内容" style="flex:2 1 200px">'+
+'<label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;"><input type="checkbox" class="opt-correct" style="accent-color:#10b981"> 正确答案</label>'+
+'<button type="button" class="btn small danger opt-remove">×</button>'+
+'</div>'+
+'<textarea class="form-textarea opt-expl" placeholder="^A: 针对此选项的解析（可空）" style="min-height:40px"></textarea>';
+el.querySelector('.opt-remove').onclick=function(){el.remove();};
+return el;
+}
+function openMcqForm(){
+var body=
+'<div class="form-group"><label>题目 *</label><input id="mcq-title" class="form-input" placeholder="题目内容"></div>'+
+'<div class="form-group"><label>提示条（可选）</label><input id="mcq-hint" class="form-input" placeholder="显示在题目下方的提示"></div>'+
+'<div class="form-group"><label>选项（勾选 ≥2 个正确答案即自动多选）</label><div id="mcq-opts"></div><button type="button" class="btn small" id="mcq-add-opt"><i class="fa-solid fa-plus"></i> 添加选项</button></div>'+
+'<div class="form-group"><label>答对解析（*^:，可空）</label><textarea id="mcq-correct-expl" class="form-textarea" placeholder="回答正确时的通用解析" style="min-height:50px"></textarea></div>'+
+'<div class="form-group"><label>答错解析（-^:，可空）</label><textarea id="mcq-wrong-expl" class="form-textarea" placeholder="回答错误时的通用解析" style="min-height:50px"></textarea></div>'+
+'<div class="form-group"><label>整体解析（^:，可空）</label><textarea id="mcq-expl" class="form-textarea" placeholder="所有选项下方显示的整体解析" style="min-height:50px"></textarea></div>'+
+'<div class="form-row">'+
+'<div class="form-group" style="flex:1"><label>展示模式（:::mcq+）</label><select id="mcq-display" class="form-select"><option value="0">普通（交互作答）</option><option value="1">展示模式（看 TA 答案）</option></select></div>'+
+'<div class="form-group" style="flex:1"><label>TA 选择的选项（如 A,B）</label><input id="mcq-sel" class="form-input" placeholder="A,B"></div>'+
+'</div>';
+openFormDialog('选择题生成器','fa-solid fa-list-check',body,function(mask){
+var title=mask.querySelector('#mcq-title').value.trim();
+if(!title)throw new Error('题目不能为空');
+var hint=mask.querySelector('#mcq-hint').value.trim();
+var correctExpl=mask.querySelector('#mcq-correct-expl').value.trim();
+var wrongExpl=mask.querySelector('#mcq-wrong-expl').value.trim();
+var expl=mask.querySelector('#mcq-expl').value.trim();
+var display=mask.querySelector('#mcq-display').value==='1';
+var selRaw=mask.querySelector('#mcq-sel').value.trim();
+var sel=selRaw?selRaw.split(/[,，\s]+/).map(function(s){return s.trim();}).filter(Boolean):[];
+var opts=mask.querySelectorAll('#mcq-opts .item-editor');
+if(!opts.length)throw new Error('至少需要一个选项');
+var lines=[':::mcq'+(display?'+':'')];
+lines.push('title: '+title);
+if(hint)lines.push('hint: '+hint);
+if(display&&sel.length)lines.push('sel: '+sel.join(','));
+opts.forEach(function(o){
+var marker=o.querySelector('.opt-marker').value.trim();
+var text=o.querySelector('.opt-text').value.trim();
+var correct=o.querySelector('.opt-correct').checked;
+var oe=o.querySelector('.opt-expl').value.trim();
+lines.push((correct?'*':'-')+' '+marker+' '+text);
+if(oe)lines.push('^'+marker+': '+oe);
+});
+if(correctExpl)lines.push('*^: '+correctExpl);
+if(wrongExpl)lines.push('-^: '+wrongExpl);
+if(expl)lines.push('^: '+expl);
+lines.push(':::');
+return '\n'+lines.join('\n')+'\n';
+});
+var mask=document.querySelector('.form-modal-mask');
+var list=mask.querySelector('#mcq-opts');
+var count=0;
+mask.querySelector('#mcq-add-opt').onclick=function(){
+var o=createMcqOption();count++;
+o.querySelector('.opt-marker').value=String.fromCharCode(65+(count-1));
+list.appendChild(o);
+};
+for(var i=0;i<3;i++){
+var o=createMcqOption();
+o.querySelector('.opt-marker').value=String.fromCharCode(65+i);
+list.appendChild(o);
+}
+count=3;
+}
+function createTimelineItem(){
+var el=document.createElement('div');
+el.className='item-editor';
+el.innerHTML='<div class="form-row">'+
+'<input class="form-input tl-date w-mid" placeholder="日期" value="2024-01-01">'+
+'<input class="form-input tl-title" placeholder="标题" value="事件标题" style="flex:1 1 160px">'+
+'<input class="form-input tl-color w-mid" list="color-suggest" placeholder="颜色（可空）" value="">'+
+'<button type="button" class="btn small danger tl-remove">×</button>'+
+'</div>'+
+'<input class="form-input tl-desc" placeholder="描述（可选）">';
+el.querySelector('.tl-remove').onclick=function(){el.remove();};
+return el;
+}
+function openTimelineForm(){
+var body='<div class="form-group"><label>整体颜色（留空=默认紫，rainbow=彩虹，或 red/green/#hex）</label><input id="tl-global" class="form-input" list="color-suggest" placeholder="rainbow / red / #6b5acf / 留空"></div>'+
+'<div class="form-group"><label>样式</label><select id="tl-numbered" class="form-select"><option value="0">圆点</option><option value="1">数字序号</option></select></div>'+
+'<div class="form-group"><label>事件列表</label><div id="tl-items"></div><button type="button" class="btn small" id="tl-add-item"><i class="fa-solid fa-plus"></i> 添加事件</button></div>';
+openFormDialog('时间线生成器','fa-solid fa-timeline',body,function(mask){
+var globalColor=mask.querySelector('#tl-global').value.trim();
+var numbered=mask.querySelector('#tl-numbered').value==='1';
+var items=mask.querySelectorAll('#tl-items .item-editor');
+if(!items.length)throw new Error('至少需要一个事件');
+var lines=[':::timeline'+(numbered?'+':'')+(globalColor?' '+globalColor:'')];
+items.forEach(function(it){
+var date=it.querySelector('.tl-date').value.trim();
+var title=it.querySelector('.tl-title').value.trim();
+var desc=it.querySelector('.tl-desc').value.trim();
+var color=it.querySelector('.tl-color').value.trim();
+var row=date+' | '+title;
+if(desc)row+=' | '+desc;
+if(color)row+=' | '+color;
+lines.push(row);
+});
+lines.push(':::');
+return '\n'+lines.join('\n')+'\n';
+});
+var mask=document.querySelector('.form-modal-mask');
+var list=mask.querySelector('#tl-items');
+mask.querySelector('#tl-add-item').onclick=function(){list.appendChild(createTimelineItem());};
+list.appendChild(createTimelineItem());
+}
+function createTabItem(){
+var el=document.createElement('div');
+el.className='item-editor';
+el.innerHTML='<div class="form-row">'+
+'<input class="form-input tab-title" placeholder="标签名" value="标签" style="flex:1">'+
+'<button type="button" class="btn small danger tab-remove">×</button>'+
+'</div>'+
+'<textarea class="form-textarea tab-content" placeholder="标签内容（支持 Markdown）" style="min-height:80px"></textarea>';
+el.querySelector('.tab-remove').onclick=function(){el.remove();};
+return el;
+}
+function openTabsForm(){
+var body='<div class="form-group"><label>标签页列表</label><div id="tabs-items"></div><button type="button" class="btn small" id="tabs-add-item"><i class="fa-solid fa-plus"></i> 添加标签页</button></div>';
+openFormDialog('选项卡生成器','fa-solid fa-table-columns',body,function(mask){
+var items=mask.querySelectorAll('#tabs-items .item-editor');
+if(!items.length)throw new Error('至少需要一个标签页');
+var lines=[':::tabs'];
+items.forEach(function(it,idx){
+var title=it.querySelector('.tab-title').value.trim()||('标签'+(idx+1));
+var content=it.querySelector('.tab-content').value;
+lines.push(':::tab '+title);lines.push('');lines.push(content||' ');lines.push('');lines.push(':::');lines.push('');
+});
+lines.push(':::');
+return '\n'+lines.join('\n')+'\n';
+});
+var mask=document.querySelector('.form-modal-mask');
+var list=mask.querySelector('#tabs-items');
+mask.querySelector('#tabs-add-item').onclick=function(){list.appendChild(createTabItem());};
+list.appendChild(createTabItem());list.appendChild(createTabItem());
+}
+function openPbarForm(){
+var body='<div class="form-group"><label>标题（可选）</label><input id="pbar-title" class="form-input" placeholder="例如：完成进度"></div>'+
+'<div class="form-row">'+
+'<div class="form-group" style="flex:1"><label>当前值 *</label><input id="pbar-pct" class="form-input" type="number" value="50"></div>'+
+'<div class="form-group" style="flex:1"><label>最大值（可空）</label><input id="pbar-max" class="form-input" type="number" placeholder="100"></div>'+
+'</div>'+
+'<div class="form-group"><label>颜色</label><input id="pbar-color" class="form-input" list="color-suggest" value="#6b5acf" placeholder="red / #hex"></div>'+
+'<div class="form-group"><label>是否显示数字</label><select id="pbar-showtext" class="form-select"><option value="0">不显示</option><option value="1">显示</option></select></div>';
+openFormDialog('进度条生成器','fa-solid fa-bars-progress',body,function(mask){
+var title=mask.querySelector('#pbar-title').value.trim();
+var pct=mask.querySelector('#pbar-pct').value.trim();
+var max=mask.querySelector('#pbar-max').value.trim();
+var color=mask.querySelector('#pbar-color').value.trim();
+var show=mask.querySelector('#pbar-showtext').value==='1';
+if(!pct)throw new Error('当前值不能为空');
+var lines=[':::pbar'+(show?'+':'')+(title?' '+title:'')];
+lines.push('pct: '+pct);
+if(max)lines.push('max: '+max);
+if(color)lines.push('color: '+color);
+lines.push(':::');
+return '\n'+lines.join('\n')+'\n';
+});
+}
+function openCalloutForm(){
+var variants=['tip','hint','important','info','warn','warning','caution','attention','danger','error','ask','question','help','faq','ok','success','check','done','note','abstract','summary','tldr','todo','failure','fail','missing','bug','example','quote','cite'];
+var opts=variants.map(function(v){return '<option value="'+v+'">'+v.charAt(0).toUpperCase()+v.slice(1)+'</option>';}).join('');
+var body='<div class="form-row">'+
+'<div class="form-group" style="flex:1"><label>类型</label><select id="cal-type" class="form-select">'+opts+'</select></div>'+
+'<div class="form-group" style="flex:1"><label>输出格式</label><select id="cal-format" class="form-select"><option value="container">容器式 :::tip</option><option value="github">GitHub 引用式 > [!TIP]</option></select></div>'+
+'</div>'+
+'<div class="form-group"><label>自定义标题（可空）</label><input id="cal-title" class="form-input" placeholder="留空使用默认"></div>'+
+'<div class="form-group"><label>内容</label><textarea id="cal-content" class="form-textarea" style="min-height:100px"></textarea></div>'+
+'<div class="form-group"><label>折叠（仅容器式生效）</label><select id="cal-collapse" class="form-select"><option value="">固定显示</option><option value="+">默认展开</option><option value="-">默认折叠</option></select></div>';
+openFormDialog('提示框生成器','fa-solid fa-circle-info',body,function(mask){
+var type=mask.querySelector('#cal-type').value;
+var format=mask.querySelector('#cal-format').value;
+var title=mask.querySelector('#cal-title').value.trim();
+var content=mask.querySelector('#cal-content').value||' ';
+var collapse=mask.querySelector('#cal-collapse').value;
+if(format==='github'){
+var label=type.toUpperCase();
+var glines=['> [!'+label+']'];
+var bodyLines=content.split('\n');
+bodyLines.forEach(function(l){glines.push('> '+l);});
+return '\n'+glines.join('\n')+'\n';
+}
+var lines=[':::'+type+collapse+(title?' '+title:'')];
+lines.push(content);
+lines.push(':::');
+return '\n'+lines.join('\n')+'\n';
+});
+}
+function openDetailForm(){
+var body='<div class="form-group"><label>标题</label><input id="detail-title" class="form-input" placeholder="点击展开"></div>'+
+'<div class="form-group"><label>内容</label><textarea id="detail-content" class="form-textarea" style="min-height:120px"></textarea></div>'+
+'<div class="form-group"><label>默认状态</label><select id="detail-open" class="form-select"><option value="0">默认折叠</option><option value="1">默认展开</option></select></div>';
+openFormDialog('折叠面板生成器','fa-solid fa-chevron-down',body,function(mask){
+var title=mask.querySelector('#detail-title').value.trim();
+var content=mask.querySelector('#detail-content').value;
+var open=mask.querySelector('#detail-open').value==='1';
+var lines=[':::detail'+(open?'+':'')+(title?' '+title:'')];
+lines.push(content||' ');
+lines.push(':::');
+return '\n'+lines.join('\n')+'\n';
+});
+}
+function createGridCell(){
+var el=document.createElement('div');
+el.className='item-editor';
+el.innerHTML='<div class="form-row"><span style="font-size:12px;color:#9090a8;">格子</span><button type="button" class="btn small danger cell-remove">×</button></div>'+
+'<textarea class="form-textarea cell-content" placeholder="格子内容" style="min-height:60px"></textarea>';
+el.querySelector('.cell-remove').onclick=function(){el.remove();};
+return el;
+}
+function openGridForm(){
+var body='<div class="form-group"><label>列数</label><select id="grid-cols" class="form-select"><option value="1">1 列</option><option value="2" selected>2 列</option><option value="3">3 列</option><option value="4">4 列</option></select></div>'+
+'<div class="form-group"><label>格子列表</label><div id="grid-cells"></div><button type="button" class="btn small" id="grid-add-cell"><i class="fa-solid fa-plus"></i> 添加格子</button></div>';
+openFormDialog('网格布局生成器','fa-solid fa-table-cells',body,function(mask){
+var cols=mask.querySelector('#grid-cols').value;
+var cells=mask.querySelectorAll('#grid-cells .item-editor');
+if(!cells.length)throw new Error('至少需要一个格子');
+var lines=[':::grid '+cols];
+cells.forEach(function(it){
+lines.push(':::cell');
+lines.push(it.querySelector('.cell-content').value||' ');
+lines.push(':::');
+});
+lines.push(':::');
+return '\n'+lines.join('\n')+'\n';
+});
+var mask=document.querySelector('.form-modal-mask');
+var list=mask.querySelector('#grid-cells');
+mask.querySelector('#grid-add-cell').onclick=function(){list.appendChild(createGridCell());};
+list.appendChild(createGridCell());list.appendChild(createGridCell());
+}
+function createVoteOption(){
+var el=document.createElement('div');
+el.className='item-editor';
+el.innerHTML='<div class="form-row">'+
+'<input class="form-input vote-name" placeholder="选项名称" value="选项" style="flex:2 1 180px">'+
+'<input class="form-input vote-count w-small" placeholder="票数" value="0" type="number">'+
+'<label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;"><input type="checkbox" class="vote-mark" style="accent-color:#6366f1"> 我投的</label>'+
+'<button type="button" class="btn small danger vote-remove">×</button>'+
+'</div>';
+el.querySelector('.vote-remove').onclick=function(){el.remove();};
+return el;
+}
+function openVoteForm(){
+var body='<div class="form-group"><label>投票标题</label><input id="vote-title" class="form-input" placeholder="例如：你最喜欢哪种语言？"></div>'+
+'<div class="form-group"><label>总人数（可空，自动求和）</label><input id="vote-all" class="form-input" type="number" placeholder="100"></div>'+
+'<div class="form-group"><label>选项列表</label><div id="vote-opts"></div><button type="button" class="btn small" id="vote-add-opt"><i class="fa-solid fa-plus"></i> 添加选项</button></div>'+
+'<div class="form-group"><label>显示汇总</label><select id="vote-plus" class="form-select"><option value="1">显示"共 N 人参与"</option><option value="0">不显示</option></select></div>';
+openFormDialog('投票生成器','fa-solid fa-square-poll-vertical',body,function(mask){
+var title=mask.querySelector('#vote-title').value.trim();
+var all=mask.querySelector('#vote-all').value.trim();
+var showPlus=mask.querySelector('#vote-plus').value==='1';
+var opts=mask.querySelectorAll('#vote-opts .item-editor');
+if(!opts.length)throw new Error('至少需要一个选项');
+var lines=[':::vote'+(showPlus?'+':'')+(title?' '+title:'')+(all?' all='+all:'')];
+opts.forEach(function(o){
+var name=o.querySelector('.vote-name').value.trim();
+var count=o.querySelector('.vote-count').value.trim();
+var mark=o.querySelector('.vote-mark').checked;
+lines.push('- '+name+(count?' | '+count:'')+(mark?' | mark':''));
+});
+lines.push(':::');
+return '\n'+lines.join('\n')+'\n';
+});
+var mask=document.querySelector('.form-modal-mask');
+var list=mask.querySelector('#vote-opts');
+mask.querySelector('#vote-add-opt').onclick=function(){list.appendChild(createVoteOption());};
+list.appendChild(createVoteOption());list.appendChild(createVoteOption());
+}
+function openFlashcardForm(){
+var body=
+'<div class="form-group"><label>正面</label>'+
+'<div class="form-row"><div class="form-group" style="flex:1"><label>正面标签</label><input id="fc-front-label" class="form-input" value="问题" placeholder="例如：问题 / 提示"></div></div>'+
+'<textarea id="fc-front" class="form-textarea" style="min-height:80px" placeholder="正面内容"></textarea>'+
+'</div>'+
+'<div class="form-group"><label>背面</label>'+
+'<div class="form-row"><div class="form-group" style="flex:1"><label>背面标签</label><input id="fc-back-label" class="form-input" value="答案" placeholder="例如：答案 / 解析"></div></div>'+
+'<textarea id="fc-back" class="form-textarea" style="min-height:80px" placeholder="背面内容"></textarea>'+
+'</div>'+
+'<div class="form-group"><label>翻转轴</label><select id="fc-flip" class="form-select"><option value="x">水平翻转（默认）</option><option value="y">垂直翻转</option></select></div>';
+openFormDialog('闪卡生成器','fa-solid fa-clone',body,function(mask){
+var frontLabel=mask.querySelector('#fc-front-label').value.trim()||'问题';
+var backLabel=mask.querySelector('#fc-back-label').value.trim()||'答案';
+var front=mask.querySelector('#fc-front').value.trim();
+var back=mask.querySelector('#fc-back').value.trim();
+var flip=mask.querySelector('#fc-flip').value;
+if(!front&&!back)throw new Error('至少需要正面或背面内容');
+var lines=[':::flashcard'+(flip==='y'?' flip=y':'')];
+lines.push(frontLabel+': '+(front||' '));
+lines.push(backLabel+': '+(back||' '));
+lines.push(':::');
+return '\n'+lines.join('\n')+'\n';
+});
+}
+function createFlashcardSetItem(){
+var el=document.createElement('div');
+el.className='item-editor';
+el.innerHTML=
+'<div class="form-row"><div class="form-group" style="flex:1"><label>正面标签</label><input class="form-input fcs-front-label" value="问题"></div><div class="form-group" style="flex:1"><label>背面标签</label><input class="form-input fcs-back-label" value="答案"></div><button type="button" class="btn small danger fcs-remove">×</button></div>'+
+'<textarea class="form-textarea fcs-front" placeholder="正面内容" style="min-height:56px"></textarea>'+
+'<textarea class="form-textarea fcs-back" placeholder="背面内容" style="min-height:56px"></textarea>';
+el.querySelector('.fcs-remove').onclick=function(){el.remove();};
+return el;
+}
+function openFlashcardsForm(){
+var body=
+'<div class="form-group"><label>闪卡组（每张卡片之间空行分隔）</label>'+
+'<div id="fcs-items"></div>'+
+'<button type="button" class="btn small" id="fcs-add"><i class="fa-solid fa-plus"></i> 添加卡片</button></div>'+
+'<div class="form-row">'+
+'<div class="form-group" style="flex:1"><label>翻转轴</label><select id="fcs-flip" class="form-select"><option value="x">水平翻转（默认）</option><option value="y">垂直翻转</option></select></div>'+
+'<div class="form-group" style="flex:1"><label>洗牌按钮</label><select id="fcs-shuffle" class="form-select"><option value="1">显示（默认）</option><option value="0">隐藏</option></select></div>'+
+'</div>';
+openFormDialog('闪卡组生成器','fa-solid fa-layer-group',body,function(mask){
+var items=mask.querySelectorAll('#fcs-items .item-editor');
+if(!items.length)throw new Error('至少需要一张卡片');
+var flip=mask.querySelector('#fcs-flip').value;
+var shuffleOff=mask.querySelector('#fcs-shuffle').value==='0';
+var header=':::flashcards';
+if(flip==='y')header+=' flip=y';
+if(shuffleOff)header+=' shuffle=0';
+var lines=[header];
+items.forEach(function(it,idx){
+if(idx>0)lines.push('');
+var fl=it.querySelector('.fcs-front-label').value.trim()||'问题';
+var bl=it.querySelector('.fcs-back-label').value.trim()||'答案';
+var fc=it.querySelector('.fcs-front').value.trim();
+var bc=it.querySelector('.fcs-back').value.trim();
+lines.push(fl+': '+(fc||' '));
+lines.push(bl+': '+(bc||' '));
+});
+lines.push(':::');
+return '\n'+lines.join('\n')+'\n';
+});
+var mask=document.querySelector('.form-modal-mask');
+var list=mask.querySelector('#fcs-items');
+mask.querySelector('#fcs-add').onclick=function(){list.appendChild(createFlashcardSetItem());};
+list.appendChild(createFlashcardSetItem());
+list.appendChild(createFlashcardSetItem());
+}
+function openScrForm(){
+var body='<div class="form-group"><label>刮层颜色</label><select id="scr-color" class="form-select"><option value="gold">金色</option><option value="silver">银色</option><option value="purple">紫色</option><option value="red">红色</option><option value="green">绿色</option><option value="dark">深色</option></select></div>'+
+'<div class="form-group"><label>刮除比例（0~1）</label><input id="scr-ratio" class="form-input" type="number" min="0.1" max="1" step="0.05" value="0.5"></div>'+
+'<div class="form-group"><label>刮层提示文字（可空）</label><input id="scr-tip" class="form-input" placeholder="例如：刮开查看答案"></div>'+
+'<div class="form-group"><label>内容（Markdown）</label><textarea id="scr-content" class="form-textarea" style="min-height:100px" placeholder="刮开后显示的内容"></textarea></div>';
+openFormDialog('刮刮乐生成器','fa-solid fa-eraser',body,function(mask){
+var color=mask.querySelector('#scr-color').value;
+var ratio=mask.querySelector('#scr-ratio').value.trim()||'0.5';
+var tip=mask.querySelector('#scr-tip').value.trim();
+var content=mask.querySelector('#scr-content').value.trim();
+if(!content)throw new Error('内容不能为空');
+var header=':::scr ratio='+ratio+(tip?' "'+tip+'"':'')+' '+color;
+var lines=[header];
+lines.push(content);
+lines.push(':::');
+return '\n'+lines.join('\n')+'\n';
+});
+}
+function openDlForm(){
+var body='<div class="form-group"><label>文件名 *</label><input id="dl-name" class="form-input" placeholder="例如：项目源码.zip"></div>'+
+'<div class="form-group"><label>下载 URL *</label><input id="dl-url" class="form-input" placeholder="https://..."></div>'+
+'<div class="form-row">'+
+'<div class="form-group" style="flex:1"><label>大小</label><input id="dl-size" class="form-input" placeholder="例如：12.5MB"></div>'+
+'<div class="form-group" style="flex:1"><label>日期</label><input id="dl-date" class="form-input" placeholder="2024-01-15"></div>'+
+'</div>';
+openFormDialog('下载卡片生成器','fa-solid fa-file-arrow-down',body,function(mask){
+var name=mask.querySelector('#dl-name').value.trim();
+var url=mask.querySelector('#dl-url').value.trim();
+if(!name)throw new Error('文件名不能为空');
+if(!url)throw new Error('URL 不能为空');
+var size=mask.querySelector('#dl-size').value.trim();
+var date=mask.querySelector('#dl-date').value.trim();
+var lines=[':::dl '+name];
+lines.push('url: '+url);
+if(size)lines.push('size: '+size);
+if(date)lines.push('date: '+date);
+lines.push(':::');
+return '\n'+lines.join('\n')+'\n';
+});
+}
+var FORM_MAP={
+chat:openChatForm,users:openUsersForm,table:openTableForm,block:openCodeForm,
+image:openImageForm,media:openMediaForm,linkcard:openLinkCardForm,
+mcq:openMcqForm,timeline:openTimelineForm,tabs:openTabsForm,pbar:openPbarForm,
+callout:openCalloutForm,detail:openDetailForm,grid:openGridForm,vote:openVoteForm,
+flashcard:openFlashcardForm,flashcards:openFlashcardsForm,scr:openScrForm,dl:openDlForm
+};
+var SYNTAX_MAP={
+h1:{before:'# '},h2:{before:'## '},h3:{before:'### '},h4:{before:'#### '},h5:{before:'##### '},h6:{before:'###### '},
+setext1:{before:'',after:'\n==='},setext2:{before:'',after:'\n---'},
+bold:{before:'**',after:'**'},italic:{before:'*',after:'*'},strike:{before:'~~',after:'~~'},
+mark:{before:'==',after:'=='},sup:{before:'^',after:'^'},sub:{before:'~',after:'~'},
+u:{before:'@@',after:'@@'},ins:{before:'++',after:'++'},
+quote:{before:'> '},ul:{before:'- '},ol:{before:'1. '},task:{before:'- [ ] '},hr:{before:'\n---\n'},
+link:{before:'[',after:'](https://example.com)'},video:{before:'!video[视频描述](',after:')'},audio:{before:'!audio[音频标题](',after:')'},
+toc:{before:'\n[[toc]]\n',after:''},'footnote-ref':{before:'[^',after:']'},'footnote-def':{before:'\n[^note1]: ',after:'这里填写脚注内容，支持 **Markdown** 语法。\n'},
+code:{before:'`',after:'`'},math:{before:'$',after:'$'},mathblock:{before:'$$\n',after:'\n$$'},
+badge:{before:'::badge[徽章文字](',after:'green)::'},color:{before:'::color[red]这段文字变成红色',after:'::'},
+hei:{before:'::hei ',after:' ::'},key:{before:'::key Ctrl + C ::',after:''},copy:{before:'::copy 点击这段文字可以复制 ::',after:''},
+term:{before:'::term[术语]',after:'{这里是悬浮显示的提示内容}::'},ruby:{before:'::ruby 漢字',after:'(hàn zì)::'},
+qr:{before:'::qr[',after:']::'},date:{before:'::date[',after:']::'},alt:{before:'::alt[默认文本]',after:'(选项一)(选项二)(选项三)::'},
+circle:{before:'::circle[',after:']::'},cross:{before:'::cross[',after:']::'},stamp:{before:'::stamp[已阅](',after:'red)::'},
+score:{before:'::score[4.5]+::',after:''},wave:{before:'::wave[',after:']::'},neon:{before:'::neon[',after:'](cyan)::'},
+marker:{before:'::marker[',after:'](yellow)::'},shake:{before:'::shake[',after:'](x,3)::'},
+upper:{before:'::upper[',after:']::'},lower:{before:'::lower[',after:']::'},cap:{before:'::cap[',after:']::'},
+cmd:{before:'::cmd[',after:']::'},flag:{before:'::flag[--verbose]',after:'::'},
+lang:{before:'::lang ',after:' js ::'},'lang-plus':{before:'::lang+ ',after:' js ::'},
+path:{before:'::path[首页 > 分类 > 文章]',after:'::'},vert:{before:'::vert[竖排文字]',after:'::'},
+cursor:{before:'::cursor[打字机效果，点击重播]',after:'::'},shadow:{before:'::shadow[',after:']::'},
+blur:{before:'::blur[模糊文字，点击显示]',after:'::'},
+'style-inline':{before:'::style[自定义样式]{color=#6b5acf size=1.1em weight=bold italic}::',after:''},
+'btnimg-inline':{before:'::btnimg[图片按钮](https://picsum.photos/32/32)(https://example.com){height=32}::',after:''},
+ref:{before:'::ref[标题 ID 或名称]',after:'::'},dot:{before:'::dot[着重文字](circle red)::',after:''},
+pn:{before:'::pn[拼音下划]',after:'::'},note:{before:'::note[1]{注：点击可看详细提示}::',after:''},
+echo:{before:'::echo[',after:']::'},'align-center-inline':{before:'::center 行内居中文字 ::',after:''},
+'align-right-inline':{before:'::right 行内右对齐文字 ::',after:''},
+'key-block':{before:':::key\nCtrl + Shift + Enter\n:::',after:''},
+'copy-block':{before:':::copy\n这段文字点击即可复制，可以包含多行内容。\n:::',after:''},
+'hei-block':{before:':::hei\n这段内容默认是黑幕，点击后才会显示。\n:::',after:''},
+cfg:{before:':::cfg\nreset: on\nhljs: on\nkatex: on\nmermaid: on\n:::',after:''},
+'detail-quick':{before:':::detail 点击展开的标题\n这里是默认折叠的内容。\n:::',after:''},
+'tabs-quick':{before:':::tabs\n:::tab 标签一\n\n标签一的内容。\n\n:::\n\n:::tab 标签二\n\n标签二的内容。\n\n:::\n:::',after:''},
+'grid-quick':{before:':::grid 2\n:::cell\n格子1\n:::\n:::cell\n格子2\n:::\n:::',after:''},
+'chat-quick':{before:':::chat 群聊标题\n:::users\n张三: color=#e74c6f\n李四: color=#4a90d9\n:::\n\n:::msg 张三 left 09:30\n早上好！\n:::\n\n:::msg 李四 right 09:31\n早！\n:::\n:::',after:''},
+'chat-full':{before:':::chat 完整群聊示例\n:::users\n张三: color=#e74c6f\n李四: color=#4a90d9\n王五: color=#10b981\n:::\n\n:::sys join 张三加入了群聊\n:::\n\n:::msg 张三 left 09:30 id=m1\n大家早！\n:::\n\n:::msg 李四 right 09:31\n:::quote 张三 id=m1\n大家早！\n:::\n早上好~\n:::\n\n:::msg 张三 left 09:32\n:::redpacket blessing=恭喜发财，大吉大利 amount=100 winners="李四:60|王五:40"\n:::\n:::\n\n:::sys leave 李四离开了群聊\n:::\n:::',after:''},
+kanban:{before:':::kanban cols=3 任务看板\n:::col 待办 color=blue\n- 任务一 #doc\n- 任务二 #feat @张三\n:::\n:::col 进行中 color=orange\n:::task 复杂任务标题\n内容\n:::\n:::\n:::col 完成 color=green\n- 已完成 #bug\n:::\n:::',after:''},
+tree:{before:':::tree\nsrc/components/Button.vue | 2.1KB\nsrc/components/Card.vue | 1.8KB\nsrc/utils/helper.js | 3.4KB\nsrc/index.js | 1.2KB\npackage.json | 800B\nREADME.md | 3.2KB\n:::',after:''},
+swipe:{before:':::swipe\n![图一](https://picsum.photos/400/300?random=1)\n![图二](https://picsum.photos/400/300?random=2)\n![图三](https://picsum.photos/400/300?random=3)\n:::',after:''},
+collage:{before:':::collage\n![图一](https://picsum.photos/300/300?random=1)\n![图二](https://picsum.photos/300/300?random=2)\n![图三](https://picsum.photos/300/300?random=3)\n![图四](https://picsum.photos/300/300?random=4)\n:::',after:''},
+compare:{before:':::compare\n:::col 优点 green\n- 快速\n- 简洁\n:::\n:::col 缺点 red\n- 还有待完善\n:::\n:::',after:''},
+row:{before:':::row 5:5\n:::left\n**左边 50%**\n\n左侧内容\n:::\n:::right\n**右边 50%**\n\n右侧内容\n:::\n:::',after:''},
+box:{before:':::box\n卡片内容。\n:::',after:''},'box-square':{before:':::box square\n方角卡片。\n:::',after:''},
+chartbar:{before:':::chartbar 各语言使用率\nJavaScript: 85\nPython: 60\nRust: 45\nGo: 40\n:::',after:''},
+chartline:{before:':::chartline 月度访问量\nlines: solid, dashed\n| 月份 | 桌面端 | 移动端 |\n| --- | --- | --- |\n| 1月 | 120 | 80 |\n| 2月 | 150 | 100 |\n:::',after:''},
+game:{before:':::game 游戏名称\ncover: https://picsum.photos/300/400\ndesc: 游戏的详细描述\ntime: 60 小时\nrate: 97\nurl: https://example.com\n:::',after:''},
+say:{before:':::say 苏格拉底\n我唯一知道的就是我一无所知。\n:::',after:''},
+'align-center-block':{before:':::center\n**居中标题**\n\n居中的内容。\n:::',after:''},
+'align-right-block':{before:':::right\n右对齐的内容。\n:::',after:''},
+'style-block':{before:':::style {color=#6b5acf size=1.1em bg=#f0f0ff padding=16px radius=8px}\n自定义样式块内容。\n:::',after:''},
+'btnimg-block':{before:':::btnimg {align=center gap=12}\n按钮一 | https://picsum.photos/120/40 | https://example.com | 32\n按钮二 | https://picsum.photos/120/40 | https://example.com | 32\n:::',after:''},
+'blur-block':{before:':::blur\n猜猜我在说什么？点击显示。\n:::',after:''},
+ghr:{before:':::ghr\nvuejs/core\n官方 Vue.js 框架核心\n:::',after:''}
+};
+var CALLOUT_LIST=['tip','hint','important','info','warn','warning','caution','attention','danger','error','ask','question','help','faq','ok','success','check','done','note','abstract','summary','tldr','todo','failure','fail','missing','bug','example','quote','cite'];
+function hydrateMath(root){if(!window.katex)return;(root||document).querySelectorAll('.math-inline[data-tex],.math-block[data-tex]').forEach(function(el){var tex=el.getAttribute('data-tex');if(!tex)return;var display=el.classList.contains('math-block');try{window.katex.render(tex,el,{displayMode:display,throwOnError:false});el.removeAttribute('data-tex');}catch(e){}});}
+function hydrateMermaid(root){if(!window.mermaid)return;var nodes=(root||document).querySelectorAll('.mermaid:not([data-processed])');if(!nodes.length)return;try{if(typeof window.mermaid.run==='function')window.mermaid.run({nodes:nodes});else if(typeof window.mermaid.init==='function')window.mermaid.init(undefined,nodes);}catch(e){}}
+function hydrateHljs(root){if(!window.hljs)return;(root||document).querySelectorAll('pre code:not([data-highlighted])').forEach(function(el){try{window.hljs.highlightElement(el);}catch(e){}});}
+function hydrateAll(root){hydrateMath(root);hydrateMermaid(root);hydrateHljs(root);}
+function render(md){previewHost.innerHTML='';var api=useNiMode?apiNi:apiAll;if(api){try{if(useNiMode)previewHost.innerHTML=api.renderMarkdown(md);else api.mountMarkdown(previewHost,md);}catch(err){previewHost.innerHTML='<pre style="color:#e5484d;white-space:pre-wrap">渲染出错：'+(err&&err.message?err.message:String(err))+'</pre>';}}else previewHost.innerHTML='<p style="color:#e5484d">未找到对应的 UpKram 解析器。</p>';hydrateAll(previewHost);}
+function updateStats(md){var lines=md.length?md.split('\n').length:0;var api=useNiMode?apiNi:apiAll;var wordCount=0;if(api&&typeof api.countWords==='function'){try{wordCount=api.countWords(md);}catch(e){wordCount=md.length;}}else wordCount=md.length;var readTime=Math.max(1,Math.ceil(wordCount/300));statsEl.textContent=lines+' 行 · '+wordCount+' 字 · 约 '+readTime+' 分钟';}
+var timer=null;
+function scheduleRender(immediate){clearTimeout(timer);var run=function(){var md=editor.value;render(md);updateStats(md);if(immersiveMask.classList.contains('on'))renderImmersive(md);try{localStorage.setItem(STORE_SRC,md);}catch(e){}};if(immediate)run();else timer=setTimeout(run,120);}
+editor.addEventListener('input',function(){scheduleRender();});
+editor.addEventListener('keydown',function(e){
+if(e.key==='Enter'){const start=editor.selectionStart;const end=editor.selectionEnd;if(start!==end)return;const text=editor.value;const beforeText=text.substring(0,start);const currentLineStart=beforeText.lastIndexOf('\n')+1;const currentLine=beforeText.substring(currentLineStart);const match=currentLine.match(/^(\s*)([-*+]|\d+[.)])\s+(.*)/);if(match){e.preventDefault();const indent=match[1];const marker=match[2];const content=match[3];if(content.trim()===''){const newText=text.substring(0,currentLineStart)+text.substring(start);editor.value=newText;editor.selectionStart=editor.selectionEnd=currentLineStart;scheduleRender();}else{let nextMarker=marker;if(/^\d+[.)]$/.test(marker)){const num=parseInt(marker,10);const dot=marker.charAt(marker.length-1);nextMarker=(num+1)+dot;}const insertStr='\n'+indent+nextMarker+' ';editor.setRangeText(insertStr,start,end,'end');scheduleRender();}return;}}
+if(e.key==='Tab'){e.preventDefault();var start=editor.selectionStart,end=editor.selectionEnd;editor.setRangeText('  ',start,end,'end');scheduleRender();return;}
+if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();copyText(previewHost.innerHTML,document.getElementById('btn-copy-html'));}
+});
+function isThematicBreakStr(s){var t=String(s).replace(/[ \t]/g,'');if(t.length<3)return false;var c=t.charAt(0);if(c!=='-'&&c!=='*'&&c!=='_')return false;for(var i=1;i<t.length;i++){if(t.charAt(i)!==c)return false;}return true;}
+function scanHeadings(text){var headings=[];var lines=text.split('\n');var offset=0;for(var i=0;i<lines.length;i++){var line=lines[i];var lineStart=offset;var lineEnd=offset+line.length;if(/^#{1,6}\s+/.test(line)&&!/^(    |\t)/.test(line)){headings.push({start:lineStart,end:lineEnd,type:'atx'});}else if(line.trim()&&i+1<lines.length){var nextLine=lines[i+1];if(/^ {0,3}(?:=+|-+)\s*$/.test(nextLine)){var t=line.trim();var isBlockMarker=/^#{1,6}\s/.test(t)||/^:::/.test(t)||/^>/.test(t)||/^(    |\t)/.test(line)||/^([-*+]|\d+[.)])\s/.test(t)||/^(```|~~~)/.test(t)||/^\|/.test(t)||/^\[/.test(t)||isThematicBreakStr(t);var prevLine=i>0?lines[i-1]:'';var prevTrim=prevLine.trim();var prevIsBlank=(i===0)||(prevTrim==='');var prevIsBlockEnd=/^ {0,3}(?:=+|-+)\s*$/.test(prevLine)||/^#{1,6}\s/.test(prevLine)||/^:::/.test(prevTrim);var prevIsParagraph=!prevIsBlank&&!prevIsBlockEnd;if(!isBlockMarker&&!prevIsParagraph){headings.push({start:lineStart,end:lineEnd,type:'setext'});}}}offset=lineEnd+1;}return headings;}
+function toggleMod(mods,modifier){var removed;if(mods.indexOf(modifier)!==-1){mods=mods.split('').filter(function(c){return c!==modifier;}).join('');removed=true;}else{var ORDER='^!~?*';var arr=Array.from(new Set((mods+modifier).split('')));arr.sort(function(a,b){return ORDER.indexOf(a)-ORDER.indexOf(b);});mods=arr.join('');removed=false;}return {mods:mods,removed:removed};}
+function applyHeadingModifier(modifier){var start=editor.selectionStart;var text=editor.value;var headings=scanHeadings(text);if(!headings.length){showToast('未找到任何标题行');return;}var target=null;var direction='';for(var i=0;i<headings.length;i++){var h=headings[i];if(start>=h.start&&start<=h.end){target=h;direction='cur';break;}}if(!target){for(var i=headings.length-1;i>=0;i--){if(headings[i].end<start){target=headings[i];direction='up';break;}}}if(!target){for(var i=0;i<headings.length;i++){if(headings[i].start>start){target=headings[i];direction='down';break;}}}if(!target){showToast('未找到任何标题行');return;}var line=text.substring(target.start,target.end);var newLine,content,removed;if(target.type==='atx'){var m=line.match(/^(#{1,6}\s+)(.*?)(?:\s+([\^!~?*]+))?$/);if(!m)return;var prefix=m[1];content=m[2].replace(/\s+$/,'');var res=toggleMod(m[3]||'',modifier);newLine=res.mods?(prefix+content+' '+res.mods):(prefix+content);removed=res.removed;}else{var m2=line.match(/^(.*?)(?:\s+([\^!~?*]+))?$/);if(!m2)return;content=m2[1].replace(/\s+$/,'');var res2=toggleMod(m2[2]||'',modifier);newLine=res2.mods?(content+' '+res2.mods):content;removed=res2.removed;}editor.setRangeText(newLine,target.start,target.end,'end');editor.selectionStart=editor.selectionEnd=target.start+newLine.length;editor.focus();scheduleRender(true);var verb=removed?'移除':'添加';var shortTitle=content.replace(/^#+\s*/,'').trim();if(shortTitle.length>16)shortTitle=shortTitle.slice(0,16)+'…';var where=direction==='up'?' · 已定位上方标题：':direction==='down'?' · 已定位下方标题：':' · ';showToast(verb+' '+modifier+where+shortTitle);}
+function insertSyntax(type){
+if(type.indexOf('heading-mod-')===0){applyHeadingModifier(type.slice('heading-mod-'.length));return;}
+if(FORM_MAP[type]){FORM_MAP[type]();return;}
+if(type.startsWith('callout-')){const variant=type.replace('callout-','');const start=editor.selectionStart;const end=editor.selectionEnd;const selected=editor.value.substring(start,end);let before='',after='';if(ghCalloutMode){const label=variant.toUpperCase();before='> [!'+label+']\n> ';after='';}else{before=':::'+variant+'\n';after='\n:::';}const insertStr=before+selected+after;let posStart=start+before.length;let posEnd=start+before.length;if(selected.length>0){posStart=posEnd=start+insertStr.length;}editor.setRangeText(insertStr,start,end,'end');editor.selectionStart=posStart;editor.selectionEnd=posEnd;editor.focus();scheduleRender(true);return;}
+const conf=SYNTAX_MAP[type];if(!conf)return;
+const start=editor.selectionStart;const end=editor.selectionEnd;const selected=editor.value.substring(start,end);
+const before=conf.before||'';const after=conf.after||'';
+const insertStr=before+selected+after;
+let insertPosStart=start+before.length;let insertPosEnd=start+before.length;
+if(selected.length>0)insertPosStart=insertPosEnd=start+insertStr.length;
+editor.setRangeText(insertStr,start,end,'end');
+editor.selectionStart=insertPosStart;editor.selectionEnd=insertPosEnd;
+editor.focus();scheduleRender(true);
+}
+let activeDropdown=null;let activeAnchor=null;
+function toggleDropdown(anchor,itemsHtml,hasCheckbox){
+if(activeDropdown){activeDropdown.remove();activeDropdown=null;if(activeAnchor===anchor){activeAnchor=null;return;}}
+const rect=anchor.getBoundingClientRect();
+const menu=document.createElement('div');
+menu.className='custom-dropdown-menu';
+menu.style.top=(rect.bottom+window.scrollY+4)+'px';
+let leftPos=rect.left+window.scrollX;
+if(leftPos+280>window.innerWidth)leftPos=window.innerWidth-300;
+menu.style.left=leftPos+'px';
+if(hasCheckbox){
+const header=document.createElement('div');
+header.className='dropdown-header';
+header.innerHTML='<label style="cursor:pointer;display:flex;align-items:center;gap:6px;"><input type="checkbox" id="gh-callout-chk" style="accent-color:#6366f1"> GitHub 引用格式 (> [!NOTE])</label>';
+menu.appendChild(header);
+const chk=header.querySelector('input');chk.checked=ghCalloutMode;chk.onchange=function(){ghCalloutMode=this.checked;};
+}
+itemsHtml.forEach(opt=>{
+if(opt.group){const gh=document.createElement('div');gh.className='dropdown-header';gh.textContent=opt.label;menu.appendChild(gh);return;}
+const item=document.createElement('div');
+item.className='custom-dropdown-item';
+item.textContent=opt.label;
+item.title=opt.syntax;
+item.onclick=(e)=>{e.stopPropagation();menu.remove();activeDropdown=null;activeAnchor=null;insertSyntax(opt.syntax);};
+menu.appendChild(item);
+});
+document.body.appendChild(menu);activeDropdown=menu;activeAnchor=anchor;
+}
+document.getElementById('btn-h-dropdown').addEventListener('click',function(e){e.stopPropagation();toggleDropdown(this,[
+{group:true,label:'基础标题'},
+{label:'H1 一级标题',syntax:'h1'},{label:'H2 二级标题',syntax:'h2'},{label:'H3 三级标题',syntax:'h3'},
+{label:'H4 四级标题',syntax:'h4'},{label:'H5 五级标题',syntax:'h5'},{label:'H6 六级标题',syntax:'h6'},
+{label:'Setext 一级 (===)',syntax:'setext1'},{label:'Setext 二级 (---)',syntax:'setext2'},
+{group:true,label:'目录修饰符（ATX / Setext 通用）'},
+{label:'^ 隐藏于目录',syntax:'heading-mod-^'},{label:'! 目录置顶排序',syntax:'heading-mod-!'},
+{label:'~ 目录中弱化',syntax:'heading-mod-~'},{label:'? 目录禁止跳转',syntax:'heading-mod-?'},
+{label:'* 目录中加粗',syntax:'heading-mod-*'}
+],false);});
+document.getElementById('btn-text-dropdown').addEventListener('click',function(e){e.stopPropagation();toggleDropdown(this,[
+{group:true,label:'强调 / 修饰'},
+{label:'加粗 **',syntax:'bold'},{label:'斜体 *',syntax:'italic'},{label:'删除线 ~~',syntax:'strike'},
+{label:'高亮 ==',syntax:'mark'},{label:'下划线 @@',syntax:'u'},{label:'插入线 ++',syntax:'ins'},
+{label:'上标 ^',syntax:'sup'},{label:'下标 ~',syntax:'sub'},
+{group:true,label:'块结构'},
+{label:'无序列表',syntax:'ul'},{label:'有序列表',syntax:'ol'},{label:'任务列表',syntax:'task'},
+{label:'引用 >',syntax:'quote'},{label:'分割线 ---',syntax:'hr'},
+{group:true,label:'链接 / 媒体'},
+{label:'插入链接',syntax:'link'},{label:'插入图片',syntax:'image'},
+{label:'插入视频',syntax:'video'},{label:'插入音频',syntax:'audio'},
+{group:true,label:'导航 / 引用'},
+{label:'目录 [[toc]]',syntax:'toc'},
+{label:'脚注引用 [^1]',syntax:'footnote-ref'},{label:'脚注定义 [^1]:',syntax:'footnote-def'}
+],false);});
+document.getElementById('btn-code-dropdown').addEventListener('click',function(e){e.stopPropagation();toggleDropdown(this,[
+{label:'代码块 ```',syntax:'block'},
+{label:'行内代码 `',syntax:'code'},
+{label:'行内公式 $',syntax:'math'},
+{label:'块级公式 $$',syntax:'mathblock'}
+],false);});
+document.getElementById('btn-inline-dropdown').addEventListener('click',function(e){e.stopPropagation();toggleDropdown(this,[
+{group:true,label:'标签 / 提示'},
+{label:'徽章 Badge',syntax:'badge'},{label:'颜色 Color',syntax:'color'},
+{label:'黑幕 Hei（行内）',syntax:'hei'},{label:'按键 Key（行内）',syntax:'key'},
+{label:'复制 Copy（行内）',syntax:'copy'},{label:'术语 Term',syntax:'term'},
+{label:'注释 Note',syntax:'note'},{label:'引用跳转 Ref',syntax:'ref'},
+{group:true,label:'文字 / 排版'},
+{label:'注音 Ruby',syntax:'ruby'},{label:'大写 Upper',syntax:'upper'},
+{label:'小写 Lower',syntax:'lower'},{label:'首字母大写 Cap',syntax:'cap'},
+{label:'拼音下划线 Pn',syntax:'pn'},{label:'竖排 Vert',syntax:'vert'},
+{label:'样式 Style',syntax:'style-inline'},
+{label:'行内居中',syntax:'align-center-inline'},{label:'行内右对齐',syntax:'align-right-inline'},
+{group:true,label:'装饰效果'},
+{label:'圈圈 Circle',syntax:'circle'},{label:'叉叉 Cross',syntax:'cross'},
+{label:'印章 Stamp',syntax:'stamp'},{label:'评分 Score',syntax:'score'},
+{label:'波浪 Wave',syntax:'wave'},{label:'霓虹 Neon',syntax:'neon'},
+{label:'荧光笔 Marker',syntax:'marker'},{label:'抖动 Shake',syntax:'shake'},
+{label:'回声 Echo',syntax:'echo'},{label:'阴影 Shadow',syntax:'shadow'},
+{label:'模糊 Blur',syntax:'blur'},{label:'着重号 Dot',syntax:'dot'},
+{label:'打字机 Cursor',syntax:'cursor'},{label:'路径 Path',syntax:'path'},
+{group:true,label:'图标 / 图片'},
+{label:'语言图标 Lang',syntax:'lang'},{label:'语言图标+文字',syntax:'lang-plus'},
+{label:'二维码 QR',syntax:'qr'},{label:'相对时间 Date',syntax:'date'},
+{label:'交替文本 Alt',syntax:'alt'},{label:'图片按钮 BtnImg',syntax:'btnimg-inline'},
+{label:'命令 Cmd',syntax:'cmd'},{label:'标志 Flag',syntax:'flag'}
+],false);});
+document.getElementById('btn-block-dropdown').addEventListener('click',function(e){e.stopPropagation();toggleDropdown(this,[
+{group:true,label:'块级文本样式'},
+{label:'块级按键 Key',syntax:'key-block'},{label:'块级复制 Copy',syntax:'copy-block'},
+{label:'块级黑幕 Hei',syntax:'hei-block'},{label:'配置块 Cfg',syntax:'cfg'},
+{group:true,label:'折叠 / 分栏'},
+{label:'折叠面板 Detail',syntax:'detail-quick'},
+{label:'选项卡 Tabs',syntax:'tabs-quick'},
+{label:'网格 Grid',syntax:'grid-quick'},
+{label:'对比 Compare',syntax:'compare'},{label:'行布局 Row',syntax:'row'},
+{label:'卡片 Box',syntax:'box'},{label:'方角卡片 Box',syntax:'box-square'},
+{group:true,label:'媒体 / 图片'},
+{label:'轮播图 Swipe',syntax:'swipe'},{label:'幻灯片 Collage',syntax:'collage'},
+{label:'按钮图片组 BtnImg',syntax:'btnimg-block'},
+{group:true,label:'聊天 / 用户'},
+{label:'聊天简版',syntax:'chat-quick'},
+{label:'聊天完整示例',syntax:'chat-full'},
+{label:'引用说话 Say',syntax:'say'},
+{group:true,label:'数据 / 图表'},
+{label:'图表柱 ChartBar',syntax:'chartbar'},{label:'图表线 ChartLine',syntax:'chartline'},
+{label:'树形目录 Tree',syntax:'tree'},
+{group:true,label:'学习 / 测验'},
+{label:'看板 Kanban',syntax:'kanban'},
+{group:true,label:'样式 / 效果'},
+{label:'居中块 Center',syntax:'align-center-block'},{label:'右对齐 Right',syntax:'align-right-block'},
+{label:'样式块 Style',syntax:'style-block'},{label:'模糊块 Blur',syntax:'blur-block'},
+{group:true,label:'卡片 / 信息'},
+{label:'GitHub 仓库 Ghr',syntax:'ghr'},
+{label:'游戏卡片 Game',syntax:'game'}
+],false);});
+document.getElementById('btn-form-dropdown').addEventListener('click',function(e){e.stopPropagation();toggleDropdown(this,[
+{group:true,label:'文本 / 数据'},
+{label:'表格构建器',syntax:'table'},
+{label:'代码块构建器',syntax:'block'},
+{group:true,label:'媒体 / 图片'},
+{label:'图片插入器',syntax:'image'},
+{label:'视频 / 音频',syntax:'media'},
+{label:'链接卡片',syntax:'linkcard'},
+{label:'下载卡片',syntax:'dl'},
+{group:true,label:'聊天 / 用户'},
+{label:'聊天构建器',syntax:'chat'},
+{label:'用户表',syntax:'users'},
+{group:true,label:'折叠 / 分栏'},
+{label:'折叠面板',syntax:'detail'},
+{label:'选项卡',syntax:'tabs'},
+{label:'网格布局',syntax:'grid'},
+{group:true,label:'数据展示'},
+{label:'进度条',syntax:'pbar'},
+{label:'时间线',syntax:'timeline'},
+{group:true,label:'学习 / 测验'},
+{label:'选择题',syntax:'mcq'},
+{label:'投票',syntax:'vote'},
+{label:'闪卡',syntax:'flashcard'},
+{label:'闪卡组',syntax:'flashcards'},
+{group:true,label:'特效 / 其他'},
+{label:'刮刮乐',syntax:'scr'},
+{label:'提示框构建器',syntax:'callout'}
+],false);});
+document.getElementById('btn-callout-dropdown').addEventListener('click',function(e){e.stopPropagation();var items=CALLOUT_LIST.map(function(v){return {label:v.charAt(0).toUpperCase()+v.slice(1),syntax:'callout-'+v};});toggleDropdown(this,items,true);});
+document.addEventListener('click',function(e){if(activeDropdown&&!activeDropdown.contains(e.target)){activeDropdown.remove();activeDropdown=null;activeAnchor=null;}});
+let dragCounter=0;
+document.addEventListener('dragenter',function(e){e.preventDefault();dragCounter++;dropMask.classList.add('on');});
+document.addEventListener('dragover',function(e){e.preventDefault();});
+document.addEventListener('dragleave',function(e){e.preventDefault();dragCounter--;if(dragCounter===0)dropMask.classList.remove('on');});
+document.addEventListener('drop',function(e){e.preventDefault();dragCounter=0;dropMask.classList.remove('on');if(e.dataTransfer.files&&e.dataTransfer.files.length>0){const file=e.dataTransfer.files[0];if(file.name.endsWith('.md')||file.name.endsWith('.txt')){const reader=new FileReader();reader.onload=function(ev){editor.value=ev.target.result;scheduleRender(true);};reader.readAsText(file);}else alert('请拖入 .md 或 .txt 文件');}});
+document.getElementById('btn-import').addEventListener('click',function(){var input=document.createElement('input');input.type='file';input.accept='.md,.txt';input.onchange=function(e){var file=e.target.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(ev){editor.value=ev.target.result;scheduleRender(true);};reader.readAsText(file);};input.click();});
+editor.addEventListener('paste',function(e){const items=(e.clipboardData||window.clipboardData).items;for(let index in items){const item=items[index];if(item.kind==='file'&&item.type.startsWith('image/')){e.preventDefault();const blob=item.getAsFile();const reader=new FileReader();reader.onload=function(event){const base64=event.target.result;const start=editor.selectionStart;const end=editor.selectionEnd;editor.setRangeText('![image]('+base64+')',start,end,'end');scheduleRender(true);};reader.readAsDataURL(blob);}}});
+editor.addEventListener('scroll',function(){if(!syncScrollChk.checked||isSyncingLeft)return;isSyncingRight=true;const scrollPercent=editor.scrollTop/(editor.scrollHeight-editor.clientHeight)||0;previewScroll.scrollTop=scrollPercent*(previewScroll.scrollHeight-previewScroll.clientHeight);setTimeout(()=>{isSyncingRight=false;},50);});
+previewScroll.addEventListener('scroll',function(){if(!syncScrollChk.checked||isSyncingRight)return;isSyncingLeft=true;const scrollPercent=previewScroll.scrollTop/(previewScroll.scrollHeight-previewScroll.clientHeight)||0;editor.scrollTop=scrollPercent*(editor.scrollHeight-editor.clientHeight);setTimeout(()=>{isSyncingLeft=false;},50);});
+function copyText(text,btn){var done=function(){if(!btn)return;var old=btn.innerHTML;btn.classList.add('ok');btn.innerHTML='<i class="fa-solid fa-check"></i>';setTimeout(function(){btn.classList.remove('ok');btn.innerHTML=old;},1300);};if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(text).then(done).catch(function(){fallback(text,done);});}else fallback(text,done);}
+function fallback(text,done){var ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;top:-9999px;opacity:0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done&&done();}catch(e){alert('复制失败，请手动选择复制');}document.body.removeChild(ta);}
+document.getElementById('btn-copy-md').addEventListener('click',function(){copyText(editor.value,this);});
+document.getElementById('btn-copy-html').addEventListener('click',function(){copyText(previewHost.innerHTML,this);});
+document.getElementById('btn-clear').addEventListener('click',function(){if(editor.value&&!confirm('确定清空当前内容？'))return;editor.value='';scheduleRender(true);editor.focus();});
+document.getElementById('btn-sample').addEventListener('click',function(){if(editor.value&&editor.value!==DEFAULT_MD&&!confirm('用示例内容替换当前内容？'))return;editor.value=DEFAULT_MD;scheduleRender(true);});
+function applyTheme(dark){document.documentElement.classList.toggle('dark',dark);document.body.classList.toggle('dark',dark);themeBtn.innerHTML=dark?'<i class="fa-solid fa-sun"></i>':'<i class="fa-solid fa-moon"></i>';if(immersiveTheme)immersiveTheme.innerHTML=dark?'<i class="fa-solid fa-sun"></i>':'<i class="fa-solid fa-moon"></i>';try{localStorage.setItem(STORE_THEME,dark?'dark':'light');}catch(e){}}
+themeBtn.addEventListener('click',function(){applyTheme(!document.documentElement.classList.contains('dark'));});
+if(immersiveTheme)immersiveTheme.addEventListener('click',function(){applyTheme(!document.documentElement.classList.contains('dark'));});
+engineBtn.addEventListener('click',function(){useNiMode=!useNiMode;if(useNiMode){engineLabel.textContent='Ni';engineBtn.className='btn engine-ni';}else{engineLabel.textContent='All';engineBtn.className='btn engine-all';}scheduleRender(true);});
+modeEdit.addEventListener('click',function(){workspace.classList.add('editor-only');modeEdit.classList.add('active');modeSplit.classList.remove('active');});
+modeSplit.addEventListener('click',function(){workspace.classList.remove('editor-only');modeSplit.classList.add('active');modeEdit.classList.remove('active');});
+modeView.addEventListener('click',function(){openImmersive();});
+function renderImmersive(md){immersiveContent.innerHTML='';var api=useNiMode?apiNi:apiAll;if(api){try{if(useNiMode)immersiveContent.innerHTML=api.renderMarkdown(md||editor.value);else api.mountMarkdown(immersiveContent,md||editor.value);}catch(err){immersiveContent.innerHTML='<pre style="color:#e5484d">渲染出错：'+(err&&err.message?err.message:String(err))+'</pre>';}}hydrateAll(immersiveContent);}
+function openImmersive(){renderImmersive(editor.value);immersiveMask.classList.add('on');immersiveBody.scrollTop=0;}
+function closeImmersive(){immersiveMask.classList.remove('on');}
+immersiveBack.addEventListener('click',closeImmersive);
+if(immersiveToTopBar)immersiveToTopBar.addEventListener('click',function(){immersiveBody.scrollTo({top:0,behavior:'smooth'});});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&immersiveMask.classList.contains('on'))closeImmersive();});
+var _cssCache=null;var _jsCache=null;
+function pickTextFile(hintText,accept){return new Promise(function(resolve){var tip=document.createElement('div');tip.style.cssText='position:fixed;top:0;left:0;right:0;padding:12px;background:#6366f1;color:#fff;text-align:center;font-size:14px;z-index:99999;font-family:system-ui,sans-serif';tip.textContent=hintText;document.body.appendChild(tip);var input=document.createElement('input');input.type='file';input.accept=accept||'.css,.txt,text/plain';input.style.cssText='position:fixed;left:-9999px;top:0';document.body.appendChild(input);var resolved=false;var cleanup=function(){if(tip.parentNode)tip.remove();if(input.parentNode)input.remove();};input.addEventListener('change',function(){resolved=true;var file=input.files&&input.files[0];if(!file){cleanup();return resolve('');}var reader=new FileReader();reader.onload=function(){cleanup();resolve(reader.result);};reader.onerror=function(){cleanup();resolve('');};reader.readAsText(file,'utf-8');});input.addEventListener('cancel',function(){if(!resolved){cleanup();resolve('');}});input.click();});}
+async function getAssetContent(filename,checkStr){if(filename==='upkram-all.css'&&_cssCache)return _cssCache;if((filename==='upkram-all.js'||filename==='upkram-ni.js')&&_jsCache)return _jsCache;try{var r=await fetch(filename,{cache:'no-cache'});if(r.ok){var txt=await r.text();if(!checkStr||txt.indexOf(checkStr)!==-1){if(filename.endsWith('.css'))_cssCache=txt;if(filename.endsWith('.js'))_jsCache=txt;return txt;}}}catch(e){}if(filename.endsWith('.css')){try{for(var i=0;i<document.styleSheets.length;i++){var sheet=document.styleSheets[i];var href=sheet.href||'';if(href.indexOf(filename)===-1)continue;try{var rules=[];for(var j=0;j<sheet.cssRules.length;j++)rules.push(sheet.cssRules[j].cssText);var joined=rules.join('\n');if(!checkStr||joined.indexOf(checkStr)!==-1){_cssCache=joined;return joined;}}catch(err){}}}catch(e){}}var accept=filename.endsWith('.js')?'.js,.txt,text/plain':'.css,.txt,text/plain';var picked=await pickTextFile('未自动获取到 '+filename+'，请手动选择该文件',accept);if(!picked)return null;if(filename.endsWith('.css'))_cssCache=picked;if(filename.endsWith('.js'))_jsCache=picked;return picked;}
+function safeScript(str){return String(str).replace(/<\/script/gi,'<\\/script');}
+function safeStyle(str){return String(str).replace(/<\/style/gi,'<\\/style');}
+function buildStaticHtml(mdSource,cssContent,jsContent,isNi){var cssSafe=safeStyle(cssContent);var jsSafe=safeScript(jsContent);var mdSafe=JSON.stringify(mdSource).replace(/<\/script/gi,'<\\/script');var themeLogic='(function(){var KEY="upkram.export.theme";function setDark(d){document.documentElement.classList.toggle("dark",d);document.body.classList.toggle("dark",d);var btn=document.getElementById("ksm-theme");if(btn){var ic=btn.querySelector("i");if(ic)ic.className=d?"fa-solid fa-sun":"fa-solid fa-moon";}try{localStorage.setItem(KEY,d?"dark":"light");}catch(e){}}try{var s=localStorage.getItem(KEY);if(s==="dark")setDark(true);else if(s==="light")setDark(false);else if(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches)setDark(true);}catch(e){}document.getElementById("ksm-theme").addEventListener("click",function(){setDark(!document.documentElement.classList.contains("dark"));});document.getElementById("ksm-to-top-bar").addEventListener("click",function(){window.scrollTo({top:0,behavior:"smooth"});});})();';var renderLogic=isNi?'document.getElementById("content").innerHTML = window.KSMarkdown.renderMarkdown(mdSource);':'window.KSMarkdown.mountMarkdown(document.getElementById("content"), mdSource);';var p=[];p.push('<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n');p.push('<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<title>UpKram 导出文档</title>\n');p.push('<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n');p.push('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">\n');p.push('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">\n');p.push('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">\n');p.push('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">\n');p.push('<style>\n'+cssSafe+'\n</style>\n');p.push('<style>\n*{-webkit-tap-highlight-color:transparent}html,body{margin:0;padding:0;background:#f5f5fa;color:#1f2330;transition:background .3s ease,color .3s ease;font-family:\'Inter\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif}html.dark,body.dark{background:#1a1a2e;color:#e8e8f5}body.dark .markdown-body,html.dark .markdown-body{color:#D0CAF0}.ksm-bar{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #e4e4ee;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);z-index:100;flex-wrap:wrap;gap:8px}body.dark .ksm-bar{background:rgba(30,28,52,.88);border-bottom-color:#2f2d4a}.ksm-brand{display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px;color:#1f2330}body.dark .ksm-brand{color:#e8e8f5}.ksm-brand i{color:#6366f1;font-size:16px}.ksm-bar-actions{display:flex;align-items:center;gap:6px}.ksm-toggle{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid #d9d9e6;background:#fff;color:#3a3a52;font:inherit;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent}.ksm-toggle.icon-only{padding:6px 10px;font-size:14px}body.dark .ksm-toggle{background:#2a2845;color:#d6d6ea;border-color:#3d3a5c}.ksm-wrap{max-width:800px;margin:0 auto;padding:32px 24px 100px;box-sizing:border-box}@media(max-width:560px){.ksm-wrap{padding:20px 14px 70px}}\n</style>\n</head>\n<body>\n');p.push('<div class="ksm-bar"><div class="ksm-brand"><i class="fa-solid fa-feather-pointed"></i>UpKram</div><div class="ksm-bar-actions"><button class="ksm-toggle icon-only" id="ksm-to-top-bar" type="button" title="回到顶部"><i class="fa-solid fa-arrow-up"></i></button><button class="ksm-toggle icon-only" id="ksm-theme" type="button" title="切换主题"><i class="fa-solid fa-moon"></i></button></div></div>\n');p.push('<div class="ksm-wrap"><div id="content" class="markdown-body"></div></div>\n');p.push('<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"><\/script>\n');p.push('<script src="https://cdn.jsdelivr.net/npm/emoji-js/lib/emoji.min.js"><\/script>\n');p.push('<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"><\/script>\n');p.push('<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"><\/script>\n');p.push('<script>if(window.mermaid){try{mermaid.initialize({startOnLoad:false})}catch(e){}}<\/script>\n');p.push('<script>\n'+jsSafe+'\n<\/script>\n');p.push('<script>\nvar mdSource = '+mdSafe+';\n');p.push(renderLogic+'\n');p.push('setTimeout(function(){if(window.mermaid&&window.mermaid.run){mermaid.run({nodes:document.querySelectorAll(".mermaid:not([data-processed])")});}},10);\n');p.push(themeLogic);p.push('\n<\/script>\n');p.push('</body>\n</html>');return p.join('');}
+function openModal(html,isNi){exportText.value=html;exportModal.classList.add('on');var engineName=isNi?'Ni 版 (纯解析)':'All 版 (交互增强)';exportTip.innerHTML='静态 HTML 已生成（引擎：<b>'+engineName+'</b>，<b>'+html.length.toLocaleString()+'</b> 字符）。点 <code>复制全部</code>，粘贴到 <code>.html</code> 文件即可。';}
+function closeModal(){exportModal.classList.remove('on');}
+modalClose.addEventListener('click',closeModal);
+exportModal.addEventListener('click',function(e){if(e.target===exportModal)closeModal();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&exportModal.classList.contains('on'))closeModal();});
+btnCopyAll.addEventListener('click',function(){copyText(exportText.value,btnCopyAll);});
+btnSelectAll.addEventListener('click',function(){exportText.focus();exportText.select();try{exportText.setSelectionRange(0,exportText.value.length);}catch(e){}});
+btnDownload.addEventListener('click',function(){try{var blob=new Blob([exportText.value],{type:'text/html;charset=utf-8'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;var ts=new Date();var pad=function(n){return String(n).padStart(2,'0');};a.download='upkram-'+ts.getFullYear()+pad(ts.getMonth()+1)+pad(ts.getDate())+'-'+pad(ts.getHours())+pad(ts.getMinutes())+pad(ts.getSeconds())+'.html';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(url);if(a.parentNode)a.parentNode.removeChild(a);},1000);}catch(e){alert('下载失败：'+(e&&e.message?e.message:e)+'\n请改用"复制全部"。');}});
+exportBtn.addEventListener('click',async function(){if(!editor.value){alert('先输入内容或点击"示例"！');return;}var oldHtml=exportBtn.innerHTML;exportBtn.disabled=true;exportBtn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> 获取资源...';try{var css=await getAssetContent('upkram-all.css','.markdown-body');if(!css){alert('未获取到 upkram-all.css，导出已取消。');return;}var jsFile=useNiMode?'upkram-ni.js':'upkram-all.js';var js=await getAssetContent(jsFile,useNiMode?'renderMarkdown':'KSMarkdown');if(!js){alert('未获取到 '+jsFile+'，导出已取消。');return;}exportBtn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> 生成中...';var fullHtml=buildStaticHtml(editor.value,css,js,useNiMode);openModal(fullHtml,useNiMode);exportTip.innerHTML+='<br><b>CSS：</b>'+css.length.toLocaleString()+' 字符 · <b>JS：</b>'+js.length.toLocaleString()+' 字符';}catch(e){alert('导出失败：'+(e&&e.message?e.message:e));}finally{exportBtn.innerHTML=oldHtml;exportBtn.disabled=false;}});
+var dragging=false;
+divider.addEventListener('pointerdown',function(e){if(window.innerWidth<=860||workspace.classList.contains('editor-only'))return;dragging=true;divider.classList.add('dragging');divider.setPointerCapture(e.pointerId);document.body.style.cursor='col-resize';document.body.style.userSelect='none';});
+divider.addEventListener('pointermove',function(e){if(!dragging)return;var rect=workspace.getBoundingClientRect();var w=e.clientX-rect.left;w=Math.max(220,Math.min(w,rect.width-220));workspace.style.gridTemplateColumns=w+'px 6px 1fr';});
+function endDrag(e){if(!dragging)return;dragging=false;divider.classList.remove('dragging');try{divider.releasePointerCapture(e.pointerId);}catch(err){}document.body.style.cursor='';document.body.style.userSelect='';}
+divider.addEventListener('pointerup',endDrag);
+divider.addEventListener('pointercancel',endDrag);
+window.addEventListener('resize',function(){if(window.innerWidth<=860)workspace.style.gridTemplateColumns='';});
+var DEFAULT_MD=[
+'# UpKram 语法完全指南',
+'',
+':::info 阅读提示',
+'本示例展示了 **UpKram 支持的所有语法**。滚动右侧预览即可看到每一种语法的实际效果。',
+'左侧是源码，右侧是渲染结果——对照着看可以最快掌握全部用法。',
+':::',
+'',
+':::cfg',
+'reset: on',
+':::',
+'',
+'[[toc]]',
+'',
+'---',
+'',
+'## 一、标题',
+'',
+'### 1.1 ATX 标题（# 号开头）',
+'',
+'# 一级标题','## 二级标题','### 三级标题','#### 四级标题','##### 五级标题','###### 六级标题',
+'',
+'### 1.2 Setext 标题（下划线）',
+'',
+'一级标题','=======','',
+'二级标题','-------',
+'',
+'### 1.3 目录修饰符（ATX / Setext 通用）',
+'',
+'在标题行末尾加以下符号，会影响它在 **目录** 中的呈现：',
+'',
+'- `^` — 隐藏在目录中','- `!` — 目录置顶（橙色）','- `~` — 目录中弱化（半透明）','- `?` — 目录中禁止跳转','- `*` — 目录中加粗',
+'',
+'带隐藏修饰的标题 ^','===================',
+'',
+'被置顶的二级标题 !','-------------------',
+'',
+'---',
+'',
+'## 二、基础排版',
+'',
+'**加粗**、*斜体*、~~删除线~~、==高亮==、@@下划线@@、++插入线++、^上标^、~下标~',
+'',
+'引用块：','','> 这是一段引用文字。','> 支持多行，也支持 **Markdown** 语法。','',
+'分割线：','','---','',
+'### 2.1 列表','',
+'无序列表：','- 项目一','- 项目二','  - 嵌套一','  - 嵌套二','',
+'有序列表：','1. 第一步','2. 第二步','3. 第三步','',
+'任务列表：','- [ ] 未完成','- [x] 已完成','- [ ] 待处理','',
+'### 2.2 表格','',
+'| 左对齐 | 居中 | 右对齐 |','| :--- | :---: | ---: |','| A | B | C |','| 1 | 2 | 3 |','',
+'带排序的表格（在表格前加 `Table: 标题 {sort}`）：','',
+'Table: 排序表 {sort}','| 名称 | 数量 |','| --- | --- |','| 苹果 | 30 |','| 香蕉 | 12 |','',
+'### 2.3 链接与媒体','',
+'- 普通链接：[示例网站](https://example.com)','- 带标题的链接：[示例网站](https://example.com "鼠标悬停提示")','- 自动链接：<https://example.com>','- 邮箱：<someone@example.com>','- 裸链接：https://example.com','',
+'图片：','','![图片描述](https://picsum.photos/600/300)','',
+'带尺寸的图片（`= 宽x高`）：','','![带尺寸](https://picsum.photos/200/100 = 200x100)','',
+'视频：','','!video[演示视频](https://www.youtube.com/watch?v=dQw4w9WgXcQ)','',
+'音频：','','!audio[示例音频](https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3)','',
+'### 2.4 行内代码与转义','',
+'使用 `console.log()` 打印日志。','',
+'转义字符：\\*这不是斜体\\*，\\`不是代码\\`，\\# 不是标题。','',
+'---','',
+'## 三、代码与公式','',
+'### 3.1 代码块','',
+'```js','// JavaScript 代码高亮示例','function greet(name) {','  return `Hello, ${name}!`;','}','console.log(greet("World"));','```','',
+'```python','# Python 代码示例','def hello(name):','    print(f"Hello, {name}")','','hello("World")','```','',
+'支持行号高亮（在代码块语言后加 `hl=2,4-5`）：','',
+'```js hl=2,4-5','const a = 1;','const b = 2; // 高亮','const c = 3;','const d = 4; // 高亮','const e = 5; // 高亮','```','',
+'Mermaid 图表：','',
+'```mermaid','graph TD','  A[开始] --> B{判断}','  B -->|是| C[执行]','  B -->|否| D[结束]','```','',
+'### 3.2 数学公式','',
+'行内公式：$E = mc^2$，以及 $\\int_0^1 x^2 dx = \\frac{1}{3}$','',
+'块级公式：','','$$','\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}','$$','',
+'---','',
+'## 四、行内装饰','',
+'### 4.1 颜色与样式','',
+'::color[red]这段文字是红色::','',
+'::color[这段文字是蓝色](blue)::','',
+'::style[自定义样式]{color=#6b5acf size=1.2em weight=bold italic}::','',
+'::marker[荧光笔高亮](yellow)::','',
+'::wave[波浪下划线]::','',
+'::neon[霓虹效果](cyan)::','',
+'::shadow[阴影文字]::','',
+'::blur[模糊文字，点击显示]::','',
+'::stamp[已阅](red)::','',
+'### 4.2 徽章与按钮','',
+'::badge[New](green)::','',
+'::badge[Beta](orange)::','',
+'::badge[可点击的徽章](purple){url=https://example.com}::','',
+'::btnimg[图片按钮](https://picsum.photos/32/32)(https://example.com){height=32}::','',
+'### 4.3 术语与注释','',
+'::term[UpKram]{一个超级友好的 Markdown 渲染器}::','',
+'::note[1]{这是注释，点击可看}::','',
+'::ruby 漢字(hàn zì)::','',
+'::qr[https://example.com]::','',
+'### 4.4 日期与时间','',
+'::date[2024-01-01]::','',
+'::date[2024-12-25](2024-12-25)::','',
+'### 4.5 语言图标','',
+'::lang js:: JavaScript','',
+'::lang+ py:: Python（带文字）','',
+'### 4.6 装饰效果','',
+'::circle[圈圈字]::','',
+'::cross[叉叉字]::','',
+'::score[4.5]+::（带数字）','',
+'::shake[抖动文字](x,3)::','',
+'::echo[重影文字]::','',
+'::vert[竖排文字]::','',
+'::cursor[打字机效果，点击重播]::','',
+'### 4.7 路径','',
+'::path[首页 > 分类 > 文章 > 详情]::','',
+'### 4.8 着重与标记','',
+'::dot[着重号](circle red)::','',
+'::hei 点击显示的黑幕内容 ::','',
+'::key Ctrl + C ::','',
+'::copy 点击复制这段文字 ::','',
+'::upper[大写]:: ::lower[小写]:: ::cap[首字母大写]::','',
+'::cmd[npm install]::','',
+'::flag[--verbose]::','',
+'### 4.9 交叉引用与交替文本','',
+'::ref[一、标题]::','',
+'::alt[默认文本](选项一)(选项二)(选项三)::','',
+'---','',
+'## 五、块级容器','',
+'### 5.1 块级 Key / Copy / Hei','',
+':::key','Ctrl + Shift + Enter',':::','',
+':::copy','这段文字点击即可复制，可以包含多行内容。','支持 **Markdown** 语法。',':::','',
+':::hei','这段内容默认是黑幕，点击后才会显示出来。',':::','',
+':::cfg','reset: on',':::','',
+'### 5.2 折叠面板','',
+':::detail 点击展开的标题','这里是默认折叠的内容。',':::','',
+':::detail+ 默认展开的详情','这个默认就是展开状态的。',':::','',
+'### 5.3 提示框 Callout','',
+':::tip','这是 Tip 提示框，适合放小贴士。',':::','',
+':::warn','这是警告提示框。',':::','',
+':::danger','这是危险提示框。',':::','',
+':::detail 可折叠的 Callout','这个默认折叠，点击后展开。',':::','',
+'（共支持 30 种 Callout：tip / hint / info / warn / warning / caution / danger / error / ask / question / help / faq / ok / success / check / done / note / abstract / summary / tldr / todo / failure / fail / missing / bug / example / quote / cite 等）','',
+'### 5.4 选项卡','',
+':::tabs',':::tab 标签一','','标签一的内容，支持 Markdown。','',':::','',':::tab 标签二','','标签二的内容，**加粗**、*斜体*。','',':::',':::','',
+'### 5.5 网格布局','',
+':::grid 3',':::cell','**格子一**','','第一格内容。',':::',':::cell','**格子二**','','第二格内容。',':::',':::cell','**格子三**','','第三格内容。',':::',':::','',
+'### 5.6 对比','',
+':::compare',':::col 优点 green','- 快速','- 简洁',':::',':::col 缺点 red','- 还有待完善',':::',':::','',
+'### 5.7 行布局','',
+':::row 5:5',':::left','**左边 50%**','','左侧内容区。',':::',':::right','**右边 50%**','','右侧内容区。',':::',':::','',
+'### 5.8 卡片 Box','',
+':::box','圆角卡片，可以放文字、图片、代码等。',':::','',
+':::box square','方角卡片（square）。',':::','',
+'---','',
+'## 六、数据展示','',
+'### 6.1 进度条','',
+':::pbar+ 完成进度','pct: 75','max: 100','color: green',':::','',
+'### 6.2 时间线','',
+':::timeline rainbow','2020-01-01 | 项目启动 | 立项完成','2021-06-15 | 第一版发布 | 内测上线','2023-03-20 | 大版本更新 | 重构引擎','2024-12-31 | 十周年 | 感谢所有用户',':::','',
+'### 6.3 树形目录','',
+':::tree','src/components/Button.vue | 2.1KB','src/components/Card.vue | 1.8KB','src/components/Modal.vue | 3.2KB','src/utils/helper.js | 3.4KB','src/utils/format.js | 2.5KB','src/index.js | 1.2KB','package.json | 800B','README.md | 3.2KB',':::','',
+'### 6.4 柱状图','',
+':::chartbar 各语言使用率','JavaScript: 85','Python: 60','Rust: 45','Go: 40',':::','',
+'### 6.5 折线图','',
+':::chartline 月度访问量','lines: solid, dashed','| 月份 | 桌面端 | 移动端 |','| --- | --- | --- |','| 1月 | 120 | 80 |','| 2月 | 150 | 100 |','| 3月 | 180 | 120 |',':::','',
+'---','',
+'## 七、媒体展示','',
+'### 7.1 轮播图','',
+':::swipe','![图一](https://picsum.photos/400/300?random=11)','![图二](https://picsum.photos/400/300?random=12)','![图三](https://picsum.photos/400/300?random=13)',':::','',
+'### 7.2 幻灯片','',
+':::collage','![图一](https://picsum.photos/300/300?random=21)','![图二](https://picsum.photos/300/300?random=22)','![图三](https://picsum.photos/300/300?random=23)','![图四](https://picsum.photos/300/300?random=24)',':::','',
+'---','',
+'## 八、聊天记录（完整示例）','',
+':::chat 项目组',':::users','张三: color=#e74c6f','李四: color=#4a90d9','王五: color=#10b981',':::','',
+':::sys join 张三加入了群聊',':::','',
+':::msg 张三 left 09:30 id=m1','大家早！今天的评审会几点开始？',':::','',
+':::msg 李四 right 09:31 "已读"',':::quote 张三 id=m1','大家早！今天的评审会几点开始？',':::','10 点，别忘了带原型图。',':::','',
+':::msg 王五 left 09:32','收到！',':::','',
+':::msg 张三 left 09:33',':::redpacket blessing=恭喜发财，大吉大利 amount=100 winners="李四:60|王五:40"',':::',':::','',
+':::msg 李四 left 09:34',':::card name=王五 desc=产品经理',':::',':::','',
+':::msg 王五 left 09:35','谢谢老板！',':::','',
+':::msg 李四 left 09:36',':::img url=https://picsum.photos/280/180 alt=原型图',':::',':::','',
+':::msg 李四 left 09:37',':::transfer amount=200 note=上周的报销',':::',':::','',
+':::sys leave 王五离开了群聊',':::',':::','',
+':::cfg','reset: on',':::','',
+'---','',
+'## 九、学习 / 测验','',
+'### 9.1 选择题（单选）','',
+':::mcq','title: Markdown 中表示一级标题的符号是？','- A ##','* B #','- C ###','- D ####','^: 用单个 # 加空格表示一级标题。',':::','',
+'### 9.2 选择题（多选）','',
+'多选的识别方式：**多个 `*` 即为多选**，无需额外加号。','',
+':::mcq','title: 以下哪些是 Markdown 强调语法？（多选）','* A 双星号 **','* B 单星号 *','- C 波浪号 ~~','- D 下划线 @@','*^: 完全正确！','-^: 再想想，波浪号是删除线，不是强调。','^: **加粗** 和 *斜体* 是最常用的强调方式。',':::','',
+'### 9.3 选择题（展示模式，看 TA 的答案）','',
+':::mcq+','title: 哪个是 HTML 标签？','- A `<div>`','- B `[div]`','- C `{div}`','- D `(div)`','*^: 答对了','-^: 你选错了','sel: A',':::','',
+'### 9.4 投票','',
+':::vote 你最喜欢哪种编程语言？ all=200','- JavaScript | 80 | mark','- Python | 60','- Rust | 40','- Go | 20',':::','',
+'### 9.5 闪卡','',
+':::flashcard','问题: 什么是 Markdown？','答案: 一种轻量级标记语言，用简单的符号实现文档排版。',':::','',
+'### 9.6 闪卡组','',
+':::flashcards','问题一: 双星号表示什么？','答案: 加粗文字。','','问题二: 单星号表示什么？','答案: 斜体文字。','','问题三: 波浪号表示什么？','答案: 删除线。',':::','',
+'### 9.7 看板','',
+':::kanban cols=3 任务看板',':::col 待办 color=blue','- 完善文档 #doc','- 优化性能 #perf @张三',':::',':::col 进行中 color=orange',':::task 新增渲染语法','正在调试 inline 规则的性能。',':::',':::',':::col 完成 color=green','- 修复渲染 bug #bug',':::',':::','',
+'---','',
+'## 十、信息卡片','',
+'### 10.1 链接卡片','',
+':::link','url: https://example.com','website: Example Site','content: 这是一个示例网站的描述内容。','author: 张三','img: https://picsum.photos/80/80',':::','',
+'### 10.2 大链接卡片','',
+':::link big','url: https://example.com','website: Big Card Site','content: 大卡片模式的详细描述。适合放需要更多文字介绍的内容。','img: https://picsum.photos/600/340',':::','',
+'### 10.3 下载卡片','',
+':::dl 项目源码.zip','url: https://example.com/download.zip','size: 12.5MB','date: 2024-01-15',':::','',
+'### 10.4 GitHub 仓库','',
+':::ghr','vuejs/core','官方 Vue.js 框架核心仓库',':::','',
+'### 10.5 游戏卡片','',
+':::game 塞尔达传说：旷野之息','cover: https://picsum.photos/300/400','desc: 任天堂经典动作冒险游戏，探索开放世界海拉鲁大陆。','time: 60 小时','rate: 97','url: https://example.com',':::','',
+'---','',
+'## 十一、引用说话','',
+':::say 苏格拉底','我唯一知道的就是我一无所知。',':::','',
+'---','',
+'## 十二、样式','',
+'### 12.1 行内居中 / 右对齐','',
+'::center 这一行文字居中显示 ::','',
+'::right 这一行文字右对齐 ::','',
+'### 12.2 块级居中 / 右对齐','',
+':::center','**居中标题**','','这一整段都是居中的。',':::','',
+':::right','右对齐的内容。',':::','',
+'### 12.3 样式块','',
+':::style {color=#6b5acf size=1.1em bg=#f0f0ff padding=16px radius=8px}','这是自定义样式的块内容。',':::','',
+'### 12.4 模糊块','',
+':::blur','猜猜我在说什么？点击显示内容。',':::','',
+'### 12.5 刮刮乐','',
+':::scr ratio=0.5 "刮开查看答案"','答案是 **42**，宇宙的终极答案。',':::','',
+'---','',
+'## 十三、脚注','',
+'这是一个带脚注的句子[^note1]。','',
+'这里还有另一个脚注引用[^note2]。','',
+'[^note1]: 这是第一个脚注的内容。支持 **Markdown** 语法。',
+'[^note2]: 这是第二个脚注，也可以很长，甚至可以换行。','',
+'---','',
+'## 十四、配置块','',
+':::cfg','reset: on','hljs: on','katex: on','mermaid: on',':::','',
+'配置块可以在文档任意位置切换渲染行为（例如关闭 katex 后公式就显示为原始文本）。','',
+'---','',
+'## 十五、Emoji','',
+'支持 Emoji 短名：:smile: :heart: :rocket: :fire: :tada: :sparkles: :star2: :100:','',
+'---','',
+'> **UpKram** — 你敢写，我就敢渲。'
+].join('\n');
+(function init(){
+var savedTheme=null;
+try{savedTheme=localStorage.getItem(STORE_THEME);}catch(e){}
+if(savedTheme===null){try{savedTheme=localStorage.getItem(STORE_THEME_LEGACY);}catch(e){}}
+if(savedTheme)applyTheme(savedTheme==='dark');
+else applyTheme(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);
+var savedSrc=null;
+try{savedSrc=localStorage.getItem(STORE_SRC);}catch(e){}
+if(savedSrc===null){try{savedSrc=localStorage.getItem(STORE_SRC_LEGACY);}catch(e){}}
+editor.value=(savedSrc!==null&&savedSrc!=='')?savedSrc:'';
+scheduleRender(true);
+})();
+})();
+</script>
+</body>
+</html>
